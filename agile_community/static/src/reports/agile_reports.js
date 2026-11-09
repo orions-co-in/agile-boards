@@ -1,4 +1,4 @@
-import { Component, markup, onMounted, useState } from "@odoo/owl";
+import { Component, markup, onMounted, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -11,6 +11,7 @@ import { AgileControlChart } from "./agile_control";
 import { AgileDeploys } from "./agile_deploys";
 import { ReportExport, sprintPngBlob } from "./report_export";
 import { unitShort, unitWord } from "../estimate_unit";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // The four numbers of the sprint report, in the order a person reads them.
 export const SPRINT_TILES = [
@@ -52,12 +53,12 @@ export class AgileReports extends Component {
     static template = "agile_community.Reports";
     static displayName = _t("Reports");
     static components = { Layout, AgileCfd, AgileBurndown, AgileBurnup, AgileControlChart, AgileDeploys, ReportExport };
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.state = useState({
+        this.action = usePlugin(ActionPlugin);
+        this.state = proxy({
             loading: true,
             error: null,
             meta: null,

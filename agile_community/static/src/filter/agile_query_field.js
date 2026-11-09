@@ -1,7 +1,9 @@
-import { Component, onWillUpdateProps, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onWillUpdateProps, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 const PAUSE = 250;
@@ -48,12 +50,12 @@ export function countText(count) {
  */
 export class AgileQueryField extends Component {
     static template = "agile_community.AgileQueryField";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
         this.orm = useService("orm");
-        this.input = useRef("input");
-        this.state = useState({
+        this.input = signal.ref();
+        this.state = proxy({
             text: this.props.record.data[this.props.name] || "",
             open: false,
             index: 0,
@@ -75,7 +77,7 @@ export class AgileQueryField extends Component {
         this.requestId = 0;
         onWillUpdateProps((next) => {
             const value = next.record.data[next.name] || "";
-            if (value !== this.state.text && document.activeElement !== this.input.el) {
+            if (value !== this.state.text && document.activeElement !== this.input()) {
                 this.state.text = value;
                 this.assist(false);
             }
@@ -143,7 +145,7 @@ export class AgileQueryField extends Component {
             return;
         }
         const id = ++this.requestId;
-        const cursor = this.input.el ? this.input.el.selectionStart : this.state.text.length;
+        const cursor = this.input() ? this.input().selectionStart : this.state.text.length;
         const result = await this.orm.call("agile.filter", "agile_query_assist", [
             projectId,
             this.state.text,
@@ -215,7 +217,7 @@ export class AgileQueryField extends Component {
         this.state.text = text;
         this.props.record.update({ [this.props.name]: text });
         this.state.open = false;
-        const el = this.input.el;
+        const el = this.input();
         el.value = text;
         el.focus();
         el.setSelectionRange(cursor, cursor);

@@ -1,0 +1,24 @@
+id,name,model_id,group_id/id,operation,domain
+project_sprint_visibility_user_rule,Sprint: project visibility,project.sprint,project.group_project_user,r,"[
+            '|',
+            ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+            ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+project_sprint_visibility_manager_rule,Sprint: project manager,project.sprint,project.group_project_manager,crud,
+project_sprint_company_rule,Sprint: multi-company,project.sprint,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+access_project_sprint_close_manager,project.sprint.close.manager,project.sprint.close,project.group_project_manager,crud,
+access_project_sprint_scope_change_wizard_manager,project.sprint.scope.change.wizard.manager,project.sprint.scope.change.wizard,project.group_project_manager,crud,
+project_sprint_scope_change_user_rule,Sprint history: project visibility,project.sprint.scope.change,project.group_project_user,r,"['|', ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_scope_change_company_rule,Sprint history: multi-company,project.sprint.scope.change,,crud,"[('sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+project_sprint_commitment_user_rule,Sprint commitment: project visibility,project.sprint.commitment,project.group_project_user,r,"['|', ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_commitment_company_rule,Sprint commitment: multi-company,project.sprint.commitment,,crud,"[('sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+project_sprint_commitment_line_user_rule,Sprint commitment issue: project visibility,project.sprint.commitment.line,project.group_project_user,r,"['|', ('commitment_id.sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('commitment_id.sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_commitment_line_company_rule,Sprint commitment issue: multi-company,project.sprint.commitment.line,,crud,"[('commitment_id.sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+project_sprint_capacity_user_rule,Sprint capacity: project visibility,project.sprint.capacity,project.group_project_user,r,"['|', ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_capacity_user_rule_1,Sprint capacity: project visibility,project.sprint.capacity,project.group_project_manager,crud,"['|', ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_capacity_company_rule,Sprint capacity: multi-company,project.sprint.capacity,,crud,"[('sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+project_sprint_commitment_capacity_user_rule,Sprint capacity snapshot: project visibility,project.sprint.commitment.capacity,project.group_project_user,r,"['|', ('commitment_id.sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('commitment_id.sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_commitment_capacity_company_rule,Sprint capacity snapshot: multi-company,project.sprint.commitment.capacity,,crud,"[('commitment_id.sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+project_sprint_correction_user_rule,Sprint correction: project visibility,project.sprint.correction,project.group_project_user,r,"['|', ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)]"
+project_sprint_correction_company_rule,Sprint correction: multi-company,project.sprint.correction,,crud,"[('sprint_id.project_id.company_id', 'in', company_ids + [False])]"
+access_project_sprint_correction_wizard_manager,project.sprint.correction.wizard.manager,project.sprint.correction.wizard,project.group_project_manager,crud,

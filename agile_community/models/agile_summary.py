@@ -199,7 +199,7 @@ class ProjectProject(models.Model):
             [
                 ("model", "=", "project.task"),
                 ("res_id", "in", tasks.ids),
-                ("message_type", "in", ["comment", "notification"]),
+                ("message_type", "in", ["comment", "notification", "tracking"]),
             ],
             order="id desc",
             limit=ACTIVITY_LIMIT,

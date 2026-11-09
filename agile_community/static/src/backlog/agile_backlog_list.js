@@ -1,4 +1,5 @@
-import { onMounted, onPatched, onWillStart, onWillUnmount, onWillUpdateProps, useState } from "@odoo/owl";
+import { onMounted, onPatched, onWillStart, onWillUnmount, onWillUpdateProps, proxy, usePlugin } from "@odoo/owl";
+import { NotificationPlugin } from "@web/core/notifications/notification_plugin";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -25,6 +26,7 @@ import {
     stateLabel,
     unestimatedText,
 } from "./backlog_helpers";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 const HIDE_COMPLETED_FILTER = "agile_hide_completed";
 const EPICS_OPEN_KEY = "agile_backlog_epics_open";
@@ -42,11 +44,11 @@ export class AgileBacklogRenderer extends ListRenderer {
 
     setup() {
         super.setup();
-        this.action = useService("action");
+        this.action = usePlugin(ActionPlugin);
         this.orm = useService("orm");
-        this.notification = useService("notification");
+        this.notification = usePlugin(NotificationPlugin);
         this.dialog = useService("dialog");
-        this.announcer = useState({ text: "" });
+        this.announcer = proxy({ text: "" });
         this.onBacklogKeydown = this.onBacklogKeydown.bind(this);
         this.onBacklogClick = this.onBacklogClick.bind(this);
         this.editTarget = null;
@@ -55,14 +57,14 @@ export class AgileBacklogRenderer extends ListRenderer {
             popoverClass: "o_ag_inline_popover",
             onClose: () => this.editTarget?.focus?.(),
         });
-        this.quick = useState({ typeId: null });
+        this.quick = proxy({ typeId: null });
         this.refocusQuick = null;
         this.refocusRecord = null;
         // Capture phase, so Alt+arrows and "m" are handled before the native cell navigation.
         onMounted(() => {
             this.reopenAutoFoldedGroups();
-            this.rootRef.el.addEventListener("keydown", this.onBacklogKeydown, true);
-            this.rootRef.el.addEventListener("click", this.onBacklogClick, true);
+            this.rootRef().addEventListener("keydown", this.onBacklogKeydown, true);
+            this.rootRef().addEventListener("click", this.onBacklogClick, true);
             this.syncEditable();
         });
         onPatched(() => {
@@ -70,18 +72,18 @@ export class AgileBacklogRenderer extends ListRenderer {
             this.reopenAutoFoldedGroups();
             this.restoreRowFocus();
             if (this.refocusQuick !== null) {
-                this.rootRef.el
+                this.rootRef()
                     .querySelector(`.o_ag_quick_input[data-group-key="${this.refocusQuick}"]`)
                     ?.focus();
                 this.refocusQuick = null;
             }
         });
         onWillUnmount(() => {
-            this.rootRef.el?.removeEventListener("keydown", this.onBacklogKeydown, true);
-            this.rootRef.el?.removeEventListener("click", this.onBacklogClick, true);
+            this.rootRef()?.removeEventListener("keydown", this.onBacklogKeydown, true);
+            this.rootRef()?.removeEventListener("click", this.onBacklogClick, true);
         });
-        this.info = useState({ data: null, error: false });
-        this.epics = useState({ data: null, open: this.readEpicsOpen() });
+        this.info = proxy({ data: null, error: false });
+        this.epics = proxy({ data: null, open: this.readEpicsOpen() });
         this.infoKey = null;
         this.foldedByUser = new Set();
         this.emptiedGroups = new Set();
@@ -375,7 +377,7 @@ export class AgileBacklogRenderer extends ListRenderer {
         if (this.refocusRecord === null) {
             return;
         }
-        this.rootRef.el
+        this.rootRef()
             ?.querySelector(`tr.o_data_row[data-id="${this.refocusRecord}"] td.o_data_cell`)
             ?.focus();
     }
@@ -574,7 +576,7 @@ export class AgileBacklogRenderer extends ListRenderer {
     /** A new sprint group lands below Backlog in the list; reload so it takes its place above it (OI-3). */
     async addNewGroup() {
         this.state.showGroupInput = false;
-        const value = this.groupInputRef.el.value;
+        const value = this.groupInputRef().value;
         if (value) {
             await this.props.list.createGroup(value);
             await this.props.list.model.load();
@@ -677,7 +679,7 @@ export class AgileBacklogRenderer extends ListRenderer {
 
     /** Styling hook: cells only look editable once the header data says the user may edit. */
     syncEditable() {
-        this.rootRef.el?.classList.toggle("o_ag_can_edit", this.canEdit);
+        this.rootRef()?.classList.toggle("o_ag_can_edit", this.canEdit);
     }
 
     recordFor(row) {

@@ -379,7 +379,6 @@ class TestAgileIssueIdentity(TransactionCase):
             'name="project"',
             'name="user"',
             'name="groupby_priority"',
-            'name="tags"',
             'name="stage"',
         ):
             self.assertIn(native_filter, search_arch)

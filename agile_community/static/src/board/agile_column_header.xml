@@ -2,13 +2,13 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.ColumnHeader" t-inherit="mail.RottingKanbanHeader" t-inherit-mode="primary">
         <xpath expr="//div[hasclass('o_kanban_header_title')]" position="after">
-            <div t-if="!group.isFolded" class="o_ag_colinfo">
-                <span t-if="facts.blocked" class="o_ag_blocked_count">
-                    <span aria-hidden="true">⚑</span> <t t-out="facts.blocked"/> blocked
+            <div t-if="!this.group.isFolded" class="o_ag_colinfo">
+                <span t-if="this.facts.blocked" class="o_ag_blocked_count">
+                    <span aria-hidden="true">⚑</span> <t t-out="this.facts.blocked"/> blocked
                 </span>
-                <span t-if="facts.wip" t-attf-class="o_ag_wip o_ag_wip_{{facts.wip.kind}}" role="status">
-                    <span t-if="facts.wip.icon" aria-hidden="true" t-out="facts.wip.icon"/>
-                    <t t-out="facts.wip.text"/>
+                <span t-if="this.facts.wip" t-attf-class="o_ag_wip o_ag_wip_{{this.facts.wip.kind}}" role="status">
+                    <span t-if="this.facts.wip.icon" aria-hidden="true" t-out="this.facts.wip.icon"/>
+                    <t t-out="this.facts.wip.text"/>
                 </span>
             </div>
         </xpath>

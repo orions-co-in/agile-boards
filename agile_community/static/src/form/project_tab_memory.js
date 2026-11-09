@@ -1,7 +1,7 @@
-import { useEffect } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { patch } from "@web/core/utils/patch";
 import { Notebook } from "@web/core/notebook/notebook";
+import { useLayoutEffect } from "@web/owl2/utils";
 
 const STORAGE_KEY = "agile_project_form_tab";
 
@@ -40,7 +40,7 @@ patch(Notebook.prototype, {
         if (saved && match) {
             this.state.currentPage = match[0];
         }
-        useEffect(
+        useLayoutEffect(
             () => rememberProjectTab(nameOf(this.state.currentPage)),
             () => [this.state.currentPage]
         );

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.BoardKanbanView" t-inherit="project.ProjectTaskKanbanView" t-inherit-mode="primary">
-        <t t-component="props.Renderer" position="before">
-            <AgileBoardBar t-if="boardProjectId" projectId="boardProjectId" filterKey="barFilterKey"
-                           swimlane="board.swimlane" onSwimlane.bind="setSwimlane" onColumns.bind="setColumns"
-                           selecting="select.on" onSelect.bind="toggleSelectMode"/>
+        <t t-component="this.props.Renderer" position="before">
+            <AgileBoardBar t-if="this.boardProjectId" projectId="this.boardProjectId" filterKey="this.barFilterKey"
+                           swimlane="this.board.swimlane" onSwimlane.bind="this.setSwimlane" onColumns.bind="this.setColumns"
+                           selecting="this.select.on" onSelect.bind="this.toggleSelectMode"/>
         </t>
-        <t t-component="props.Renderer" position="after">
-            <AgileBulkBar t-if="select.on and boardProjectId" projectId="boardProjectId"
-                          ids="select.ids" onDone.bind="onBulkDone" onClear.bind="clearSelected"/>
-            <AgileCardDrawer t-if="drawer.resId" t-key="drawer.resId" resId="drawer.resId" viewId="drawerViewId"
-                             context="props.context" register.bind="registerDrawerLeave"
-                             onClose.bind="closeDrawer" onExpand.bind="expandDrawer"/>
+        <t t-component="this.props.Renderer" position="after">
+            <AgileBulkBar t-if="this.select.on and this.boardProjectId" projectId="this.boardProjectId"
+                          ids="this.select.ids" onDone.bind="this.onBulkDone" onClear.bind="this.clearSelected"/>
+            <AgileCardDrawer t-if="this.drawer.resId" t-key="this.drawer.resId" resId="this.drawer.resId" viewId="this.drawerViewId"
+                             context="this.props.context" register.bind="this.registerDrawerLeave"
+                             onClose.bind="this.closeDrawer" onExpand.bind="this.expandDrawer"/>
         </t>
-        <t t-component="props.Renderer" position="attributes">
-            <attribute name="swimlane">board.swimlane</attribute>
+        <t t-component="this.props.Renderer" position="attributes">
+            <attribute name="swimlane">this.board.swimlane</attribute>
         </t>
     </t>
 </templates>

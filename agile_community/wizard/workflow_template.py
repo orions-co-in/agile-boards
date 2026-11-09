@@ -1,4 +1,3 @@
-import base64
 import json
 
 from odoo import _, api, fields, models
@@ -52,7 +51,7 @@ class AgileWorkflowTemplateWizard(models.TransientModel):
         self.ensure_one()
         if not self.file or not self.project_id:
             raise UserError(_("Choose a workflow file and a project."))
-        raw = base64.b64decode(self.file)
+        raw = self.file.content
         if len(raw) > MAX_FILE_BYTES:
             raise UserError(_("This file is too large to be a workflow."))
         try:

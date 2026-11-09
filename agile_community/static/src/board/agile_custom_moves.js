@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
@@ -9,7 +9,7 @@ import { standardFieldProps } from "@web/views/fields/standard_field_props";
  */
 export class AgileCustomMoves extends Component {
     static template = "agile_community.CustomMoves";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
         this.orm = useService("orm");

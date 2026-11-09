@@ -1,4 +1,6 @@
-import { Component, onMounted, useRef, useSubEnv } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, useProps, t } from "@odoo/owl";
+import {useSubEnv} from "@web/owl2/utils";
 import { CallbackRecorder } from "@web/search/action_hook";
 import { useService } from "@web/core/utils/hooks";
 import { View, getDefaultConfig } from "@web/views/view";
@@ -10,14 +12,13 @@ import { View, getDefaultConfig } from "@web/views/view";
 export class AgileCardDrawer extends Component {
     static template = "agile_community.CardDrawer";
     static components = { View };
-    static props = {
-        resId: Number,
-        viewId: Number,
-        context: { type: Object, optional: true },
-        register: Function,
-        onClose: Function,
-        onExpand: Function,
-    };
+    props = useProps({
+        resId: t.number(),
+        viewId: t.number(),
+        context: t.object().optional(),
+        register: t.function(),
+        onClose: t.function(),
+        onExpand: t.function()});
 
     setup() {
         // The embedded form must not rename the board's breadcrumb.
@@ -25,7 +26,7 @@ export class AgileCardDrawer extends Component {
         // Opening the drawer counts as viewing the issue, for the command palette's recent list.
         this.orm = useService("orm");
         this.orm.silent.call("project.task", "agile_palette_visit", [[this.props.resId]]).catch(() => {});
-        this.rootRef = useRef("root");
+        this.rootRef = signal.ref();
         this.beforeLeave = new CallbackRecorder();
         this.viewProps = {
             type: "form",
@@ -38,7 +39,7 @@ export class AgileCardDrawer extends Component {
             __beforeLeave__: this.beforeLeave,
         };
         this.props.register(() => this.leave());
-        onMounted(() => this.rootRef.el?.focus());
+        onMounted(() => this.rootRef()?.focus());
     }
 
     /** Save pending changes; false when the record cannot be saved yet. */

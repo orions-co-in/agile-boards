@@ -37,3 +37,28 @@ $agile-tag-colors: #7c8794, #d9534f, #e8873b, #e0b82e, #4aa3a0, #3b6fb5, #7b5ea7
         padding: 0.15rem 0.35rem;
     }
 }
+
+// Odoo 20 puts the issue key, badges and title on one flex row; with the Agile
+// badges added the title was squeezed to a sliver. Let the row wrap and give
+// the title its own line.
+.o_kanban_renderer .o_kanban_record .o_kanban_project_header > .d-flex > .d-flex.align-items-baseline {
+    flex-wrap: wrap;
+    min-width: 0;
+
+    > * {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin-inline-end: 0.35rem;
+    }
+
+    > .o_ag_card_blocked,
+    > .o_ag_card_blocker,
+    > .o_ag_card_flagged,
+    > .o_ag_card_resolution,
+    > .o_ag_card_lock,
+    > .fw-bold {
+        flex: 1 1 100%;
+        white-space: normal;
+        margin-inline-end: 0;
+    }
+}

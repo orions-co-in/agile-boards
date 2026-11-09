@@ -1,12 +1,16 @@
-import { Component, onMounted, onWillDestroy, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, onWillDestroy, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { UIPlugin } from "@web/core/ui/ui_plugin";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+
 import { Layout } from "@web/search/layout";
 import { browser } from "@web/core/browser/browser";
 import { downloadText } from "../dashboard/dashboard_export";
 import { AgilePlan } from "./agile_plan";
 import { AgileRoadmapShare, STATUS_LABELS, barColour, colourLegend, releaseColours, shareIdFrom } from "./agile_roadmap_share";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 const DAY_MS = 86400000;
 export const ROW_H = 48; // tall enough for a bar and an arrow running past it
@@ -255,14 +259,14 @@ export class AgileRoadmap extends Component {
     static template = "agile_community.Roadmap";
     static displayName = _t("Roadmap");
     static components = { Layout, AgilePlan, AgileRoadmapShare };
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.ui = useService("ui");
+        this.action = usePlugin(ActionPlugin);
+        this.ui = usePlugin(UIPlugin);
         this.display = { controlPanel: {} };
-        this.state = useState({
+        this.state = proxy({
             loading: true,
             error: null,
             data: null,
@@ -286,7 +290,7 @@ export class AgileRoadmap extends Component {
             hiddenProjects: 0,
         });
         this.shareId = shareIdFrom(this.props.action?.params, browser.location.search);
-        this.root = useRef("root");
+        this.root = signal.ref();
         this.searchToken = 0;
         onMounted(() => this.start());
         onWillDestroy(() => clearTimeout(this.undoTimer));
@@ -294,7 +298,7 @@ export class AgileRoadmap extends Component {
 
     /** Arrow keys, Home and End move focus between the bars, in reading order. */
     onBarKeydown(ev) {
-        const bars = [...(this.root.el?.querySelectorAll(".o_ag_rm_bar") || [])];
+        const bars = [...(this.root()?.querySelectorAll(".o_ag_rm_bar") || [])];
         const target = nextBarIndex(bars.length, bars.indexOf(ev.currentTarget), ev.key);
         if (target === null) {
             return;
@@ -529,7 +533,7 @@ export class AgileRoadmap extends Component {
 
     /** Opens the warning under the bar (or above it when the page ends too soon), fixed on screen so no scroll area clips it. */
     openWarning(row, target) {
-        const bar = this.root.el?.querySelector(`.o_ag_rm_bar[data-id="${row.item.id}"]`) || target;
+        const bar = this.root()?.querySelector(`.o_ag_rm_bar[data-id="${row.item.id}"]`) || target;
         const rect = bar.getBoundingClientRect();
         const below = window.innerHeight - rect.bottom;
         this.state.warning = {
@@ -544,7 +548,7 @@ export class AgileRoadmap extends Component {
         const id = this.state.warning?.item.id;
         this.state.warning = null;
         // Back to the bar the warning came from, so keyboard use carries on from there.
-        this.root.el?.querySelector(`.o_ag_rm_bar[data-id="${id}"]`)?.focus();
+        this.root()?.querySelector(`.o_ag_rm_bar[data-id="${id}"]`)?.focus();
     }
 
     onWarningKeydown(ev) {

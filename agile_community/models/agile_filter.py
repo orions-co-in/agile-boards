@@ -318,7 +318,7 @@ class AgileFilterSubscription(models.Model):
         )
         total = len(issues) if len(issues) <= DIGEST_LIMIT else digest.match_count
         more = _("%(count)s more. Open the filter to see them all.", count=total - DIGEST_LIMIT) if total > DIGEST_LIMIT else ""
-        base = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "")
+        base = self.env["ir.config_parameter"].sudo().get_str("web.base.url", "")
         link = f"{base}/odoo/agile.filter/{self.filter_id.id}"
         body = Markup(
             "<p>%(intro)s</p><table cellpadding='4'><tr><th>%(key)s</th><th>%(title)s</th><th>%(status)s</th>"

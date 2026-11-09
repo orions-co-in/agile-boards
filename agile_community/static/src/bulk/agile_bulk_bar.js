@@ -1,4 +1,4 @@
-import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUpdateProps, proxy, useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { Dropdown } from "@web/core/dropdown/dropdown";
@@ -34,11 +34,11 @@ export function resultText(change, label, done, total, refused) {
 export class AgileBulkBar extends Component {
     static template = "agile_community.BulkBar";
     static components = { Dropdown, DropdownItem };
-    static props = { projectId: Number, ids: Array, onDone: Function, onClear: Function };
+    props = useProps({ projectId: t.number(), ids: t.array(), onDone: t.function(), onClear: t.function()});
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             options: { members: [], sprints: [], statuses: [], tags: [], types: [], priorities: [] },
             busy: false,
             confirm: null,

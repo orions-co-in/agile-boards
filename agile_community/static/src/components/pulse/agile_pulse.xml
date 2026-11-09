@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.Pulse">
-        <section t-if="hasStrip" class="o_ag_pulse" aria-label="Sprint pulse">
-            <div class="o_ag_pulse_strip" role="group" t-att-aria-label="ariaLabel"
-                 t-on-keydown="onKeydown">
-                <t t-foreach="cells" t-as="cell" t-key="cell.key">
+        <section t-if="this.hasStrip" class="o_ag_pulse" aria-label="Sprint pulse">
+            <div class="o_ag_pulse_strip" role="group" t-att-aria-label="this.ariaLabel"
+                 t-on-keydown="this.onKeydown">
+                <t t-foreach="this.cells" t-as="cell" t-key="cell.key">
                     <div class="o_ag_pulse_cell" role="img"
                          t-att-data-cell="cell_index"
-                         t-att-tabindex="cell.index === tabStop ? 0 : -1"
+                         t-att-tabindex="cell.index === this.tabStop ? 0 : -1"
                          t-att-aria-label="cell.label"
                          t-att-title="cell.label"
                          t-attf-class="{{cell.today ? 'o_ag_pulse_today' : ''}} {{cell.future ? 'o_ag_pulse_future' : ''}} {{cell.weekend ? 'o_ag_pulse_weekend' : ''}} {{cell.estimated ? 'o_ag_pulse_estimated' : ''}}"
                          t-on-focus="() => this.onCellFocus(cell.index)"
-                         t-on-blur="onCellBlur"
+                         t-on-blur="this.onCellBlur"
                          t-on-mouseenter="() => this.onCellFocus(cell.index)"
-                         t-on-mouseleave="onCellBlur"
+                         t-on-mouseleave="this.onCellBlur"
                          t-on-click="() => this.onCellFocus(cell.index)">
                         <span t-if="cell.scope" class="o_ag_pulse_scope" aria-hidden="true"/>
                         <span class="o_ag_pulse_fill" t-attf-style="height: {{cell.fill}}%"/>
@@ -23,22 +23,22 @@
                     </div>
                 </t>
             </div>
-            <p class="o_ag_pulse_tip" aria-live="polite" t-out="tip"/>
+            <p class="o_ag_pulse_tip" aria-live="polite" t-out="this.tip"/>
             <div class="o_ag_pulse_caption">
-                <t t-foreach="captionParts" t-as="part" t-key="part_index">
+                <t t-foreach="this.captionParts" t-as="part" t-key="part_index">
                     <button t-if="part.sprint or part.action" type="button" class="btn btn-link o_ag_pulse_link"
                             t-on-click="() => this.onPartClick(part)">
                         <t t-if="part.sprint"><b t-out="part.text"/></t>
                         <t t-else="" t-out="part.text"/>
                     </button>
-                    <span t-else="" t-att-class="part.pace ? paceClass : ''" t-out="part.text"/>
+                    <span t-else="" t-att-class="part.pace ? this.paceClass : ''" t-out="part.text"/>
                 </t>
             </div>
-            <table t-if="days.length" class="visually-hidden">
-                <caption><t t-out="unit"/> left per sprint day</caption>
+            <table t-if="this.days.length" class="visually-hidden">
+                <caption><t t-out="this.unit"/> left per sprint day</caption>
                 <thead><tr><th scope="col">Day</th><th scope="col">Left</th><th scope="col">Ideal</th></tr></thead>
                 <tbody>
-                    <tr t-foreach="tableRows" t-as="row" t-key="row_index">
+                    <tr t-foreach="this.tableRows" t-as="row" t-key="row_index">
                         <th scope="row" t-out="row.date"/>
                         <td t-out="row.left"/>
                         <td t-out="row.ideal"/>
@@ -46,12 +46,12 @@
                 </tbody>
             </table>
         </section>
-        <section t-elif="isEmptyState" class="o_ag_pulse o_ag_pulse_empty" aria-label="Sprint pulse">
+        <section t-elif="this.isEmptyState" class="o_ag_pulse o_ag_pulse_empty" aria-label="Sprint pulse">
             <div class="o_ag_pulse_caption">
                 <b>No active sprint</b>
                 <span>Work left, pace and scope changes appear once a sprint is running.</span>
-                <button t-if="props.pulse.can_manage_project" type="button" class="btn btn-primary"
-                        t-on-click="() => props.onPlanSprint?.()">Plan a sprint</button>
+                <button t-if="this.props.pulse.can_manage_project" type="button" class="btn btn-primary"
+                        t-on-click="() => this.props.onPlanSprint?.()">Plan a sprint</button>
             </div>
         </section>
     </t>

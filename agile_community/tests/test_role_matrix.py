@@ -118,7 +118,7 @@ class TestAgileRoleMatrix(TransactionCase):
         project.with_user(self.admin_manager).write({
             "agile_enabled": True, "agile_key": "ENAB",
         })
-        member = project.agile_member_ids.filtered(
+        member = project.with_user(self.admin_manager).agile_member_ids.filtered(
             lambda m: m.user_id == self.admin_manager
         )
         self.assertEqual(member.role, "manager")

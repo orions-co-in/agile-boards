@@ -1,9 +1,11 @@
-import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { niceMax } from "./agile_cfd";
 import { ReportExport, svgPngBlob } from "./report_export";
 import { unitWord } from "../estimate_unit";
+import {useLayoutEffect} from "@web/owl2/utils";
 
 const CHART = { w: 720, h: 276, left: 48, right: 12, top: 12, bottom: 44 };
 
@@ -51,12 +53,12 @@ export function doneText(days, unit) {
 export class AgileBurnup extends Component {
     static template = "agile_community.Burnup";
     static components = { ReportExport };
-    static props = ["projectId", "sprints", "initialSprintId?"];
+    props = useProps({projectId: t.any(), sprints: t.any(), initialSprintId: t.any().optional()});
 
     setup() {
         this.orm = useService("orm");
         this.unitWord = unitWord;
-        this.state = useState({
+        this.state = proxy({
             loading: false,
             error: null,
             data: null,
@@ -64,14 +66,14 @@ export class AgileBurnup extends Component {
             hover: null,
             table: false,
         });
-        this.chartBox = useRef("chartBox");
-        useEffect(
+        this.chartBox = signal.ref();
+        useLayoutEffect(
             (box) => {
                 if (box) {
                     box.scrollLeft = box.scrollWidth;
                 }
             },
-            () => [this.chartBox.el, this.state.data]
+            () => [this.chartBox(), this.state.data]
         );
         onMounted(() => this.load());
     }
@@ -86,7 +88,7 @@ export class AgileBurnup extends Component {
     }
 
     exportPng() {
-        return svgPngBlob(this.chartBox.el.querySelector("svg"), this.exportTitle, this.summary);
+        return svgPngBlob(this.chartBox().querySelector("svg"), this.exportTitle, this.summary);
     }
 
     get layout() {

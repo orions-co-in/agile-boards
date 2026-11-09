@@ -1,4 +1,5 @@
-from odoo.tests.common import Form, TransactionCase, new_test_user
+from odoo.tests import Form
+from odoo.tests.common import TransactionCase, new_test_user
 
 
 class TestAgileEnablingAndNativeTasks(TransactionCase):
@@ -79,7 +80,7 @@ class TestEpicCreationAndBulkPreview(TransactionCase):
             self.assertIn("Select changes", form.preview_result)
             form.update_assignees = True
             form.assignee_operation = "replace"
-            form.assignee_ids.add(self.env.user)
+            form.assignee_ids.add(self.env.ref("base.user_admin"))
             self.assertIn("Set assignees to", form.preview_result)
             self.assertIn("Can be updated", form.preview_result)
 

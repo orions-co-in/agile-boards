@@ -1,8 +1,11 @@
-import { Component, onPatched, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onPatched, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 /** The link types in the order the Add link select lists them. */
 export function linkKinds() {
@@ -23,14 +26,14 @@ export function linkKinds() {
  */
 export class AgileLinks extends Component {
     static template = "agile_community.Links";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.addRef = useRef("addButton");
-        this.searchRef = useRef("search");
-        this.state = useState({
+        this.action = usePlugin(ActionPlugin);
+        this.addRef = signal.ref();
+        this.searchRef = signal.ref();
+        this.state = proxy({
             loading: true,
             error: null,
             data: null,
@@ -47,13 +50,13 @@ export class AgileLinks extends Component {
         this.focusSearch = false;
         // Focus returns to Add link once the box has been replaced by it.
         onPatched(() => {
-            if (this.focusSearch && this.searchRef.el) {
+            if (this.focusSearch && this.searchRef()) {
                 this.focusSearch = false;
-                this.searchRef.el.focus();
+                this.searchRef().focus();
             }
-            if (this.focusAdd && this.addRef.el) {
+            if (this.focusAdd && this.addRef()) {
                 this.focusAdd = false;
-                this.addRef.el.focus();
+                this.addRef().focus();
             }
         });
         this.loadedFor = null;
@@ -155,7 +158,7 @@ export class AgileLinks extends Component {
             }
         } else if (ev.key === "ArrowDown") {
             ev.preventDefault();
-            this.searchRef.el?.parentElement.querySelector(".o_ag_links_result")?.focus();
+            this.searchRef()?.parentElement.querySelector(".o_ag_links_result")?.focus();
         }
     }
 
@@ -174,7 +177,7 @@ export class AgileLinks extends Component {
             items[index + 1]?.focus();
         } else if (ev.key === "ArrowUp") {
             ev.preventDefault();
-            (items[index - 1] || this.searchRef.el)?.focus();
+            (items[index - 1] || this.searchRef())?.focus();
         }
     }
 

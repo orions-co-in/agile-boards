@@ -74,7 +74,7 @@
         <field name="name">project.task.calendar.agile.backlog</field>
         <field name="model">project.task</field>
         <field name="arch" type="xml">
-            <calendar string="Due dates" js_class="agile_calendar" date_start="date_deadline" mode="month" color="stage_id_color"
+            <calendar string="Due dates" js_class="agile_calendar" date_start="date_deadline" mode="month" color="agile_task_type_color"
                       hide_time="true" event_limit="5" event_open_popup="true" quick_create="0"
                       show_unusual_days="True" scales="month,week,day">
                 <field name="issue_key"/>
@@ -82,7 +82,7 @@
                 <field name="parent_id" string="Epic" invisible="not parent_id"/>
                 <field name="story_points" string="Points" invisible="not story_points_estimated"/>
                 <field name="story_points_estimated" invisible="1"/>
-                <field name="stage_id_color" invisible="1"/>
+                <field name="agile_task_type_color" invisible="1"/>
                 <field name="stage_id"/>
             </calendar>
         </field>

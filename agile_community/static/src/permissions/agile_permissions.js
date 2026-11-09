@@ -1,4 +1,4 @@
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -18,7 +18,7 @@ export function switchQuestion(project, scheme) {
 export class AgilePermissions extends Component {
     static template = "agile_community.Permissions";
     static components = { Layout };
-    static props = ["*"];
+    props = useProps();
     // The breadcrumb name when the page is restored from its address.
     static displayName = _t("Permissions");
 
@@ -26,7 +26,7 @@ export class AgilePermissions extends Component {
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.display = { controlPanel: {} };
-        this.state = useState({ loading: true, error: null, data: null, busy: false, viewing: null, draft: {} });
+        this.state = proxy({ loading: true, error: null, data: null, busy: false, viewing: null, draft: {} });
         onMounted(() => this.load());
     }
 

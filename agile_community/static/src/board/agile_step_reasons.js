@@ -1,5 +1,7 @@
-import { Component, useEffect, useRef } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import {useLayoutEffect} from "@web/owl2/utils";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 // The status category each step button leads to.
@@ -20,13 +22,13 @@ const UNMET = "o_ag_step_unmet";
  */
 export class AgileStepReasons extends Component {
     static template = "agile_community.StepReasons";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
-        this.rootRef = useRef("root");
-        useEffect(
+        this.rootRef = signal.ref();
+        useLayoutEffect(
             () => {
-                const scope = this.rootRef.el?.closest(".o_kanban_record, .o_form_view");
+                const scope = this.rootRef()?.closest(".o_kanban_record, .o_form_view");
                 if (!scope) {
                     return;
                 }

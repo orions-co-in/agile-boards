@@ -5,67 +5,67 @@
             <h1 class="o_ag_reports_title">Where is the work piling up?</h1>
             <div class="o_ag_reports_controls">
                 <label class="o_ag_reports_control"><span>From</span>
-                    <input type="date" class="form-control" t-att-value="state.from" t-on-change="(ev) => this.onDate('from', ev)"/></label>
+                    <input type="date" class="form-control" t-att-value="this.state.from" t-on-change="(ev) => this.onDate('from', ev)"/></label>
                 <label class="o_ag_reports_control"><span>To</span>
-                    <input type="date" class="form-control" t-att-value="state.to" t-on-change="(ev) => this.onDate('to', ev)"/></label>
+                    <input type="date" class="form-control" t-att-value="this.state.to" t-on-change="(ev) => this.onDate('to', ev)"/></label>
                 <button type="button" class="btn btn-secondary" t-on-click="() => this.lastDays(30)">Last 30 days</button>
                 <button type="button" class="btn btn-secondary" t-on-click="() => this.lastDays(90)">Last 90 days</button>
-                <ReportExport t-if="state.data and state.data.days.length" title="exportTitle" table.bind="exportTable" png.bind="exportPng"/>
+                <ReportExport t-if="this.state.data and this.state.data.days.length" title="this.exportTitle" table.bind="this.exportTable" png.bind="this.exportPng"/>
             </div>
         </header>
-        <div t-if="state.error" class="alert alert-danger" role="alert">
-            <p class="mb-2" t-out="state.error"/>
-            <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+        <div t-if="this.state.error" class="alert alert-danger" role="alert">
+            <p class="mb-2" t-out="this.state.error"/>
+            <button type="button" class="btn btn-secondary" t-on-click="this.load">Retry</button>
         </div>
-        <p t-elif="state.data and !state.data.days.length" class="o_ag_reports_empty">
+        <p t-elif="this.state.data and !this.state.data.days.length" class="o_ag_reports_empty">
             No daily figures in these dates yet. They are recorded every night, so the chart fills as the days pass.
-            <button type="button" class="btn btn-secondary ms-2" t-on-click="recordNow">Record today's figures now</button>
+            <button type="button" class="btn btn-secondary ms-2" t-on-click="this.recordNow">Record today's figures now</button>
         </p>
-        <t t-elif="state.data and layout">
-            <p t-if="state.data.days.length === 1" class="o_ag_cfd_one_day text-muted" role="status">
+        <t t-elif="this.state.data and this.layout">
+            <p t-if="this.state.data.days.length === 1" class="o_ag_cfd_one_day text-muted" role="status">
                 Only one day is recorded so far. The bands need at least two days to show a trend.
             </p>
-            <div t-ref="chartBox" t-attf-class="o_ag_cfd {{state.loading ? 'o_ag_cfd_loading' : ''}}">
-                <svg class="o_ag_cfd_chart" t-attf-viewBox="0 0 {{layout.chart.w}} {{layout.chart.h}}" role="img"
+            <div t-ref="this.chartBox" t-attf-class="o_ag_cfd {{this.state.loading ? 'o_ag_cfd_loading' : ''}}">
+                <svg class="o_ag_cfd_chart" t-attf-viewBox="0 0 {{this.layout.chart.w}} {{this.layout.chart.h}}" role="img"
                      aria-label="Cumulative flow: issues per status per day. The numbers table has the same figures."
-                     t-on-mousemove="onMove" t-on-mouseleave="onLeave" t-on-click="onChartClick">
+                     t-on-mousemove="this.onMove" t-on-mouseleave="this.onLeave" t-on-click="this.onChartClick">
                     <g class="o_ag_cfd_axis">
-                        <text class="o_ag_axis_title" t-att-x="layout.chart.left + (layout.chart.w - layout.chart.left - layout.chart.right) / 2" t-att-y="layout.chart.h - 3" text-anchor="middle">Day</text>
-                        <text class="o_ag_axis_title" transform="rotate(-90)" t-att-x="-(layout.chart.top + (layout.chart.h - layout.chart.top - layout.chart.bottom) / 2)" y="10" text-anchor="middle" t-out="'Issues'"/>
-                        <line t-att-x1="layout.chart.left" t-att-x2="layout.chart.w - layout.chart.right"
-                              t-att-y1="layout.y(0)" t-att-y2="layout.y(0)"/>
-                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(layout.top) + 4" text-anchor="end" t-out="layout.top"/>
-                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(0)" text-anchor="end">0</text>
-                        <text t-att-x="layout.x(0)" t-att-y="layout.chart.h - 20" t-out="state.data.days[0].date"/>
-                        <text t-if="state.data.days.length > 1" t-att-x="layout.x(state.data.days.length - 1)"
-                              t-att-y="layout.chart.h - 20" text-anchor="end" t-out="state.data.days[state.data.days.length - 1].date"/>
+                        <text class="o_ag_axis_title" t-att-x="this.layout.chart.left + (this.layout.chart.w - this.layout.chart.left - this.layout.chart.right) / 2" t-att-y="this.layout.chart.h - 3" text-anchor="middle">Day</text>
+                        <text class="o_ag_axis_title" transform="rotate(-90)" t-att-x="-(this.layout.chart.top + (this.layout.chart.h - this.layout.chart.top - this.layout.chart.bottom) / 2)" y="10" text-anchor="middle" t-out="'Issues'"/>
+                        <line t-att-x1="this.layout.chart.left" t-att-x2="this.layout.chart.w - this.layout.chart.right"
+                              t-att-y1="this.layout.y(0)" t-att-y2="this.layout.y(0)"/>
+                        <text t-att-x="this.layout.chart.left - 6" t-att-y="this.layout.y(this.layout.top) + 4" text-anchor="end" t-out="this.layout.top"/>
+                        <text t-att-x="this.layout.chart.left - 6" t-att-y="this.layout.y(0)" text-anchor="end">0</text>
+                        <text t-att-x="this.layout.x(0)" t-att-y="this.layout.chart.h - 20" t-out="this.state.data.days[0].date"/>
+                        <text t-if="this.state.data.days.length > 1" t-att-x="this.layout.x(this.state.data.days.length - 1)"
+                              t-att-y="this.layout.chart.h - 20" text-anchor="end" t-out="this.state.data.days[this.state.data.days.length - 1].date"/>
                     </g>
-                    <polygon t-foreach="layout.bands" t-as="band" t-key="band.code" t-att-points="band.points"
+                    <polygon t-foreach="this.layout.bands" t-as="band" t-key="band.code" t-att-points="band.points"
                              t-attf-class="o_ag_cfd_band o_ag_cfd_{{band.code}}" t-att-data-status="band.code"/>
-                    <line t-if="hoverDay" class="o_ag_cfd_cursor" t-att-x1="layout.x(state.hover)" t-att-x2="layout.x(state.hover)"
-                          t-att-y1="layout.chart.top" t-att-y2="layout.y(0)"/>
+                    <line t-if="this.hoverDay" class="o_ag_cfd_cursor" t-att-x1="this.layout.x(this.state.hover)" t-att-x2="this.layout.x(this.state.hover)"
+                          t-att-y1="this.layout.chart.top" t-att-y2="this.layout.y(0)"/>
                 </svg>
                 <ul class="o_ag_cfd_key">
-                    <li t-foreach="[...layout.bands].reverse()" t-as="band" t-key="band.code">
+                    <li t-foreach="[...this.layout.bands].reverse()" t-as="band" t-key="band.code">
                         <i t-attf-class="o_ag_cfd_swatch o_ag_cfd_{{band.code}}"/><span t-out="band.label"/>
                     </li>
                 </ul>
                 <p class="o_ag_cfd_readout" aria-live="polite">
-                    <t t-if="hoverDay"><strong t-out="hoverDay.date"/>: <t t-out="countText(hoverDay)"/>.</t>
+                    <t t-if="this.hoverDay"><strong t-out="this.hoverDay.date"/>: <t t-out="this.countText(this.hoverDay)"/>.</t>
                     <t t-else="">Point at the chart for a day's counts. Click a band to open its issues.</t>
                 </p>
             </div>
-            <button type="button" class="btn btn-link o_ag_cfd_toggle" t-att-aria-expanded="state.table ? 'true' : 'false'"
-                    t-on-click="toggleTable">
-                <t t-if="state.table">Hide the numbers</t><t t-else="">Show the numbers</t>
+            <button type="button" class="btn btn-link o_ag_cfd_toggle" t-att-aria-expanded="this.state.table ? 'true' : 'false'"
+                    t-on-click="this.toggleTable">
+                <t t-if="this.state.table">Hide the numbers</t><t t-else="">Show the numbers</t>
             </button>
-            <div t-if="state.table" class="o_ag_cfd_table_wrap">
+            <div t-if="this.state.table" class="o_ag_cfd_table_wrap">
                 <table class="table table-sm o_ag_reports_table o_ag_cfd_table">
-                    <thead><tr><th>Day</th><th t-foreach="state.data.statuses" t-as="status" t-key="status.code" class="text-end" t-out="status.label"/><th class="text-end">Total</th></tr></thead>
+                    <thead><tr><th>Day</th><th t-foreach="this.state.data.statuses" t-as="status" t-key="status.code" class="text-end" t-out="status.label"/><th class="text-end">Total</th></tr></thead>
                     <tbody>
-                        <tr t-foreach="state.data.days" t-as="day" t-key="day.date">
+                        <tr t-foreach="this.state.data.days" t-as="day" t-key="day.date">
                             <td t-out="day.date"/>
-                            <td t-foreach="state.data.statuses" t-as="status" t-key="status.code" class="text-end">
+                            <td t-foreach="this.state.data.statuses" t-as="status" t-key="status.code" class="text-end">
                                 <button t-if="day.counts[status.code]" type="button" class="btn btn-link p-0"
                                         t-att-aria-label="'Open the ' + day.counts[status.code] + ' issues in ' + status.label + ' on ' + day.date"
                                         t-on-click="() => this.open(day.date, status.code)" t-out="day.counts[status.code]"/>

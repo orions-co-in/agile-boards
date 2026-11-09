@@ -3,7 +3,7 @@ import { click, edit, queryAllTexts, queryOne, select } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { makeMockEnv, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
-import { Component, reactive, useState, xml } from "@odoo/owl";
+import { Component, proxy, xml } from "@odoo/owl";
 import { AgileBoardBar } from "@agile_community/board/agile_board_bar";
 import { buildLanes, laneFilterId, mergeColumns } from "@agile_community/board/agile_board_renderer";
 
@@ -46,11 +46,11 @@ function fakeSearchModel() {
 class Host extends Component {
     static components = { AgileBoardBar };
     static props = ["*"];
-    static template = xml`<AgileBoardBar projectId="7" filterKey="key" swimlane="state.swimlane" onSwimlane="(value) => this.state.swimlane = value"/>`;
+    static template = xml`<AgileBoardBar projectId="7" filterKey="this.key" swimlane="this.state.swimlane" onSwimlane="(value) => this.state.swimlane = value"/>`;
 
     setup() {
-        this.state = useState({ swimlane: "none" });
-        this.model = useState(this.props.searchModel);
+        this.state = proxy({ swimlane: "none" });
+        this.model = proxy(this.props.searchModel);
     }
 
     get key() {
@@ -59,7 +59,7 @@ class Host extends Component {
 }
 
 async function mountBar({ options = OPTIONS, fail = false } = {}) {
-    const searchModel = reactive(fakeSearchModel());
+    const searchModel = proxy(fakeSearchModel());
     const saves = [];
     onRpc("project.project", "agile_board_options", () => {
         if (fail) {
@@ -358,16 +358,16 @@ const BOARDS = [
 ];
 
 async function mountBoards({ current = BOARDS[0], swimlane = "none" } = {}) {
-    const searchModel = reactive(fakeSearchModel());
+    const searchModel = proxy(fakeSearchModel());
     const calls = { switched: [], columns: [], swimlanes: [], copied: [] };
     let board = current;
     class BoardsHost extends Component {
         static components = { AgileBoardBar };
         static props = ["*"];
-        static template = xml`<AgileBoardBar projectId="7" filterKey="key" swimlane="state.swimlane"
+        static template = xml`<AgileBoardBar projectId="7" filterKey="this.key" swimlane="this.state.swimlane"
             onSwimlane="(value) => this.onLane(value)" onColumns="(ids) => this.props.calls.columns.push(ids)"/>`;
         setup() {
-            this.state = useState({ swimlane });
+            this.state = proxy({ swimlane });
         }
         get key() {
             return "boards";
@@ -526,7 +526,7 @@ test("choosing a board with merged columns tells the board its columns and group
     }));
     onRpc("project.project", "agile_board_switch", () => true);
     const env = await makeMockEnv();
-    env.searchModel = reactive(fakeSearchModel());
+    env.searchModel = proxy(fakeSearchModel());
     await mountWithCleanup(GroupsHost, { props: { seen }, env });
     await animationFrame();
     await select("5", { target: "[data-pick=board]" });

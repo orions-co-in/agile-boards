@@ -1,5 +1,7 @@
-import { Component, onMounted, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+
 
 /**
  * The small editor that opens on a backlog cell (spec section 12): a number box
@@ -8,20 +10,19 @@ import { _t } from "@web/core/l10n/translation";
  */
 export class AgileInlineEditor extends Component {
     static template = "agile_community.InlineEditor";
-    static props = {
-        label: String,
-        kind: { type: String }, // "number" | "select"
-        value: { optional: true },
-        options: { type: Array, optional: true },
-        onSave: Function,
-        close: Function,
-    };
+    props = useProps({
+        label: t.string(),
+        kind: t.string(), // "number" | "select"
+        value: t.any().optional(),
+        options: t.array().optional(),
+        onSave: t.function(),
+        close: t.function()});
 
     setup() {
-        this.inputRef = useRef("input");
-        this.state = useState({ value: this.props.value ?? "", error: "", saving: false });
+        this.inputRef = signal.ref();
+        this.state = proxy({ value: this.props.value ?? "", error: "", saving: false });
         onMounted(() => {
-            const el = this.inputRef.el;
+            const el = this.inputRef();
             el?.focus();
             el?.select?.();
         });

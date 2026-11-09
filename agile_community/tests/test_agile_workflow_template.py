@@ -97,11 +97,11 @@ class TestWorkflowTemplate(TransactionCase):
         names = []
         for _ in range(2):
             wizard = Wizard.create({
-                "project_id": self.target.id, "file": base64.b64encode(text.encode()), "filename": "flow.json",
+                "project_id": self.target.id, "file": base64.b64encode(text.encode()).decode(), "filename": "flow.json",
             })
             wizard.action_import()
             names.append(wizard.new_workflow_id.name)
             self.assertIn("Created the workflow", wizard.report)
         self.assertEqual(len(set(names)), 2)
         with self.assertRaises(UserError):
-            Wizard.create({"project_id": self.target.id, "file": base64.b64encode(b"not json")}).action_import()
+            Wizard.create({"project_id": self.target.id, "file": base64.b64encode(b"not json").decode()}).action_import()

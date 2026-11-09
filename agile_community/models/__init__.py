@@ -17,6 +17,7 @@ from . import agile_resolution
 from . import agile_permission
 from . import agile_view_preference
 from . import agile_issue_template
+from . import agile_access_scope
 from . import agile_chatter
 from . import agile_attachment
 from . import agile_activity

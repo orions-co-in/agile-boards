@@ -1,0 +1,261 @@
+id,name,model_id,group_id/id,operation,domain
+access_agile_task_type_admin,agile.task.type.admin,agile_community.task_type,base.group_system,crud,
+access_agile_task_type_user,agile.task.type.user,agile_community.task_type,project.group_project_user,cru,
+agile_task_type_company_rule,Agile issue type: multi-company,agile_community.task_type,,crud,"[('company_id', 'in', company_ids + [False])]"
+access_agile_bulk_update_wizard_user,agile.bulk.update.wizard.user,agile_community.bulk_update_wizard,project.group_project_user,crud,
+agile_release_audit_visibility_rule,Release history: follow Project visibility,agile_community.release_audit,project.group_project_user,r,"[
+                '|',
+                    '&', ('release_id.project_id.agile_enabled', '=', False),
+                        '|', ('release_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('release_id.project_id.allowed_internal_user_ids', 'in', user.id),
+                    '&', ('release_id.project_id.agile_enabled', '=', True),
+                        '&',
+                            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('release_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                            '|',
+                                ('release_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                                ('release_id.project_id.allowed_internal_user_ids', 'in', user.id)
+            ]"
+agile_release_audit_manager_rule,Release history: Project Managers see all,agile_community.release_audit,project.group_project_manager,r,"[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('release_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"
+agile_release_audit_company_rule,Agile release history: allowed companies,agile_community.release_audit,,crud,"[('release_id.project_id.company_id', 'in', company_ids + [False])]"
+access_agile_release_correction_manager,agile.release.correction.manager,agile_community.release_correction_wizard,project.group_project_user,crud,
+access_agile_release_notes_user,agile.release.notes.user,agile_community.release_notes_wizard,project.group_project_user,crud,
+access_agile_sprint_start_user,agile.sprint.start.user,agile.sprint.start.wizard,project.group_project_user,crud,
+access_agile_release_confirm_user,agile.release.confirm.user,agile.release.confirm,project.group_project_user,crud,
+agile_metric_snapshot_project_user_rule,Agile metric snapshots: visible projects,agile.metric.snapshot,project.group_project_user,r,"[
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|',
+                    ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                    ('project_id.allowed_internal_user_ids', 'in', user.id)
+            ]"
+agile_metric_snapshot_manager_rule,Agile metric snapshots: project managers,agile.metric.snapshot,project.group_project_manager,r,"[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"
+agile_metric_snapshot_company_rule,Agile metric snapshots: allowed companies,agile.metric.snapshot,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_metric_line_project_user_rule,Agile metric issues: same task visibility as Project,agile.metric.snapshot.line,project.group_project_user,r,"[
+                ('task_id', '!=', False),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|',
+                    ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                    '|',
+                        ('project_id.allowed_internal_user_ids', 'in', user.id),
+                        '|',
+                            ('task_id.message_partner_ids', 'in', [user.partner_id.id]),
+                            ('task_id.user_ids', 'in', [user.id])
+            ]"
+agile_metric_line_manager_rule,Agile metric issues: project managers,agile.metric.snapshot.line,project.group_project_manager,r,"[('task_id', '!=', False), (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"
+agile_metric_line_company_rule,Agile metric issues: allowed companies,agile.metric.snapshot.line,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_roadmap_item_project_member_rule,Agile roadmap: visible project team items,agile.roadmap.item,project.group_project_user,r,"[
+            ('company_id', 'in', company_ids + [False]),
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                '|',
+                    ('project_id.allowed_internal_user_ids', 'in', user.id),
+                    '&',
+                        ('item_type', '=', 'issue'),
+                        '|',
+                            ('issue_id.message_partner_ids', 'in', [user.partner_id.id]),
+                            ('issue_id.user_ids', 'in', [user.id])
+        ]"
+agile_metric_event_project_user_rule,Agile metric milestones: same task visibility as Project,agile.issue.metric.event,project.group_project_user,r,"[
+                ('task_id', '!=', False),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|',
+                    ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                    '|',
+                        ('project_id.allowed_internal_user_ids', 'in', user.id),
+                        '|',
+                            ('task_id.message_partner_ids', 'in', [user.partner_id.id]),
+                            ('task_id.user_ids', 'in', [user.id])
+            ]"
+agile_metric_event_manager_rule,Agile metric milestones: project managers,agile.issue.metric.event,project.group_project_manager,r,"[('task_id', '!=', False), (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"
+agile_metric_event_company_rule,Agile metric milestones: allowed companies,agile.issue.metric.event,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_project_member_project_manager_rule,Agile team role: project managers,agile.project.member,project.group_project_user,crud,"[
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_member_company_rule,Agile team role: allowed companies,agile.project.member,,crud,"['|', ('project_id.company_id', '=', False), ('project_id.company_id', 'in', company_ids)]"
+agile_project_wip_limit_project_member_rule,Agile WIP limits: assigned project team only,agile.project.wip.limit,project.group_project_user,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_wip_limit_company_rule,Agile WIP limits: allowed companies,agile.project.wip.limit,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+access_agile_sprint_project_user,agile.sprint.project.user,project.sprint,project.group_project_user,crud,
+agile_sprint_project_member_rule,"Agile sprints: Project-visible team (global, narrows native sprint rule)",project.sprint,,crud,"[
+            '|',
+                ('project_id.agile_enabled', '=', False),
+                '&',
+                    (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                    '|',
+                        ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                        ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+access_agile_sprint_reopen_project_user,agile.sprint.reopen.project.user,agile.sprint.reopen,project.group_project_user,crud,
+access_agile_sprint_close_project_user,agile.sprint.close.project.user,project.sprint.close,project.group_project_user,crud,
+access_agile_sprint_scope_wizard_project_user,agile.sprint.scope.wizard.project.user,project.sprint.scope.change.wizard,project.group_project_user,crud,
+agile_sprint_capacity_project_member_rule,Agile sprint capacity: Project-visible team,project.sprint.capacity,project.group_project_user,crud,"[
+            '|',
+                ('sprint_id.project_id.agile_enabled', '=', False),
+                '&',
+                    (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                    '|',
+                        ('sprint_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                        ('sprint_id.project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_sprint_capacity_project_manager_visibility_rule,Agile sprint capacity: native Project Manager visibility,project.sprint.capacity,project.group_project_manager,crud,"[
+            ('sprint_id.project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
+        ]"
+access_agile_sprint_correction_wizard_project_user,agile.sprint.correction.wizard.project.user,project.sprint.correction.wizard,project.group_project_user,crud,
+access_agile_issue_migration_wizard_user,agile.issue.migration.wizard.user,agile_community.issue_migration_wizard,project.group_project_user,crud,
+access_agile_issue_migration_stage_user,agile.issue.migration.stage.user,agile_community.issue_migration_stage,project.group_project_user,crud,
+agile_project_component_project_member_rule,Agile components: assigned project team only,agile.project.component,project.group_project_user,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_component_system_rule,Agile components: administrator access,agile.project.component,base.group_system,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_component_company_rule,Agile components: allowed companies,agile.project.component,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_project_view_preference_own_rule,Agile view preferences: owner only,agile.project.view.preference,project.group_project_user,crud,"[
+            ('user_id', '=', user.id),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_view_preference_company_rule,Agile view preferences: allowed companies,agile.project.view.preference,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_project_quick_filter_project_member_rule,Agile quick filters: assigned project team only,agile.project.quick.filter,project.group_project_user,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_quick_filter_system_rule,Agile quick filters: administrator access,agile.project.quick.filter,base.group_system,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_quick_filter_company_rule,Agile quick filters: allowed companies,agile.project.quick.filter,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_issue_checklist_project_member_rule,Agile acceptance checklists: visible project issues only,agile.issue.checklist.item,project.group_project_user,crud,"[
+            ('task_id.project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('task_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('task_id.project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_issue_checklist_system_rule,Agile acceptance checklists: administrator access,agile.issue.checklist.item,base.group_system,crud,"[
+            ('task_id.project_id.agile_enabled', '=', True),
+            '|',
+                ('task_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('task_id.project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_issue_checklist_project_manager_rule,Agile acceptance checklists: Project Manager team access,agile.issue.checklist.item,project.group_project_manager,crud,"[
+            ('task_id.project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
+        ]"
+agile_issue_checklist_company_rule,Agile acceptance checklists: allowed companies,agile.issue.checklist.item,,crud,"[('task_id.project_id.company_id', 'in', company_ids + [False])]"
+agile_workflow_project_member_rule,Agile workflows (workflow): assigned project team only,agile.workflow,project.group_project_user,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_workflow_company_rule,Agile workflows (workflow): allowed companies,agile.workflow,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_workflow_status_project_member_rule,Agile workflows (workflow_status): assigned project team only,agile.workflow.status,project.group_project_user,crud,"[
+            ('workflow_id.project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('workflow_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('workflow_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('workflow_id.project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_workflow_status_company_rule,Agile workflows (workflow_status): allowed companies,agile.workflow.status,,crud,"[('workflow_id.project_id.company_id', 'in', company_ids + [False])]"
+agile_workflow_transition_project_member_rule,Agile workflows (workflow_transition): assigned project team only,agile.workflow.transition,project.group_project_user,crud,"[
+            ('workflow_id.project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('workflow_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|',
+                ('workflow_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                ('workflow_id.project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_workflow_transition_company_rule,Agile workflows (workflow_transition): allowed companies,agile.workflow.transition,,crud,"[('workflow_id.project_id.company_id', 'in', company_ids + [False])]"
+access_agile_workflow_field_user,agile.workflow.field.project.user,agile.workflow.field,project.group_project_user,r,
+agile_filter_visibility_rule,"Agile filters: project team, private ones only for the owner",agile.filter,project.group_project_user,crud,"[
+            ('project_id.agile_enabled', '=', True),
+            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+            '|', ('owner_id', '=', user.id), ('visibility', '=', 'shared')
+        ]"
+agile_filter_company_rule,Agile filters: allowed companies,agile.filter,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_filter_subscription_rule,Agile filter subscriptions: your own,agile.filter.subscription,project.group_project_user,crud,"[('user_id', '=', user.id), (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('filter_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])]"
+access_agile_clone_wizard_user,agile.clone.wizard.user,agile_community.clone_wizard,project.group_project_user,crud,
+access_agile_resolution_wizard_user,agile.resolution.wizard.user,agile_community.resolution_wizard,project.group_project_user,crud,
+agile_recent_issue_own_rule,Agile recent issues: owner only,agile.recent.issue,project.group_project_user,r,"[('user_id', '=', user.id)]"
+agile_board_project_member_rule,Agile boards: assigned project team only,agile.board,project.group_project_user,crud,"[
+                ('project_id.agile_enabled', '=', True),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|',
+                    ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                    ('project_id.allowed_internal_user_ids', 'in', user.id)
+            ]"
+agile_board_company_rule,Agile boards: allowed companies,agile.board,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+agile_board_column_project_member_rule,Agile board columns: assigned project team only,agile.board.column,project.group_project_user,crud,"[
+                ('board_id.project_id.agile_enabled', '=', True),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('board_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|',
+                    ('board_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                    ('board_id.project_id.allowed_internal_user_ids', 'in', user.id)
+            ]"
+agile_board_column_company_rule,Agile board columns: allowed companies,agile.board.column,,crud,"[('board_id.project_id.company_id', 'in', company_ids + [False])]"
+agile_issue_vote_visible_rule,Agile votes: only on issues the person may open,agile.issue.vote,project.group_project_user,r,"[
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|', ('task_id.agile_restricted', '=', False),
+                '|', ('task_id.agile_visible_user_ids', 'in', [user.id]),
+                '|', ('task_id.user_ids', 'in', [user.id]),
+                '|', ('task_id.create_uid', '=', user.id),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])
+            ]"
+agile_issue_document_visible_rule,Agile document links: only on issues the person may open,agile.issue.document,project.group_project_user,crud,"[
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|', ('task_id.agile_restricted', '=', False),
+                '|', ('task_id.agile_visible_user_ids', 'in', [user.id]),
+                '|', ('task_id.user_ids', 'in', [user.id]),
+                '|', ('task_id.create_uid', '=', user.id),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])
+            ]"
+agile_issue_old_key_visible_rule,Agile former keys: only on issues the person may open,agile.issue.old.key,project.group_project_user,r,"[
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                '|', ('task_id.agile_restricted', '=', False),
+                '|', ('task_id.agile_visible_user_ids', 'in', [user.id]),
+                '|', ('task_id.user_ids', 'in', [user.id]),
+                '|', ('task_id.create_uid', '=', user.id),
+                (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('task_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])
+            ]"
+access_agile_move_project_user,agile.move.project.user,agile.move.project,project.group_project_user,crud,
+access_agile_move_project_line_user,agile.move.project.line.user,agile.move.project.line,project.group_project_user,crud,
+access_agile_workflow_template_wizard_user,agile.workflow.template.wizard.user,agile_community.workflow_template_wizard,project.group_project_user,crud,
+agile_roadmap_share_read_rule,Agile roadmap shares: read own and named,agile.roadmap.share,project.group_project_user,r,"['|', ('owner_id', '=', user.id), ('user_ids', 'in', [user.id])]"
+access_agile_log_time_user,agile.log.time.user,agile.log.time,project.group_project_user,crud,
+agile_task_project_member_rule,Agile issues: assigned project team only,project.task,,crud,"['|', ('project_id.agile_enabled', '=', False), '|', '&', ('agile_issue', '=', False), ('is_template', '=', False), (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])]"
+agile_task_restricted_rule,Agile issues: restricted issues,project.task,,crud,"['|', ('agile_restricted', '=', False), '|', ('agile_visible_user_ids', 'in', [user.id]), '|', ('user_ids', 'in', [user.id]), '|', ('create_uid', '=', user.id), (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"
+agile_project_version_company_rule,Project versions: allowed companies,project.version,,crud,"[('project_id.company_id', 'in', company_ids + [False])]"
+access_agile_roadmap_share_admin,agile.roadmap.share.admin,agile.roadmap.share,base.group_system,r,
+agile_project_version_visibility_rule,Agile releases: team-only for Agile projects,project.version,base.group_user,crud,"[
+            '|',
+                ('project_id.agile_enabled', '=', False),
+                '&',
+                    (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                    '|',
+                        ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                        ('project_id.allowed_internal_user_ids', 'in', user.id)
+        ]"
+agile_project_version_manager_rule,Agile releases: Project Managers see all,project.version,project.group_project_manager,crud,"[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]"

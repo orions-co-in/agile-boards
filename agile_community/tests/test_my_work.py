@@ -1,7 +1,8 @@
 from datetime import datetime, time, timedelta
 from types import SimpleNamespace
 
-import pytz
+from datetime import UTC
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command, fields
@@ -90,12 +91,12 @@ class TestAgileMyWork(TransactionCase):
         )
         eval_context = {"uid": user.id}
         if xmlid.endswith("action_agile_my_work_due_soon"):
-            client_timezone = pytz.timezone(timezone)
+            client_timezone = ZoneInfo(timezone)
 
             class ClientDateTime(datetime):
                 def to_utc(self):
-                    return client_timezone.localize(self).astimezone(
-                        pytz.UTC
+                    return self.replace(tzinfo=client_timezone).astimezone(
+                        UTC
                     ).replace(tzinfo=None)
 
             eval_context.update({
@@ -116,10 +117,10 @@ class TestAgileMyWork(TransactionCase):
 
         def deadline_on(day_offset, due_time=time(hour=12)):
             due_date = today + timedelta(days=day_offset)
-            local_deadline = pytz.timezone("Asia/Kolkata").localize(
-                datetime.combine(due_date, due_time)
+            local_deadline = datetime.combine(due_date, due_time).replace(
+                tzinfo=ZoneInfo("Asia/Kolkata")
             )
-            return local_deadline.astimezone(pytz.UTC).replace(tzinfo=None)
+            return local_deadline.astimezone(UTC).replace(tzinfo=None)
 
         assigned = self._new_issue("Assigned", self.contributor)
         blocked = self._new_issue("Blocked", self.contributor)

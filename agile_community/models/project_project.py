@@ -1,7 +1,6 @@
 import re
-from datetime import datetime, time
-
-import pytz
+from datetime import datetime, time, timezone
+from zoneinfo import available_timezones
 
 from odoo import Command, SUPERUSER_ID, api, fields, models, _
 from odoo.exceptions import AccessError, UserError, ValidationError
@@ -12,7 +11,7 @@ def _agile_timezone_selection(_model):
     return [
         (timezone, timezone)
         for timezone in sorted(
-            pytz.all_timezones,
+            available_timezones(),
             key=lambda value: value if not value.startswith("Etc/") else "_",
         )
     ]
@@ -107,8 +106,8 @@ class ProjectProject(models.Model):
 
     def _agile_local_day_start_utc(self):
         today = fields.Date.context_today(self)
-        local_midnight = self.env.tz.localize(datetime.combine(today, time.min))
-        return local_midnight.astimezone(pytz.UTC).replace(tzinfo=None)
+        local_midnight = datetime.combine(today, time.min).replace(tzinfo=self.env.tz)
+        return local_midnight.astimezone(timezone.utc).replace(tzinfo=None)
 
     @api.depends_context("uid")
     @api.depends(
@@ -634,9 +633,29 @@ class ProjectProject(models.Model):
         projects = super().create(vals_list)
         agile_projects = projects.filtered("agile_enabled")
         agile_projects._ensure_agile_issue_sequence()
+        agile_projects._drop_default_native_stages()
         agile_projects._ensure_agile_workflow_stages()
         agile_projects._initialize_agile_team_roles()
         return projects
+
+    def _drop_default_native_stages(self):
+        """Odoo 20 gives every new project New, In Progress, Done and Cancelled.
+
+        A new Agile project has its own workflow, so those empty stages would only add
+        columns without an Agile status. Stages that hold tasks, or that other projects share, stay.
+        """
+        stage_model = self.env["project.task.type"].sudo().with_context(active_test=False)
+        for project in self:
+            stale = stage_model.search([
+                ("project_ids", "=", project.id), ("agile_status", "=", False),
+            ]).filtered(
+                lambda stage: stage.project_ids == project
+                and not stage.user_id
+                and not stage_model.env["project.task"].sudo().with_context(active_test=False).search_count(
+                    [("stage_id", "=", stage.id)]
+                )
+            )
+            stale.unlink()
 
     def write(self, vals):
         if "agile_enabled" in vals and any(
@@ -692,6 +711,11 @@ class ProjectProject(models.Model):
                 result = super(ProjectProject, project).write(project_vals) and result
         else:
             result = super().write(vals)
+        if {"privacy_visibility", "allowed_internal_user_ids", "user_id", "company_id"} & vals.keys():
+            # Odoo 20 remembers who may read a record for the whole transaction, so a changed
+            # audience must be written and forgotten before the next check.
+            self.env.flush_all()
+            self.env.transaction.invalidate_access_cache()
         agile_projects = self.filtered("agile_enabled")
         agile_projects._ensure_agile_issue_sequence()
         if "agile_key_style" in vals:

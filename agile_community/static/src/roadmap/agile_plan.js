@@ -1,4 +1,5 @@
-import { Component, onMounted, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUpdateProps, proxy, usePlugin, useProps, t } from "@odoo/owl";
+import { UIPlugin } from "@web/core/ui/ui_plugin";
 import { useService } from "@web/core/utils/hooks";
 import { downloadText } from "../dashboard/dashboard_export";
 import { _t } from "@web/core/l10n/translation";
@@ -46,12 +47,12 @@ const BLANK = { id: null, level: "initiative", name: "", parent_id: false, owner
 export class AgilePlan extends Component {
     static template = "agile_community.Plan";
     static components = { AgilePlanScenario, AgilePlanBoard };
-    static props = { projects: Array, hideDone: Boolean };
+    props = useProps({ projects: t.array(), hideDone: t.boolean()});
 
     setup() {
         this.orm = useService("orm");
-        this.ui = useService("ui");
-        this.state = useState({
+        this.ui = usePlugin(UIPlugin);
+        this.state = proxy({
             loading: true, error: null, data: null, form: null, notice: null, closed: new Set(), labels: null, scenarios: [], scenario: 0, naming: null, scenarioView: "compare",
         });
         onMounted(() => this.load(this.props));

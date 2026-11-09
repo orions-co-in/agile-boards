@@ -480,6 +480,9 @@ class ProjectTask(models.Model):
         return result
 
     def _check_agile_release_assignment(self):
+        if self.env.context.get("copy_project"):
+            # A copied project is built in steps; its tasks get the copy's releases right after.
+            return
         for task in self.sudo().filtered("version_id"):
             release = task.version_id
             if release.project_id != task.project_id:

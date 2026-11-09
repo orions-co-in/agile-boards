@@ -1,4 +1,4 @@
-import { Component, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useProps, t } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
@@ -8,7 +8,7 @@ import { SHORTCUTS, shortcutFor } from "./shortcut_helpers";
 export class AgileShortcutHelp extends Component {
     static template = "agile_community.ShortcutHelp";
     static components = { Dialog };
-    static props = { close: Function };
+    props = useProps({ close: t.function()});
 
     setup() {
         this.shortcuts = SHORTCUTS;
@@ -25,7 +25,7 @@ export function openShortcutHelp(dialog) {
  */
 export class AgileShortcuts extends Component {
     static template = "agile_community.Shortcuts";
-    static props = {};
+    props = useProps({});
 
     setup() {
         this.dialog = useService("dialog");

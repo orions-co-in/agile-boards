@@ -1,4 +1,5 @@
-import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, proxy, usePlugin, useProps, t } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useBus, useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
@@ -6,6 +7,8 @@ import { _t } from "@web/core/l10n/translation";
 import { sidebarTarget, SIDEBAR_ENTRIES } from "@agile_community/sidebar/sidebar_helpers";
 import { openShortcutHelp } from "@agile_community/shortcuts/agile_shortcuts";
 import { PALETTE_ACTIONS, buildSections, isPaletteKey, matchTargets, moveIndex } from "./palette_helpers";
+
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 const SEARCH_DELAY = 150;
 
@@ -17,19 +20,19 @@ const SEARCH_DELAY = 150;
 export class AgilePalette extends Component {
     static template = "agile_community.Palette";
     static components = { Dialog };
-    static props = { close: Function, projectId: Number, entries: Array };
+    props = useProps({ close: t.function(), projectId: t.number(), entries: t.array()});
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
+        this.action = usePlugin(ActionPlugin);
         this.dialog = useService("dialog");
-        this.inputRef = useRef("input");
-        this.state = useState({ term: "", issues: [], index: 0, loaded: false });
+        this.inputRef = signal.ref();
+        this.state = proxy({ term: "", issues: [], index: 0, loaded: false });
         this.timer = null;
         this.token = 0;
         this.screens = SIDEBAR_ENTRIES.filter((entry) => this.props.entries.includes(entry.key));
         onMounted(() => {
-            this.inputRef.el?.focus();
+            this.inputRef()?.focus();
             this.search();
         });
         onWillUnmount(() => clearTimeout(this.timer));
@@ -156,11 +159,11 @@ export class AgilePalette extends Component {
  */
 export class AgilePaletteHost extends Component {
     static template = "agile_community.PaletteHost";
-    static props = {};
+    props = useProps({});
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
+        this.action = usePlugin(ActionPlugin);
         this.dialog = useService("dialog");
         this.lastVisit = null;
         this.onKeydown = this.onKeydown.bind(this);

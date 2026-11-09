@@ -2,29 +2,29 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.History">
         <section class="o_ag_history" aria-label="Issue history">
-            <div t-if="!resId" class="o_ag_history_note">Save the issue to see its history.</div>
-            <div t-elif="state.loading" class="o_ag_history_note" role="status">Loading history…</div>
-            <div t-elif="state.error" class="o_ag_history_note text-danger" role="alert">
-                <t t-out="state.error"/>
-                <button type="button" class="btn btn-link" t-on-click="retry">Try again</button>
+            <div t-if="!this.resId" class="o_ag_history_note">Save the issue to see its history.</div>
+            <div t-elif="this.state.loading" class="o_ag_history_note" role="status">Loading history…</div>
+            <div t-elif="this.state.error" class="o_ag_history_note text-danger" role="alert">
+                <t t-out="this.state.error"/>
+                <button type="button" class="btn btn-link" t-on-click="this.retry">Try again</button>
             </div>
             <t t-else="">
                 <div class="o_ag_history_tabs" role="tablist" aria-label="Show">
-                    <button t-foreach="tabs" t-as="tab" t-key="tab.key" type="button" role="tab"
-                            class="o_ag_history_tab" t-att-class="{ 'active': state.tab === tab.key }"
-                            t-att-data-tab="tab.key" t-att-aria-selected="state.tab === tab.key ? 'true' : 'false'"
-                            t-att-tabindex="state.tab === tab.key ? 0 : -1"
-                            t-on-click="() => this.selectTab(tab.key)" t-on-keydown="onTabKey">
+                    <button t-foreach="this.tabs" t-as="tab" t-key="tab.key" type="button" role="tab"
+                            class="o_ag_history_tab" t-att-class="{ 'active': this.state.tab === tab.key }"
+                            t-att-data-tab="tab.key" t-att-aria-selected="this.state.tab === tab.key ? 'true' : 'false'"
+                            t-att-tabindex="this.state.tab === tab.key ? 0 : -1"
+                            t-on-click="() => this.selectTab(tab.key)" t-on-keydown="this.onTabKey">
                         <t t-out="tab.label"/> <span class="o_ag_history_count" t-out="tab.count"/>
                     </button>
                 </div>
                 <div role="tabpanel" class="o_ag_history_panel">
-                    <p t-if="!entries.length" class="o_ag_history_note" t-out="emptyText"/>
+                    <p t-if="!this.entries.length" class="o_ag_history_note" t-out="this.emptyText"/>
                     <ul t-else="" class="o_ag_history_list list-unstyled">
-                        <li t-foreach="entries" t-as="entry" t-key="entry.key" class="o_ag_history_row" t-attf-data-kind="{{ entry.kind }}">
+                        <li t-foreach="this.entries" t-as="entry" t-key="entry.key" class="o_ag_history_row" t-attf-data-kind="{{ entry.kind }}">
                             <div class="o_ag_history_meta">
                                 <strong t-out="entry.author"/>
-                                <span class="o_ag_history_kind" t-if="state.tab === 'all'">
+                                <span class="o_ag_history_kind" t-if="this.state.tab === 'all'">
                                     <t t-if="entry.kind === 'comment'"><t t-if="entry.note">noted</t><t t-else="">commented</t></t>
                                     <t t-elif="entry.kind === 'worklog'">logged work</t>
                                     <t t-else="">changed</t>
@@ -32,7 +32,7 @@
                                 <span class="o_ag_history_date text-muted" t-out="entry.date"/>
                             </div>
                             <div t-if="entry.kind === 'worklog'" class="o_ag_history_body">
-                                <strong t-out="hoursText(entry.hours)"/>
+                                <strong t-out="this.hoursText(entry.hours)"/>
                                 <span t-if="entry.work_date"> on <t t-out="entry.work_date"/></span>
                                 <span t-if="entry.text">: <t t-out="entry.text"/></span>
                             </div>

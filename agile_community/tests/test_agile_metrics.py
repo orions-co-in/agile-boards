@@ -1,8 +1,9 @@
 from datetime import datetime, time, timedelta
 
-import pytz
+from datetime import UTC
+from zoneinfo import ZoneInfo
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.exceptions import AccessError, UserError
 from odoo.tests.common import TransactionCase, new_test_user
 
@@ -104,12 +105,9 @@ class TestAgileMetrics(TransactionCase):
             "agile_enabled": True,
             "agile_key": "PRIVMET",
         })
-        private_project.with_user(self.manager).message_subscribe(
-            partner_ids=[
-                self.manager.partner_id.id,
-                self.contributor.partner_id.id,
-            ]
-        )
+        private_project.with_user(self.manager).write({
+            "allowed_internal_user_ids": [Command.link(self.manager.id), Command.link(self.contributor.id)],
+        })
         self.env["agile.project.member"].with_user(self.manager).create({
             "project_id": private_project.id,
             "user_id": self.contributor.id,
@@ -155,9 +153,10 @@ class TestAgileMetrics(TransactionCase):
             for issue in (assigned_issue, hidden_issue)
         ])
 
-        private_project.with_user(self.manager).message_unsubscribe(
-            partner_ids=[self.contributor.partner_id.id]
-        )
+        private_project.with_user(self.manager).write({"allowed_internal_user_ids": [Command.unlink(self.contributor.id)]})
+
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.assertFalse(
             private_project.with_user(self.contributor).has_access("read")
         )
@@ -202,9 +201,9 @@ class TestAgileMetrics(TransactionCase):
         timezone = "Asia/Kolkata"
         project = self.project.with_user(self.contributor).with_context(tz=timezone)
         today = fields.Date.context_today(project)
-        utc_boundary = pytz.timezone(timezone).localize(
-            datetime.combine(today, time.min)
-        ).astimezone(pytz.UTC)
+        utc_boundary = datetime.combine(today, time.min).replace(
+            tzinfo=ZoneInfo(timezone)
+        ).astimezone(UTC)
         before = utc_boundary - timedelta(minutes=1)
         after = utc_boundary + timedelta(minutes=1)
         self._issue("Yesterday deadline", date_deadline=fields.Datetime.to_string(before.replace(tzinfo=None)))

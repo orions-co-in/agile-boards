@@ -11,7 +11,7 @@ class AgileIssueChecklistItem(models.Model):
         "project.task", required=True, index=True, ondelete="cascade"
     )
     sequence = fields.Integer(default=10)
-    name = fields.Char(string="Checklist item", required=True)
+    name = fields.Char(string="Checklist item", required=True, copy=True)
     is_done = fields.Boolean(string="Done", copy=False, default=False)
 
     def _check_task_editable(self, task):

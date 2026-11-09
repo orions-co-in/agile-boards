@@ -1,9 +1,13 @@
-import { onWillRender, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { proxy, usePlugin, useProps, t } from "@odoo/owl";
+import { NotificationPlugin } from "@web/core/notifications/notification_plugin";
 import { useSortable } from "@web/core/utils/sortable_owl";
 import { useService } from "@web/core/utils/hooks";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
+import {onWillRender} from "@web/owl2/utils";
 import { KanbanRecord } from "@web/views/kanban/kanban_record";
+import { kanbanRendererProps } from "@web/views/kanban/kanban_renderer";
 import { ProjectTaskKanbanRenderer } from "@project/views/project_task_kanban/project_task_kanban_renderer";
 import { AgileColumnHeader } from "./agile_column_header";
 import {
@@ -119,7 +123,7 @@ export class AgileKanbanRecord extends KanbanRecord {
     setup() {
         super.setup();
         // Watch the shared selection, so this card redraws when it is picked or dropped.
-        this.pick = this.env.agileSelect ? useState(this.env.agileSelect) : null;
+        this.pick = this.env.agileSelect ? proxy(this.env.agileSelect) : null;
     }
 
     getRecordClasses() {
@@ -135,18 +139,18 @@ export class AgileKanbanRecord extends KanbanRecord {
 export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
     static template = "agile_community.BoardKanbanRenderer";
     static components = { ...ProjectTaskKanbanRenderer.components, KanbanRecord: AgileKanbanRecord, KanbanHeader: AgileColumnHeader };
-    static props = [...ProjectTaskKanbanRenderer.props, "swimlane?"];
+    props = useProps({ ...kanbanRendererProps, hideKanbanStagesNocontent: t.any().optional(), swimlane: t.any().optional() });
 
     setup() {
         super.setup();
         // Redraw when the board's columns or merged columns change (the bar sets them after it loads).
-        this.boardState = this.env.agileBoard ? useState(this.env.agileBoard) : null;
-        this.laneState = useState({ collapsed: {}, swimlane: null });
-        this.laneFilter = useState({ id: null, name: "", ids: null });
+        this.boardState = this.env.agileBoard ? proxy(this.env.agileBoard) : null;
+        this.laneState = proxy({ collapsed: {}, swimlane: null });
+        this.laneFilter = proxy({ id: null, name: "", ids: null });
         // Phones show one column at a time; the Move-to sheet lists what the person may do.
-        this.tabState = useState({ id: null });
-        this.sheet = useState({ recordId: null, title: "", moves: [], loading: false, groupId: null });
-        this.sheetRef = useRef("sheet");
+        this.tabState = proxy({ id: null });
+        this.sheet = proxy({ recordId: null, title: "", moves: [], loading: false, groupId: null });
+        this.sheetRef = signal.ref();
         onWillRender(() => {
             this.syncClosedLanes();
             const filterId = laneFilterId(this.props.swimlane);
@@ -155,7 +159,8 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
             }
         });
         this.orm = useService("orm");
-        this.notification = useService("notification");
+        this.uiService = useService("ui");
+        this.notification = usePlugin(NotificationPlugin);
         // Swimlane cards drag sideways to change status; a drop on another row is refused.
         let draggedId = null;
         let fromGroupId = null;
@@ -247,7 +252,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
 
     focusCard(key) {
         setTimeout(() => {
-            [...this.rootRef.el.querySelectorAll(".o_kanban_record")]
+            [...this.rootRef().querySelectorAll(".o_kanban_record")]
                 .find((el) => el.innerText.includes(key))
                 ?.focus();
         }, 0);
@@ -304,7 +309,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
     }
 
     get phoneMode() {
-        return Boolean(this.env.isSmall && this.props.list.isGrouped);
+        return Boolean(this.uiService.isSmall && this.props.list.isGrouped);
     }
 
     /** The columns the current board shows (R-1107); a board with none chosen shows them all. */
@@ -374,7 +379,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
         }
         this.sheet.moves = moves;
         this.sheet.loading = false;
-        setTimeout(() => this.sheetRef.el?.focus(), 0);
+        setTimeout(() => this.sheetRef()?.focus(), 0);
     }
 
     closeSheet() {
@@ -409,7 +414,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
 
     get swimlaneMode() {
         return (
-            !this.env.isSmall &&
+            !this.uiService.isSmall &&
             this.props.list.isGrouped &&
             (Boolean(LANE_FIELD[this.props.swimlane]) || Boolean(this.filterLane) || this.mergedMode)
         );
@@ -417,7 +422,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
 
     /** R-1111: a board with merged columns uses the grid, where a column can hold several statuses. */
     get mergedMode() {
-        return Boolean(this.boardState?.columnGroups?.length) && !this.env.isSmall && this.props.list.isGrouped;
+        return Boolean(this.boardState?.columnGroups?.length) && !this.uiService.isSmall && this.props.list.isGrouped;
     }
 
     /** Without a swimlane (merged columns only) the grid has one row and no row title. */

@@ -1,7 +1,10 @@
-import { Component, onMounted, onPatched, onWillUpdateProps, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, onPatched, onWillUpdateProps, proxy, usePlugin, useProps, t } from "@odoo/owl";
+import { UIPlugin } from "@web/core/ui/ui_plugin";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { planDate } from "./agile_plan_scenario";
+
 
 /** "34 of 30 points: over by 4" for a board cell, in words as well as colour. */
 export function cellText(cell) {
@@ -30,13 +33,13 @@ export function connectorPath(from, to) {
 /** The program board of one scenario: teams as rows, each team's next sprints as columns. */
 export class AgilePlanBoard extends Component {
     static template = "agile_community.PlanBoard";
-    static props = { scenarioId: Number, onChange: Function };
+    props = useProps({ scenarioId: t.number(), onChange: t.function()});
 
     setup() {
         this.orm = useService("orm");
-        this.ui = useService("ui");
-        this.root = useRef("root");
-        this.state = useState({ data: null, error: null, notice: null, offset: 0, team: 0, lines: [], dragging: null });
+        this.ui = usePlugin(UIPlugin);
+        this.root = signal.ref();
+        this.state = proxy({ data: null, error: null, notice: null, offset: 0, team: 0, lines: [], dragging: null });
         onMounted(() => this.load(this.props.scenarioId));
         onWillUpdateProps((next) => next.scenarioId !== this.props.scenarioId && this.load(next.scenarioId));
         onPatched(() => this.drawLines());
@@ -155,7 +158,7 @@ export class AgilePlanBoard extends Component {
 
     /** Blocker-to-blocked arrows between cards on screen, measured from the page. */
     drawLines() {
-        const root = this.root.el;
+        const root = this.root();
         if (!root || !this.state.data || this.ui.isSmall) {
             return;
         }

@@ -73,7 +73,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <field name="agile_has_voted" invisible="1"/>
-                <button name="agile_toggle_vote" type="object" class="oe_stat_button" icon="fa-thumbs-up"
+                <button name="agile_toggle_vote" type="object" class="oe_stat_button" icon="thumb_up" icon_class="oi-filled"
                         invisible="not agile_issue or not id"
                         title="Vote for this issue, or take your vote back">
                     <div class="o_stat_info">
@@ -265,7 +265,7 @@
                 <field name="agile_issue" invisible="1"/>
                 <field name="issue_key" class="text-muted small" invisible="not agile_issue" readonly="1"/>
             </field>
-            <xpath expr="//kanban" position="inside">
+            <xpath expr="." position="inside">
                 <field name="agile_is_blocked"/>
                 <field name="agile_block_reason_display"/>
                 <field name="agile_blocked_by_text"/>
@@ -314,7 +314,7 @@
                 <field name="agile_vote_count" invisible="1"/>
                 <span t-if="record.agile_issue.raw_value and record.agile_vote_count.raw_value" class="o_ag_card_votes d-block mb-1 text-muted small"
                       t-att-title="record.agile_vote_count.raw_value + (record.agile_vote_count.raw_value === 1 ? ' vote' : ' votes')">
-                    <i class="fa fa-thumbs-up" role="img" aria-label="Votes"/> <t t-out="record.agile_vote_count.raw_value"/>
+                    <i class="oi oi-filled" data-icon="thumb_up" role="img" aria-label="Votes"/> <t t-out="record.agile_vote_count.raw_value"/>
                 </span>
                 <field name="agile_flagged" invisible="1"/>
                 <field name="agile_uses_resolution" invisible="1"/>
@@ -326,13 +326,13 @@
                 <span t-if="record.agile_resolution.raw_value" class="o_ag_card_resolution d-block mb-1" role="status">Resolution: <t t-out="record.agile_resolution.value"/></span>
                 <field name="agile_blocked" invisible="1"/>
                 <span t-if="record.agile_is_blocked.raw_value and (record.agile_blocked.raw_value or !record.agile_blocked_by_text.value)" class="o_ag_card_blocked d-block mb-1" role="status" t-att-title="record.agile_block_reason_display.value" t-att-aria-label="'Blocked: ' + record.agile_block_reason_display.value">
-                    <i class="fa fa-ban" aria-hidden="true"/> Blocked: <t t-esc="record.agile_block_reason_display.value"/>
+                    <i class="oi" data-icon="block" aria-hidden="true"/> Blocked: <t t-out="record.agile_block_reason_display.value"/>
                 </span>
                 <span t-if="record.agile_blocked_by_text.value" t-attf-class="o_ag_card_blocker d-block mb-1 #{record.agile_is_blocked.raw_value and !record.agile_blocked.raw_value ? 'o_ag_card_blocked' : ''}" t-att-title="'Waiting for ' + record.agile_blocked_by_text.value">
                     Blocked by <t t-out="record.agile_blocked_by_text.value"/>
                 </span>
                 <span t-if="record.agile_lock_text.value" class="o_ag_card_lock d-block mb-1 small">
-                    <i class="fa fa-lock" aria-hidden="true"/> <t t-out="record.agile_lock_text.value"/>
+                    <i class="oi" data-icon="lock" aria-hidden="true"/> <t t-out="record.agile_lock_text.value"/>
                 </span>
             </xpath>
             <!-- Scrum adds its own estimate to the card; the key line already shows it once. -->
@@ -342,7 +342,7 @@
             <xpath expr="//t[@t-name='card']//field[@name='sprint_id']/following-sibling::field[@name='story_points']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//t[@t-name='card']//footer/div[last()]/field[@name='state']" position="before">
+            <xpath expr="//t[@t-name='card']//footer/field[@name='state']" position="before">
                 <div class="o_agile_task_actions" role="group" aria-label="Issue actions">
                     <field name="agile_step_reasons" widget="agile_step_reasons"/>
                     <button name="action_agile_mark_ready" type="object" title="Move issue to To Do" string="To Do" class="btn btn-sm btn-primary" invisible="not can_agile_mark_ready"/>
@@ -356,7 +356,7 @@
                     <a href="#" role="button" class="o_ag_move_to btn btn-sm btn-link d-md-none" aria-haspopup="dialog" invisible="not can_agile_move_to">Move to…</a>
                 </div>
             </xpath>
-            <xpath expr="//t[@t-name='card']//footer/div[last()]/field[@name='state']" position="attributes">
+            <xpath expr="//t[@t-name='card']//footer/field[@name='state']" position="attributes">
                 <attribute name="invisible">agile_issue</attribute>
             </xpath>
             <xpath expr="//t[@t-name='card']/main" position="attributes">
@@ -522,7 +522,7 @@
     <record id="project_task_kanban_agile_backlog_order" model="ir.ui.view">
         <field name="name">project.task.kanban.agile.backlog.order</field>
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="project_task_kanban_agile"/>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <xpath expr="//kanban" position="attributes">

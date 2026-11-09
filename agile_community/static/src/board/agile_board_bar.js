@@ -1,10 +1,13 @@
-import { Component, onMounted, onWillStart, onWillUpdateProps, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, onWillStart, onWillUpdateProps, proxy, usePlugin, useProps, t } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
 import { browser } from "@web/core/browser/browser";
+
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // Chips that are plain filters of the search view, by chip key.
 const NAMED_FILTERS = {
@@ -33,22 +36,22 @@ export const SWIMLANES = [
 export class AgileBoardBar extends Component {
     static template = "agile_community.BoardBar";
     static components = { Dropdown, DropdownItem };
-    static props = {
-        projectId: Number,
+    props = useProps({
+        projectId: t.number(),
         // Changes whenever the active filters change, so the bar redraws.
-        filterKey: String,
-        swimlane: String,
-        onSwimlane: Function,
-        onColumns: { type: Function, optional: true },
-        selecting: { type: Boolean, optional: true },
-        onSelect: { type: Function, optional: true },
-    };
+        filterKey: t.string(),
+        swimlane: t.string(),
+        onSwimlane: t.function(),
+        onColumns: t.function().optional(),
+        selecting: t.boolean().optional(),
+        onSelect: t.function().optional()});
 
     setup() {
         this.orm = useService("orm");
-        this.actionService = useService("action");
+        this.ui = useService("ui");
+        this.actionService = usePlugin(ActionPlugin);
         this.swimlanes = SWIMLANES;
-        this.state = useState({
+        this.state = proxy({
             barOpen: false,
             types: [], epics: [], sprints: [], laneFilters: [], failed: false,
             views: [], saving: false, viewName: "", viewError: "", announce: "",
@@ -56,7 +59,7 @@ export class AgileBoardBar extends Component {
             insightsOpen: false, insights: null, insightsFailed: false,
             compact: this.readCompact(),
         });
-        this.root = useRef("root");
+        this.root = signal.ref();
         this.ready = false;
         this.savedKey = null;
         this.saved = null;
@@ -88,7 +91,7 @@ export class AgileBoardBar extends Component {
     }
 
     applyCompact() {
-        this.root.el?.closest(".o_kanban_view, .o_view_controller")?.classList.toggle("o_ag_compact", this.state.compact);
+        this.root()?.closest(".o_kanban_view, .o_view_controller")?.classList.toggle("o_ag_compact", this.state.compact);
     }
 
     /** On a phone the filter chips start folded so the board stays on screen (NU-38). */

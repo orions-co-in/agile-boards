@@ -1,6 +1,8 @@
-import { Component, useEffect, useRef } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
+import {useLayoutEffect} from "@web/owl2/utils";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 const NEEDED = "o_ag_needed";
@@ -12,13 +14,13 @@ const NEEDED = "o_ag_needed";
  */
 export class AgileTransitionHint extends Component {
     static template = "agile_community.TransitionHint";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
-        this.rootRef = useRef("root");
-        useEffect(
+        this.rootRef = signal.ref();
+        useLayoutEffect(
             () => {
-                const form = this.rootRef.el?.closest(".o_form_view");
+                const form = this.rootRef()?.closest(".o_form_view");
                 if (!form) {
                     return;
                 }
@@ -48,7 +50,7 @@ export class AgileTransitionHint extends Component {
 
     showMe(ev) {
         ev.preventDefault();
-        const form = this.rootRef.el.closest(".o_form_view");
+        const form = this.rootRef().closest(".o_form_view");
         for (const name of this.missing) {
             const target = form?.querySelector(`.o_field_widget[name="${name}"]`);
             const focusable = target?.matches("input, textarea, [contenteditable]")

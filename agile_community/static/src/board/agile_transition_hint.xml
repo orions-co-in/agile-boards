@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.TransitionHint">
-        <div class="o_ag_hint" role="status" t-ref="root" t-if="hint">
-            <span t-out="hint"/>
-            <a href="#" class="o_ag_hint_show ms-2" t-on-click="showMe">Show me</a>
+        <div class="o_ag_hint" role="status" t-ref="this.rootRef" t-if="this.hint">
+            <span t-out="this.hint"/>
+            <a href="#" class="o_ag_hint_show ms-2" t-on-click="this.showMe">Show me</a>
         </div>
     </t>
 </templates>

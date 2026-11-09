@@ -1,8 +1,9 @@
 // Roadmap colours and shared views (U-1163). The pure helpers are tested on their own.
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, usePlugin, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { browser } from "@web/core/browser/browser";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // Eight colours that stay apart for most kinds of colour blindness; the legend names each one.
 export const RELEASE_COLOURS = ["#0b5ed7", "#c2410c", "#157347", "#7a46c9", "#b4236a", "#0e7490", "#96620a", "#5d6975"];
@@ -71,18 +72,17 @@ export function shareIdFrom(params, search) {
 
 export class AgileRoadmapShare extends Component {
     static template = "agile_community.RoadmapShare";
-    static props = {
-        projects: Array,
-        hideDone: Boolean,
-        epicsOnly: Boolean,
-        colourBy: String,
-        onClose: Function,
-    };
+    props = useProps({
+        projects: t.array(),
+        hideDone: t.boolean(),
+        epicsOnly: t.boolean(),
+        colourBy: t.string(),
+        onClose: t.function()});
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.state = useState({
+        this.action = usePlugin(ActionPlugin);
+        this.state = proxy({
             loading: true,
             error: null,
             mine: [],

@@ -2,59 +2,59 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.PlanScenario">
         <section class="o_ag_scn" aria-label="Scenario">
-            <div t-if="state.error" class="alert alert-danger" role="alert" t-out="state.error"/>
-            <t t-elif="state.data">
+            <div t-if="this.state.error" class="alert alert-danger" role="alert" t-out="this.state.error"/>
+            <t t-elif="this.state.data">
                 <div class="o_ag_scn_bar">
-                    <strong t-out="state.data.name"/>
-                    <span class="badge text-bg-light o_ag_scn_summary" t-out="summary"/>
+                    <strong t-out="this.state.data.name"/>
+                    <span class="badge text-bg-light o_ag_scn_summary" t-out="this.summary"/>
                     <span class="o_ag_scn_legend text-muted">Top bar: live dates. Bottom bar: this scenario. Dashed outline: ends later than live.</span>
-                    <button t-if="state.data.can_suggest" type="button" class="btn btn-secondary o_ag_scn_suggest" t-on-click="suggest">Suggest dates</button>
-                    <button t-if="state.data.can_apply" type="button" class="btn btn-primary o_ag_scn_apply" t-on-click="askApply">Apply to live plan</button>
-                    <button t-if="state.data.can_restore" type="button" class="btn btn-secondary o_ag_scn_restore" t-on-click="restore">Restore previous dates</button>
-                    <button t-if="state.data.can_delete" type="button" class="btn btn-link o_ag_scn_delete" t-on-click="remove">Delete scenario</button>
+                    <button t-if="this.state.data.can_suggest" type="button" class="btn btn-secondary o_ag_scn_suggest" t-on-click="this.suggest">Suggest dates</button>
+                    <button t-if="this.state.data.can_apply" type="button" class="btn btn-primary o_ag_scn_apply" t-on-click="this.askApply">Apply to live plan</button>
+                    <button t-if="this.state.data.can_restore" type="button" class="btn btn-secondary o_ag_scn_restore" t-on-click="this.restore">Restore previous dates</button>
+                    <button t-if="this.state.data.can_delete" type="button" class="btn btn-link o_ag_scn_delete" t-on-click="this.remove">Delete scenario</button>
                 </div>
-                <p t-if="state.notice" class="o_ag_scn_notice" role="status" aria-live="polite" t-out="state.notice"/>
-                <div t-if="state.suggestion" class="o_ag_scn_suggestion" role="status" aria-live="polite">
-                    <p class="o_ag_scn_suggest_summary" t-out="'Placed ' + state.suggestion.placed.length + ' epics, could not place ' + state.suggestion.unplaced.length + (state.suggestion.kept ? ', kept ' + state.suggestion.kept + ' locked or not yours to change' : '') + '. The live plan has not changed.'"/>
+                <p t-if="this.state.notice" class="o_ag_scn_notice" role="status" aria-live="polite" t-out="this.state.notice"/>
+                <div t-if="this.state.suggestion" class="o_ag_scn_suggestion" role="status" aria-live="polite">
+                    <p class="o_ag_scn_suggest_summary" t-out="'Placed ' + this.state.suggestion.placed.length + ' epics, could not place ' + this.state.suggestion.unplaced.length + (this.state.suggestion.kept ? ', kept ' + this.state.suggestion.kept + ' locked or not yours to change' : '') + '. The live plan has not changed.'"/>
                     <ul class="o_ag_scn_placed list-unstyled">
-                        <li t-foreach="state.suggestion.placed" t-as="item" t-key="item.epic_id"><strong t-out="item.key"/>: <t t-out="planDate(item.start) + ' to ' + planDate(item.end)"/>. <span class="text-muted" t-out="item.reason"/></li>
+                        <li t-foreach="this.state.suggestion.placed" t-as="item" t-key="item.epic_id"><strong t-out="item.key"/>: <t t-out="this.planDate(item.start) + ' to ' + this.planDate(item.end)"/>. <span class="text-muted" t-out="item.reason"/></li>
                     </ul>
-                    <t t-if="state.suggestion.unplaced.length">
+                    <t t-if="this.state.suggestion.unplaced.length">
                         <p><strong>Not placed</strong></p>
                         <ul class="o_ag_scn_unplaced list-unstyled">
-                            <li t-foreach="state.suggestion.unplaced" t-as="item" t-key="item.epic_id"><strong t-out="item.key"/>: <span t-out="item.reason"/></li>
+                            <li t-foreach="this.state.suggestion.unplaced" t-as="item" t-key="item.epic_id"><strong t-out="item.key"/>: <span t-out="item.reason"/></li>
                         </ul>
                     </t>
                 </div>
-                <ul t-if="state.result and state.result.skipped.length" class="o_ag_scn_skipped">
-                    <li t-foreach="state.result.skipped" t-as="skip" t-key="skip_index"><strong t-out="skip.key"/>: <t t-out="skip.reason"/></li>
+                <ul t-if="this.state.result and this.state.result.skipped.length" class="o_ag_scn_skipped">
+                    <li t-foreach="this.state.result.skipped" t-as="skip" t-key="skip_index"><strong t-out="skip.key"/>: <t t-out="skip.reason"/></li>
                 </ul>
-                <div t-if="state.confirm" class="o_ag_scn_confirm" role="alertdialog" aria-label="Apply scenario">
-                    <p t-out="'Apply &quot;' + state.data.name + '&quot;? ' + summary"/>
+                <div t-if="this.state.confirm" class="o_ag_scn_confirm" role="alertdialog" aria-label="Apply scenario">
+                    <p t-out="'Apply &quot;' + this.state.data.name + '&quot;? ' + this.summary"/>
                     <ul>
-                        <li t-foreach="state.data.rows.filter((r) => r.status !== 'same')" t-as="row" t-key="row.epic_id">
-                            <strong t-out="row.key"/>: <t t-if="row.status === 'moves'"><t t-out="planDate(row.live_start) + ' to ' + planDate(row.live_end)"/> becomes <t t-out="planDate(row.start) + ' to ' + planDate(row.end)"/></t>
-                            <t t-else="" t-out="statusText(row)"/>
+                        <li t-foreach="this.state.data.rows.filter((r) => r.status !== 'same')" t-as="row" t-key="row.epic_id">
+                            <strong t-out="row.key"/>: <t t-if="row.status === 'moves'"><t t-out="this.planDate(row.live_start) + ' to ' + this.planDate(row.live_end)"/> becomes <t t-out="this.planDate(row.start) + ' to ' + this.planDate(row.end)"/></t>
+                            <t t-else="" t-out="this.statusText(row)"/>
                         </li>
                     </ul>
-                    <button type="button" class="btn btn-primary o_ag_scn_confirm_apply" t-on-click="apply">Apply</button>
+                    <button type="button" class="btn btn-primary o_ag_scn_confirm_apply" t-on-click="this.apply">Apply</button>
                     <button type="button" class="btn btn-secondary" t-on-click="() => this.state.confirm = false">Cancel</button>
                     <p class="text-muted">You can restore the previous dates for 10 minutes after applying.</p>
                 </div>
-                <p t-if="!state.data.rows.length" class="text-muted">None of this scenario's epics are open to you.</p>
+                <p t-if="!this.state.data.rows.length" class="text-muted">None of this scenario's epics are open to you.</p>
                 <ul class="o_ag_scn_rows list-unstyled">
-                    <li t-foreach="bars" t-as="bar" t-key="bar.row.epic_id" class="o_ag_scn_row" t-att-data-epic="bar.row.epic_id">
+                    <li t-foreach="this.bars" t-as="bar" t-key="bar.row.epic_id" class="o_ag_scn_row" t-att-data-epic="bar.row.epic_id">
                         <div class="o_ag_scn_label">
                             <strong t-out="bar.row.key"/> <span t-out="bar.row.name"/>
                             <span class="badge text-bg-light" t-out="bar.row.project"/>
-                            <span t-if="bar.row.status !== 'same'" class="o_ag_scn_status" t-attf-class="o_ag_scn_status {{bar.row.status}}" t-out="statusText(bar.row)"/>
+                            <span t-if="bar.row.status !== 'same'" class="o_ag_scn_status" t-attf-class="o_ag_scn_status {{bar.row.status}}" t-out="this.statusText(bar.row)"/>
                         </div>
-                        <div class="o_ag_scn_lane" role="img" t-att-aria-label="barLabel(bar)">
+                        <div class="o_ag_scn_lane" role="img" t-att-aria-label="this.barLabel(bar)">
                             <span t-if="bar.live" class="o_ag_scn_bar_live" t-attf-style="left: {{bar.live.left}}%; width: {{bar.live.width}}%"/>
                             <span t-if="bar.scenario" t-attf-class="o_ag_scn_bar_scn {{bar.later ? 'later' : ''}}" t-attf-style="left: {{bar.scenario.left}}%; width: {{bar.scenario.width}}%"/>
                         </div>
                         <div class="o_ag_scn_dates">
-                            <label t-if="state.data.can_suggest" class="o_ag_scn_lock"><input type="checkbox" t-att-checked="bar.row.locked" t-att-disabled="!bar.row.can_change"
+                            <label t-if="this.state.data.can_suggest" class="o_ag_scn_lock"><input type="checkbox" t-att-checked="bar.row.locked" t-att-disabled="!bar.row.can_change"
                                     t-on-change="(ev) => this.toggleLock(bar.row, ev)"/> Lock</label>
                             <label>Start <input type="date" class="form-control form-control-sm o_ag_scn_start" t-att-value="bar.row.start" t-att-disabled="!bar.row.can_change"
                                                 t-on-change="(ev) => this.setDates(bar.row, 'start', ev)"/></label>

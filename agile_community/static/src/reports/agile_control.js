@@ -1,9 +1,11 @@
-import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { deserializeDate } from "@web/core/l10n/dates";
 import { niceMax } from "./agile_cfd";
 import { ReportExport, svgPngBlob } from "./report_export";
+import {useLayoutEffect} from "@web/owl2/utils";
 
 const CHART = { w: 720, h: 276, left: 48, right: 12, top: 12, bottom: 44 };
 const DAY_MS = 86400000;
@@ -44,19 +46,19 @@ export function controlText(data) {
 export class AgileControlChart extends Component {
     static template = "agile_community.ControlChart";
     static components = { ReportExport };
-    static props = ["projectId"];
+    props = useProps({projectId: t.any()});
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ loading: true, error: null, data: null, from: "", to: "", hover: null, table: false });
-        this.chartBox = useRef("chartBox");
-        useEffect(
+        this.state = proxy({ loading: true, error: null, data: null, from: "", to: "", hover: null, table: false });
+        this.chartBox = signal.ref();
+        useLayoutEffect(
             (box) => {
                 if (box) {
                     box.scrollLeft = box.scrollWidth;
                 }
             },
-            () => [this.chartBox.el, this.state.data]
+            () => [this.chartBox(), this.state.data]
         );
         onMounted(() => this.load());
     }
@@ -71,7 +73,7 @@ export class AgileControlChart extends Component {
     }
 
     exportPng() {
-        return svgPngBlob(this.chartBox.el.querySelector("svg"), this.exportTitle, this.summary);
+        return svgPngBlob(this.chartBox().querySelector("svg"), this.exportTitle, this.summary);
     }
 
     get layout() {

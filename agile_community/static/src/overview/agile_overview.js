@@ -1,9 +1,10 @@
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { Layout } from "@web/search/layout";
 import { AgilePulse } from "@agile_community/components/pulse/agile_pulse";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // Tile order is the reading order: everything open, then what needs attention.
 export const OVERVIEW_TILES = [
@@ -18,12 +19,12 @@ export class AgileOverview extends Component {
     // Breadcrumb label when the action is restored from the URL.
     static displayName = _t("Overview");
     static components = { Layout, AgilePulse };
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.state = useState({ loading: true, error: null, data: null });
+        this.action = usePlugin(ActionPlugin);
+        this.state = proxy({ loading: true, error: null, data: null });
         this.tiles = OVERVIEW_TILES;
         this.display = { controlPanel: {} };
         onMounted(() => this.load());

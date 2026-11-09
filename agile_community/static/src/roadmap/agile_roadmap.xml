@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.Roadmap">
-        <Layout display="display" className="'o_ag_roadmap'">
-            <div class="o_ag_rm_body" t-ref="root">
+        <Layout display="this.display" className="'o_ag_roadmap'">
+            <div class="o_ag_rm_body" t-ref="this.root">
                 <header class="o_ag_rm_head">
-                    <h1 class="o_ag_rm_title" t-out="pageTitle"/>
+                    <h1 class="o_ag_rm_title" t-out="this.pageTitle"/>
                     <div class="o_ag_rm_controls">
-                        <label t-if="!isShared and !inProject and state.projects.length > 1" class="o_ag_rm_control"><span>Projects</span>
-                            <select class="form-select o_ag_rm_projects" multiple="multiple" t-on-change="onProjects">
-                                <option t-foreach="state.projects" t-as="project" t-key="project.id" t-att-value="project.id"
-                                        t-att-selected="!state.selected.length or state.selected.includes(project.id)" t-out="project.name"/>
+                        <label t-if="!this.isShared and !this.inProject and this.state.projects.length > 1" class="o_ag_rm_control"><span>Projects</span>
+                            <select class="form-select o_ag_rm_projects" multiple="multiple" t-on-change="this.onProjects">
+                                <option t-foreach="this.state.projects" t-as="project" t-key="project.id" t-att-value="project.id"
+                                        t-att-selected="!this.state.selected.length or this.state.selected.includes(project.id)" t-out="project.name"/>
                             </select></label>
-                        <div t-if="!isShared" class="btn-group o_ag_rm_view" role="group" aria-label="View">
-                            <button type="button" t-attf-class="btn btn-secondary o_ag_rm_view_timeline {{!isPlan ? 'active' : ''}}"
-                                    t-att-aria-pressed="!isPlan ? 'true' : 'false'" t-on-click="() => this.setView('timeline')">Timeline</button>
-                            <button t-if="state.data?.plan_available" type="button" t-attf-class="btn btn-secondary o_ag_rm_view_plan {{isPlan ? 'active' : ''}}"
-                                    t-att-aria-pressed="isPlan ? 'true' : 'false'" t-on-click="() => this.setView('plan')">Plan</button>
+                        <div t-if="!this.isShared" class="btn-group o_ag_rm_view" role="group" aria-label="View">
+                            <button type="button" t-attf-class="btn btn-secondary o_ag_rm_view_timeline {{!this.isPlan ? 'active' : ''}}"
+                                    t-att-aria-pressed="!this.isPlan ? 'true' : 'false'" t-on-click="() => this.setView('timeline')">Timeline</button>
+                            <button t-if="this.state.data?.plan_available" type="button" t-attf-class="btn btn-secondary o_ag_rm_view_plan {{this.isPlan ? 'active' : ''}}"
+                                    t-att-aria-pressed="this.isPlan ? 'true' : 'false'" t-on-click="() => this.setView('plan')">Plan</button>
                         </div>
-                        <div t-if="!isList and !isPlan" class="btn-group o_ag_rm_zoom" role="group" aria-label="Zoom">
+                        <div t-if="!this.isList and !this.isPlan" class="btn-group o_ag_rm_zoom" role="group" aria-label="Zoom">
                             <button t-foreach="['week', 'month', 'quarter']" t-as="zoom" t-key="zoom" type="button"
-                                    t-attf-class="btn btn-secondary {{state.zoom === zoom ? 'active' : ''}}"
-                                    t-att-aria-pressed="state.zoom === zoom ? 'true' : 'false'"
+                                    t-attf-class="btn btn-secondary {{this.state.zoom === zoom ? 'active' : ''}}"
+                                    t-att-aria-pressed="this.state.zoom === zoom ? 'true' : 'false'"
                                     t-on-click="() => this.setZoom(zoom)" t-out="zoom_index === 0 ? 'Week' : zoom_index === 1 ? 'Month' : 'Quarter'"/>
                         </div>
-                        <button t-if="!isList and !isPlan" type="button" class="btn btn-secondary o_ag_rm_dependencies"
-                                t-att-aria-pressed="state.showDependencies ? 'true' : 'false'" t-on-click="toggleDependencies"
-                                t-out="state.showDependencies ? 'Dependencies: on' : 'Dependencies: off'"/>
-                        <details t-if="!isPlan" class="o_ag_rm_export">
+                        <button t-if="!this.isList and !this.isPlan" type="button" class="btn btn-secondary o_ag_rm_dependencies"
+                                t-att-aria-pressed="this.state.showDependencies ? 'true' : 'false'" t-on-click="this.toggleDependencies"
+                                t-out="this.state.showDependencies ? 'Dependencies: on' : 'Dependencies: off'"/>
+                        <details t-if="!this.isPlan" class="o_ag_rm_export">
                             <summary class="btn btn-secondary">Export</summary>
                             <div class="o_ag_rm_export_items" role="group" aria-label="Export">
-                                <button type="button" class="btn btn-link o_ag_rm_download_csv" t-on-click="downloadCsv">Download CSV</button>
-                                <button t-if="!ui.isSmall" type="button" class="btn btn-link o_ag_rm_print" t-on-click="printLayout">Print layout</button>
+                                <button type="button" class="btn btn-link o_ag_rm_download_csv" t-on-click="this.downloadCsv">Download CSV</button>
+                                <button t-if="!this.ui.isSmall" type="button" class="btn btn-link o_ag_rm_print" t-on-click="this.printLayout">Print layout</button>
                             </div>
                         </details>
-                        <label t-if="!isPlan and !isShared" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_epics_only" t-att-checked="state.epicsOnly" t-on-change="(ev) => this.setOption('epicsOnly', ev)"/> Epics only</label>
-                        <label t-if="!isShared" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_hide_done" t-att-checked="state.hideDone" t-on-change="(ev) => this.setOption('hideDone', ev)"/> Hide done</label>
-                        <label t-if="!isPlan and !isList" class="o_ag_rm_control o_ag_rm_colour"><span>Colour by</span>
-                            <select class="form-select o_ag_rm_colour_by" t-model="state.colourBy">
+                        <label t-if="!this.isPlan and !this.isShared" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_epics_only" t-att-checked="this.state.epicsOnly" t-on-change="(ev) => this.setOption('epicsOnly', ev)"/> Epics only</label>
+                        <label t-if="!this.isShared" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_hide_done" t-att-checked="this.state.hideDone" t-on-change="(ev) => this.setOption('hideDone', ev)"/> Hide done</label>
+                        <label t-if="!this.isPlan and !this.isList" class="o_ag_rm_control o_ag_rm_colour"><span>Colour by</span>
+                            <select class="form-select o_ag_rm_colour_by" t-model="this.agileModel(this.state, 'colourBy')">
                                 <option value="default">Type</option>
                                 <option value="status">Status</option>
                                 <option value="release">Release</option>
                             </select></label>
-                        <button t-if="!isShared and !isPlan" type="button" class="btn btn-secondary o_ag_rm_share_button"
-                                t-att-aria-expanded="state.sharing ? 'true' : 'false'" t-on-click="toggleSharing">Share</button>
-                        <label t-if="!ui.isSmall and !isPlan" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_as_list" t-model="state.asList"/> Show as list</label>
+                        <button t-if="!this.isShared and !this.isPlan" type="button" class="btn btn-secondary o_ag_rm_share_button"
+                                t-att-aria-expanded="this.state.sharing ? 'true' : 'false'" t-on-click="this.toggleSharing">Share</button>
+                        <label t-if="!this.ui.isSmall and !this.isPlan" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_as_list" t-model="this.agileModel(this.state, 'asList')"/> Show as list</label>
                     </div>
                 </header>
-                <p t-if="isShared and state.share" class="o_ag_rm_shared_note text-muted" role="status">
-                    Shared by <t t-out="state.share.owner"/>. Read only.
-                    <t t-if="state.hiddenProjects"> <t t-out="state.hiddenProjects"/> project(s) in this roadmap are not shown because you cannot open them.</t>
+                <p t-if="this.isShared and this.state.share" class="o_ag_rm_shared_note text-muted" role="status">
+                    Shared by <t t-out="this.state.share.owner"/>. Read only.
+                    <t t-if="this.state.hiddenProjects"> <t t-out="this.state.hiddenProjects"/> project(s) in this roadmap are not shown because you cannot open them.</t>
                 </p>
-                <AgileRoadmapShare t-if="state.sharing and !isShared" projects="shareProjects" hideDone="state.hideDone"
-                                   epicsOnly="state.epicsOnly" colourBy="state.colourBy" onClose.bind="toggleSharing"/>
-                <ul t-if="state.data and state.colourBy !== 'default' and legend.length and !isList and !isPlan" class="o_ag_rm_colour_legend list-unstyled" aria-label="Colours">
-                    <li t-foreach="legend" t-as="entry" t-key="entry.key"><span class="o_ag_rm_swatch" aria-hidden="true" t-attf-style="background: {{entry.colour || 'transparent'}}"/> <t t-out="entry.label"/></li>
+                <AgileRoadmapShare t-if="this.state.sharing and !this.isShared" projects="this.shareProjects" hideDone="this.state.hideDone"
+                                   epicsOnly="this.state.epicsOnly" colourBy="this.state.colourBy" onClose.bind="this.toggleSharing"/>
+                <ul t-if="this.state.data and this.state.colourBy !== 'default' and this.legend.length and !this.isList and !this.isPlan" class="o_ag_rm_colour_legend list-unstyled" aria-label="Colours">
+                    <li t-foreach="this.legend" t-as="entry" t-key="entry.key"><span class="o_ag_rm_swatch" aria-hidden="true" t-attf-style="background: {{entry.colour || 'transparent'}}"/> <t t-out="entry.label"/></li>
                 </ul>
-                <ul t-if="state.data and state.showDependencies and !isList and !isEmpty and !isPlan" class="o_ag_rm_legend list-unstyled">
+                <ul t-if="this.state.data and this.state.showDependencies and !this.isList and !this.isEmpty and !this.isPlan" class="o_ag_rm_legend list-unstyled">
                     <li><span class="o_ag_rm_legend_bar" aria-hidden="true"/> Item</li>
                     <li><span class="o_ag_rm_legend_bar late" aria-hidden="true"/> Starts before its blocker ends</li>
                     <li><span class="o_ag_rm_legend_arrow" aria-hidden="true">→</span> Blocker to blocked item</li>
                 </ul>
-                <p t-if="dependencyNotice" class="o_ag_rm_dep_notice text-muted" role="status" t-out="dependencyNotice"/>
-                <p t-if="state.exportNotice" class="o_ag_rm_export_notice text-muted" role="status" aria-live="polite" t-out="state.exportNotice"/>
-                <AgilePlan t-if="isPlan" projects="state.selected" hideDone="state.hideDone"/>
-                <div t-elif="state.error" class="alert alert-danger" role="alert">
-                    <p class="mb-2" t-out="state.error"/>
-                    <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                <p t-if="this.dependencyNotice" class="o_ag_rm_dep_notice text-muted" role="status" t-out="this.dependencyNotice"/>
+                <p t-if="this.state.exportNotice" class="o_ag_rm_export_notice text-muted" role="status" aria-live="polite" t-out="this.state.exportNotice"/>
+                <AgilePlan t-if="this.isPlan" projects="this.state.selected" hideDone="this.state.hideDone"/>
+                <div t-elif="this.state.error" class="alert alert-danger" role="alert">
+                    <p class="mb-2" t-out="this.state.error"/>
+                    <button type="button" class="btn btn-secondary" t-on-click="this.load">Retry</button>
                 </div>
-                <p t-elif="state.loading and !state.data" class="text-muted" role="status">Loading the roadmap...</p>
-                <t t-elif="state.data">
-                    <div t-if="isEmpty" class="o_ag_rm_empty">
+                <p t-elif="this.state.loading and !this.state.data" class="text-muted" role="status">Loading the roadmap...</p>
+                <t t-elif="this.state.data">
+                    <div t-if="this.isEmpty" class="o_ag_rm_empty">
                         <p>Nothing is scheduled yet. Give an epic a start and end date to see it here.</p>
-                        <button type="button" class="btn btn-secondary" t-on-click="openUnscheduled">Open unscheduled issues</button>
+                        <button type="button" class="btn btn-secondary" t-on-click="this.openUnscheduled">Open unscheduled issues</button>
                     </div>
-                    <t t-elif="isList">
+                    <t t-elif="this.isList">
                         <ul class="o_ag_rm_list">
-                            <t t-foreach="rows" t-as="row" t-key="row.index">
+                            <t t-foreach="this.rows" t-as="row" t-key="row.index">
                                 <li t-if="row.type === 'project'" class="o_ag_rm_list_project">
                                     <span class="o_ag_rm_project_name" t-out="row.name"/>
-                                    <span class="o_ag_rm_rollup" t-out="rollupText(row.rollup)"/>
+                                    <span class="o_ag_rm_rollup" t-out="this.rollupText(row.rollup)"/>
                                     <button type="button" class="btn btn-link btn-sm o_ag_rm_open_project" t-att-aria-label="'Open the roadmap of ' + row.name"
                                             t-on-click="() => this.openProject(row)">Open project</button>
                                 </li>
                                 <li t-else="" t-attf-class="o_ag_rm_list_item {{row.type}}">
                                     <button t-if="(row.type === 'epic' or row.type === 'none') and row.item.children.length" type="button" class="o_ag_rm_chevron"
-                                            t-att-aria-expanded="isOpen(row.item) ? 'true' : 'false'" t-att-aria-label="'Show issues of ' + row.item.name"
-                                            t-on-click="() => this.toggle(row.item)" t-out="isOpen(row.item) ? '▾' : '▸'"/>
+                                            t-att-aria-expanded="this.isOpen(row.item) ? 'true' : 'false'" t-att-aria-label="'Show issues of ' + row.item.name"
+                                            t-on-click="() => this.toggle(row.item)" t-out="this.isOpen(row.item) ? '▾' : '▸'"/>
                                     <span t-else="" class="o_ag_rm_chevron_gap"/>
                                     <div class="o_ag_rm_list_body">
                                         <button type="button" class="o_ag_rm_open btn btn-link" t-on-click="() => this.open(row.item)">
                                             <strong t-out="row.item.key"/> <t t-out="row.item.name"/></button>
                                         <span t-if="row.item.start" class="o_ag_rm_dates" t-out="row.item.start + ' to ' + row.item.end"/>
-                                        <span t-if="progress(row.item)" class="o_ag_rm_progress_text" t-out="progress(row.item)"/>
-                                        <progress t-if="row.type === 'epic' and row.item.total" max="100" t-att-value="fill(row.item)" t-att-aria-label="progress(row.item)"/>
+                                        <span t-if="this.progress(row.item)" class="o_ag_rm_progress_text" t-out="this.progress(row.item)"/>
+                                        <progress t-if="row.type === 'epic' and row.item.total" max="100" t-att-value="this.fill(row.item)" t-att-aria-label="this.progress(row.item)"/>
                                         <button t-if="row.item.collision" type="button" class="badge text-bg-danger o_ag_rm_tag_blocked"
                                                 t-att-aria-label="'Blocked. Open the blockers of ' + (row.item.key || row.item.name)" t-on-click="() => this.openPanel(row.item)">Blocked</button>
                                         <span t-if="row.item.circular" class="badge text-bg-warning o_ag_rm_tag_circular">Circular dependency</span>
-                                        <button t-if="canHaveBlockers(row.item)" type="button" class="btn btn-link btn-sm o_ag_rm_blockers"
+                                        <button t-if="this.canHaveBlockers(row.item)" type="button" class="btn btn-link btn-sm o_ag_rm_blockers"
                                                 t-att-aria-label="'Blockers of ' + (row.item.key || row.item.name)" t-on-click="() => this.openPanel(row.item)">Blockers</button>
-                                        <details t-if="row.item.blocked_by and row.item.blocked_by.length" class="o_ag_rm_blocked_by" t-att-open="state.printing">
+                                        <details t-if="row.item.blocked_by and row.item.blocked_by.length" class="o_ag_rm_blocked_by" t-att-open="this.state.printing">
                                             <summary>Blocked by</summary>
-                                            <p t-out="blockedByText(row.item)"/>
-                                            <p t-if="row.item.collision" class="o_ag_rm_collision_text" t-out="collisionText(row.item.collision)"/>
+                                            <p t-out="this.blockedByText(row.item)"/>
+                                            <p t-if="row.item.collision" class="o_ag_rm_collision_text" t-out="this.collisionText(row.item.collision)"/>
                                         </details>
                                     </div>
                                 </li>
@@ -109,72 +109,72 @@
                         </ul>
                     </t>
                     <div t-else="" class="o_ag_rm_scroll">
-                        <div class="o_ag_rm_grid" t-attf-style="width: calc(16rem + {{canvasWidth}}px)">
+                        <div class="o_ag_rm_grid" t-attf-style="width: calc(16rem + {{this.canvasWidth}}px)">
                             <div class="o_ag_rm_labels">
                                 <div class="o_ag_rm_label_head">Epic and dates</div>
-                                <t t-foreach="rows" t-as="row" t-key="row.index">
+                                <t t-foreach="this.rows" t-as="row" t-key="row.index">
                                     <div t-if="row.type === 'project'" class="o_ag_rm_label o_ag_rm_label_project" t-out="row.name"/>
                                     <div t-else="" t-attf-class="o_ag_rm_label {{row.type}}">
                                         <button t-if="(row.type === 'epic' or row.type === 'none') and row.item.children.length" type="button" class="o_ag_rm_chevron"
-                                                t-att-aria-expanded="isOpen(row.item) ? 'true' : 'false'" t-att-aria-label="'Show issues of ' + row.item.name"
-                                                t-on-click="() => this.toggle(row.item)" t-out="isOpen(row.item) ? '▾' : '▸'"/>
+                                                t-att-aria-expanded="this.isOpen(row.item) ? 'true' : 'false'" t-att-aria-label="'Show issues of ' + row.item.name"
+                                                t-on-click="() => this.toggle(row.item)" t-out="this.isOpen(row.item) ? '▾' : '▸'"/>
                                         <span t-else="" class="o_ag_rm_chevron_gap"/>
                                         <span class="o_ag_rm_label_text">
                                             <span class="o_ag_rm_label_name"><strong t-if="row.item.key" t-out="row.item.key"/> <t t-out="row.item.name"/></span>
-                                            <span t-if="row.item.start" class="o_ag_rm_label_dates" t-out="shortDate(row.item.start) + ' to ' + shortDate(row.item.end)"/>
+                                            <span t-if="row.item.start" class="o_ag_rm_label_dates" t-out="this.shortDate(row.item.start) + ' to ' + this.shortDate(row.item.end)"/>
                                         </span>
                                         <button t-if="row.item.collision" type="button" class="badge text-bg-danger o_ag_rm_tag_blocked"
                                                 t-att-aria-label="'Blocked. Show why ' + (row.item.key || row.item.name) + ' starts too early'" t-on-click="(ev) => this.openWarning(row, ev.currentTarget)">Blocked</button>
-                                        <button t-if="canHaveBlockers(row.item)" type="button" class="btn btn-link btn-sm o_ag_rm_blockers"
+                                        <button t-if="this.canHaveBlockers(row.item)" type="button" class="btn btn-link btn-sm o_ag_rm_blockers"
                                                 t-att-aria-label="'Blockers of ' + (row.item.key || row.item.name)" t-on-click="() => this.openPanel(row.item)">Blockers</button>
                                     </div>
                                 </t>
                             </div>
-                            <div class="o_ag_rm_canvas" t-attf-style="width: {{canvasWidth}}px">
+                            <div class="o_ag_rm_canvas" t-attf-style="width: {{this.canvasWidth}}px">
                                 <div class="o_ag_rm_head_rail">
-                                    <span t-foreach="ticks" t-as="tick" t-key="tick_index" class="o_ag_rm_tick" t-att-class="{'month': tick.month}"
+                                    <span t-foreach="this.ticks" t-as="tick" t-key="tick_index" class="o_ag_rm_tick" t-att-class="{'month': tick.month}"
                                           t-attf-style="left: {{tick.left}}px" t-out="tick.label"/>
-                                    <span t-foreach="state.data.sprints" t-as="sprint" t-key="sprint.id" class="o_ag_rm_sprint"
-                                          t-attf-style="left: {{box(sprint.start, sprint.end).left}}px; width: {{box(sprint.start, sprint.end).width}}px"
+                                    <span t-foreach="this.state.data.sprints" t-as="sprint" t-key="sprint.id" class="o_ag_rm_sprint"
+                                          t-attf-style="left: {{this.box(sprint.start, sprint.end).left}}px; width: {{this.box(sprint.start, sprint.end).width}}px"
                                           t-att-title="sprint.name" t-out="sprint.name"/>
-                                    <span t-foreach="state.data.releases" t-as="release" t-key="release.id" class="o_ag_rm_release"
-                                          t-attf-style="left: {{releaseLeft(release)}}px" t-att-title="release.name + ' ' + release.date">⚑ <t t-out="release.name"/></span>
+                                    <span t-foreach="this.state.data.releases" t-as="release" t-key="release.id" class="o_ag_rm_release"
+                                          t-attf-style="left: {{this.releaseLeft(release)}}px" t-att-title="release.name + ' ' + release.date">⚑ <t t-out="release.name"/></span>
                                 </div>
                                 <div class="o_ag_rm_gridlines" aria-hidden="true">
-                                    <span t-foreach="ticks" t-as="tick" t-key="tick_index" t-attf-style="left: {{tick.left}}px"/>
+                                    <span t-foreach="this.ticks" t-as="tick" t-key="tick_index" t-attf-style="left: {{tick.left}}px"/>
                                 </div>
-                                <div class="o_ag_rm_today" t-attf-style="left: {{todayLeft}}px" aria-hidden="true"/>
+                                <div class="o_ag_rm_today" t-attf-style="left: {{this.todayLeft}}px" aria-hidden="true"/>
                                 <div class="o_ag_rm_rows">
-                                    <t t-foreach="rows" t-as="row" t-key="row.index">
+                                    <t t-foreach="this.rows" t-as="row" t-key="row.index">
                                         <div t-if="row.type === 'project'" class="o_ag_rm_row o_ag_rm_row_project">
-                                            <span class="o_ag_rm_rollup" t-out="rollupText(row.rollup)"/>
+                                            <span class="o_ag_rm_rollup" t-out="this.rollupText(row.rollup)"/>
                                             <button type="button" class="btn btn-link btn-sm o_ag_rm_open_project" t-att-aria-label="'Open the roadmap of ' + row.name"
                                                     t-on-click="() => this.openProject(row)">Open project</button>
                                         </div>
                                         <div t-else="" class="o_ag_rm_row">
-                                            <button t-if="row.item.start" type="button" t-attf-class="o_ag_rm_bar {{row.type}} {{row.item.status}} {{row.item.late ? 'late' : ''}} {{barVars(row.item) ? 'o_ag_rm_coloured' : ''}}"
-                                                    t-attf-style="left: {{box(row.item.start, row.item.end).left}}px; width: {{box(row.item.start, row.item.end).width}}px; {{barVars(row.item)}}"
-                                                    t-att-aria-label="describe(row.item)" t-att-title="describe(row.item)" t-att-data-id="row.item.id"
+                                            <button t-if="row.item.start" type="button" t-attf-class="o_ag_rm_bar {{row.type}} {{row.item.status}} {{row.item.late ? 'late' : ''}} {{this.barVars(row.item) ? 'o_ag_rm_coloured' : ''}}"
+                                                    t-attf-style="left: {{this.box(row.item.start, row.item.end).left}}px; width: {{this.box(row.item.start, row.item.end).width}}px; {{this.barVars(row.item)}}"
+                                                    t-att-aria-label="this.describe(row.item)" t-att-title="this.describe(row.item)" t-att-data-id="row.item.id"
                                                     t-att-aria-haspopup="row.item.late ? 'dialog' : false"
-                                                    t-on-click="(ev) => this.onBar(row, ev)" t-on-keydown="onBarKeydown"
+                                                    t-on-click="(ev) => this.onBar(row, ev)" t-on-keydown="this.onBarKeydown"
                                                     t-on-mouseenter="() => this.focusLines(row.item)" t-on-mouseleave="() => this.focusLines(null)"
                                                     t-on-focus="() => this.focusLines(row.item)" t-on-blur="() => this.focusLines(null)">
-                                                <span t-if="row.type === 'epic'" class="o_ag_rm_fill" t-attf-style="width: {{fill(row.item)}}%"/>
-                                                <span class="o_ag_rm_bar_text"><t t-out="row.item.key"/> <t t-out="row.item.name"/><t t-if="progress(row.item)">, <t t-out="progress(row.item)"/></t></span>
+                                                <span t-if="row.type === 'epic'" class="o_ag_rm_fill" t-attf-style="width: {{this.fill(row.item)}}%"/>
+                                                <span class="o_ag_rm_bar_text"><t t-out="row.item.key"/> <t t-out="row.item.name"/><t t-if="this.progress(row.item)">, <t t-out="this.progress(row.item)"/></t></span>
                                             </button>
                                             <span t-if="row.item.start and row.item.circular" class="badge text-bg-warning o_ag_rm_tag_circular"
-                                                  t-attf-style="left: {{box(row.item.start, row.item.end).left + box(row.item.start, row.item.end).width + 6}}px">Circular dependency</span>
+                                                  t-attf-style="left: {{this.box(row.item.start, row.item.end).left + this.box(row.item.start, row.item.end).width + 6}}px">Circular dependency</span>
                                         </div>
                                     </t>
                                 </div>
-                                <svg t-if="state.showDependencies" class="o_ag_rm_lines" t-attf-width="{{canvasWidth}}" t-attf-height="{{rows.length * rowH}}" aria-hidden="true">
+                                <svg t-if="this.state.showDependencies" class="o_ag_rm_lines" t-attf-width="{{this.canvasWidth}}" t-attf-height="{{this.rows.length * this.rowH}}" aria-hidden="true">
                                     <defs>
                                         <marker id="o_ag_rm_arrowhead" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
                                             <path d="M 0 0 L 8 4 L 0 8 z" fill="context-stroke" stroke="none"/>
                                         </marker>
                                     </defs>
-                                    <g t-foreach="lines" t-as="line" t-key="line_index" t-att-class="lineClass(line)">
-                                        <title t-out="lineTitle(line)"/>
+                                    <g t-foreach="this.lines" t-as="line" t-key="line_index" t-att-class="this.lineClass(line)">
+                                        <title t-out="this.lineTitle(line)"/>
                                         <path t-att-d="line.path" fill="none" marker-end="url(#o_ag_rm_arrowhead)"/>
                                     </g>
                                 </svg>
@@ -182,71 +182,71 @@
                         </div>
                     </div>
                 </t>
-                        <div t-if="state.warning" class="o_ag_rm_warning" role="dialog" aria-modal="false"
-                             t-att-aria-label="warningText(state.warning.item).title" t-on-keydown="onWarningKeydown"
-                             t-attf-style="left: {{state.warning.left}}px; {{state.warning.top !== null ? 'top: ' + state.warning.top + 'px' : 'bottom: ' + state.warning.bottom + 'px'}}">
-                            <t t-if="!state.warning.moved">
-                                <t t-set="words" t-value="warningText(state.warning.item)"/>
+                        <div t-if="this.state.warning" class="o_ag_rm_warning" role="dialog" aria-modal="false"
+                             t-att-aria-label="this.warningText(this.state.warning.item).title" t-on-keydown="this.onWarningKeydown"
+                             t-attf-style="left: {{this.state.warning.left}}px; {{this.state.warning.top !== null ? 'top: ' + this.state.warning.top + 'px' : 'bottom: ' + this.state.warning.bottom + 'px'}}">
+                            <t t-if="!this.state.warning.moved">
+                                <t t-set="words" t-value="this.warningText(this.state.warning.item)"/>
                                 <h3 class="o_ag_rm_warning_title" t-out="words.title"/>
                                 <p class="o_ag_rm_warning_lead" t-out="words.lead"/>
                                 <p class="o_ag_rm_warning_detail" t-out="words.detail"/>
                                 <p class="o_ag_rm_warning_earliest" t-out="words.earliest"/>
                             </t>
-                            <p t-else="" class="o_ag_rm_warning_lead" role="status" aria-live="polite" t-out="state.warning.notice"/>
-                            <p t-if="state.warning.notice and !state.warning.moved" class="text-danger" role="alert" t-out="state.warning.notice"/>
+                            <p t-else="" class="o_ag_rm_warning_lead" role="status" aria-live="polite" t-out="this.state.warning.notice"/>
+                            <p t-if="this.state.warning.notice and !this.state.warning.moved" class="text-danger" role="alert" t-out="this.state.warning.notice"/>
                             <div class="o_ag_rm_warning_actions">
-                                <button t-if="state.warning.canMove and !state.warning.moved" type="button" class="btn btn-primary btn-sm o_ag_rm_move_start"
-                                        t-on-click="moveFromWarning">Move start to <t t-out="shortDate(state.warning.item.collision.earliest_start)"/></button>
-                                <button t-if="state.warning.moved" type="button" class="btn btn-primary btn-sm o_ag_rm_undo_move" t-on-click="undoFromWarning">Undo move</button>
-                                <button t-if="!state.warning.moved" type="button" class="btn btn-secondary btn-sm o_ag_rm_open_blocker"
-                                        t-on-click="() => this.open({id: state.warning.item.collision.blocker_id})">Open <t t-out="state.warning.item.collision.blocker_key"/></button>
-                                <button type="button" class="btn btn-secondary btn-sm o_ag_rm_open_item" t-on-click="() => this.open(state.warning.item)">Open <t t-out="state.warning.item.key"/></button>
-                                <button type="button" class="btn btn-secondary btn-sm o_ag_rm_warning_close" t-on-click="closeWarning">Close</button>
+                                <button t-if="this.state.warning.canMove and !this.state.warning.moved" type="button" class="btn btn-primary btn-sm o_ag_rm_move_start"
+                                        t-on-click="this.moveFromWarning">Move start to <t t-out="this.shortDate(this.state.warning.item.collision.earliest_start)"/></button>
+                                <button t-if="this.state.warning.moved" type="button" class="btn btn-primary btn-sm o_ag_rm_undo_move" t-on-click="this.undoFromWarning">Undo move</button>
+                                <button t-if="!this.state.warning.moved" type="button" class="btn btn-secondary btn-sm o_ag_rm_open_blocker"
+                                        t-on-click="() => this.open({id: this.state.warning.item.collision.blocker_id})">Open <t t-out="this.state.warning.item.collision.blocker_key"/></button>
+                                <button type="button" class="btn btn-secondary btn-sm o_ag_rm_open_item" t-on-click="() => this.open(this.state.warning.item)">Open <t t-out="this.state.warning.item.key"/></button>
+                                <button type="button" class="btn btn-secondary btn-sm o_ag_rm_warning_close" t-on-click="this.closeWarning">Close</button>
                             </div>
-                            <p t-if="!state.warning.canMove and !state.warning.moved" class="text-muted o_ag_rm_warning_note">Only project managers see Move start. Everyone else reads this text.</p>
+                            <p t-if="!this.state.warning.canMove and !this.state.warning.moved" class="text-muted o_ag_rm_warning_note">Only project managers see Move start. Everyone else reads this text.</p>
                         </div>
-                <aside t-if="state.panel" class="o_ag_rm_panel" role="dialog" aria-modal="false" t-att-aria-label="'Blockers of ' + (state.panel.key || state.panel.name)"
-                       t-on-keydown="onPanelKeydown">
+                <aside t-if="this.state.panel" class="o_ag_rm_panel" role="dialog" aria-modal="false" t-att-aria-label="'Blockers of ' + (this.state.panel.key || this.state.panel.name)"
+                       t-on-keydown="this.onPanelKeydown">
                     <header class="o_ag_rm_panel_head">
-                        <h2 class="o_ag_rm_panel_title"><strong t-out="state.panel.key"/> <t t-out="state.panel.name"/></h2>
-                        <button type="button" class="btn btn-link o_ag_rm_panel_close" aria-label="Close the blockers panel" t-on-click="closePanel">Close</button>
+                        <h2 class="o_ag_rm_panel_title"><strong t-out="this.state.panel.key"/> <t t-out="this.state.panel.name"/></h2>
+                        <button type="button" class="btn btn-link o_ag_rm_panel_close" aria-label="Close the blockers panel" t-on-click="this.closePanel">Close</button>
                     </header>
-                    <section t-if="state.panel.data and state.panel.data.collision" class="o_ag_rm_collision" aria-label="Date collision">
-                        <p class="o_ag_rm_collision_text" t-out="collisionText(state.panel.data.collision)"/>
-                        <p class="text-muted o_ag_rm_collision_end">Moving the start to <t t-out="state.panel.data.collision.earliest_start"/> moves the end to <t t-out="state.panel.data.collision.new_end or 'the same day'"/>.</p>
-                        <button t-if="state.panel.data.can_move" type="button" class="btn btn-primary btn-sm o_ag_rm_move_start" t-on-click="moveStart">Move start to <t t-out="state.panel.data.collision.earliest_start"/></button>
+                    <section t-if="this.state.panel.data and this.state.panel.data.collision" class="o_ag_rm_collision" aria-label="Date collision">
+                        <p class="o_ag_rm_collision_text" t-out="this.collisionText(this.state.panel.data.collision)"/>
+                        <p class="text-muted o_ag_rm_collision_end">Moving the start to <t t-out="this.state.panel.data.collision.earliest_start"/> moves the end to <t t-out="this.state.panel.data.collision.new_end or 'the same day'"/>.</p>
+                        <button t-if="this.state.panel.data.can_move" type="button" class="btn btn-primary btn-sm o_ag_rm_move_start" t-on-click="this.moveStart">Move start to <t t-out="this.state.panel.data.collision.earliest_start"/></button>
                         <p t-else="" class="text-muted">Only people who may change planned dates can move the start.</p>
                     </section>
                     <h3 class="o_ag_rm_panel_sub">Blocked by</h3>
-                    <div t-if="state.panel.error" class="alert alert-danger" role="alert">
-                        <p class="mb-2" t-out="state.panel.error"/>
-                        <button type="button" class="btn btn-secondary" t-on-click="refreshPanel">Retry</button>
+                    <div t-if="this.state.panel.error" class="alert alert-danger" role="alert">
+                        <p class="mb-2" t-out="this.state.panel.error"/>
+                        <button type="button" class="btn btn-secondary" t-on-click="this.refreshPanel">Retry</button>
                     </div>
-                    <p t-elif="!state.panel.data" class="text-muted" role="status">Loading the blockers...</p>
+                    <p t-elif="!this.state.panel.data" class="text-muted" role="status">Loading the blockers...</p>
                     <t t-else="">
-                        <p t-if="!state.panel.data.blockers.length and !state.panel.data.hidden" class="o_ag_rm_panel_empty text-muted">Nothing blocks this issue.</p>
+                        <p t-if="!this.state.panel.data.blockers.length and !this.state.panel.data.hidden" class="o_ag_rm_panel_empty text-muted">Nothing blocks this issue.</p>
                         <ul class="o_ag_rm_blocker_list list-unstyled">
-                            <li t-foreach="state.panel.data.blockers" t-as="blocker" t-key="blocker.id" t-attf-class="o_ag_rm_blocker {{blocker.late ? 'late' : ''}}">
+                            <li t-foreach="this.state.panel.data.blockers" t-as="blocker" t-key="blocker.id" t-attf-class="o_ag_rm_blocker {{blocker.late ? 'late' : ''}}">
                                 <p class="o_ag_rm_blocker_text" t-out="blocker.sentence"/>
-                                <span class="o_ag_rm_blocker_meta text-muted"><strong t-out="blocker.key"/> <t t-out="blocker.name"/><t t-if="state.data.multi">, <t t-out="blocker.project"/></t></span>
+                                <span class="o_ag_rm_blocker_meta text-muted"><strong t-out="blocker.key"/> <t t-out="blocker.name"/><t t-if="this.state.data.multi">, <t t-out="blocker.project"/></t></span>
                                 <span class="o_ag_rm_blocker_actions">
                                     <button type="button" class="btn btn-link btn-sm o_ag_rm_blocker_open" t-on-click="() => this.open(blocker)">Open</button>
-                                    <button t-if="state.panel.data.can_edit" type="button" class="btn btn-link btn-sm o_ag_rm_blocker_remove"
+                                    <button t-if="this.state.panel.data.can_edit" type="button" class="btn btn-link btn-sm o_ag_rm_blocker_remove"
                                             t-att-aria-label="'Remove ' + blocker.key + ' as a blocker'" t-on-click="() => this.removeBlocker(blocker)">Remove</button>
                                 </span>
                             </li>
                         </ul>
-                        <p t-if="state.panel.data.hidden" class="o_ag_rm_panel_hidden text-muted">
-                            <t t-out="state.panel.data.hidden"/> <t t-if="state.panel.data.hidden === 1">blocker</t><t t-else="">blockers</t> you cannot see.
+                        <p t-if="this.state.panel.data.hidden" class="o_ag_rm_panel_hidden text-muted">
+                            <t t-out="this.state.panel.data.hidden"/> <t t-if="this.state.panel.data.hidden === 1">blocker</t><t t-else="">blockers</t> you cannot see.
                         </p>
-                        <div t-if="state.panel.data.can_edit" class="o_ag_rm_add">
+                        <div t-if="this.state.panel.data.can_edit" class="o_ag_rm_add">
                             <label class="o_ag_rm_add_label" for="o_ag_rm_add_input">Add blocker</label>
                             <input id="o_ag_rm_add_input" type="search" class="form-control o_ag_rm_add_input" placeholder="Search by key or title"
-                                   autocomplete="off" t-att-value="state.panel.term" t-on-input="(ev) => this.searchBlockers(ev.target.value)"/>
-                            <ul t-if="state.panel.results.length" class="o_ag_rm_results list-unstyled">
-                                <li t-foreach="state.panel.results" t-as="result" t-key="result.id">
+                                   autocomplete="off" t-att-value="this.state.panel.term" t-on-input="(ev) => this.searchBlockers(ev.target.value)"/>
+                            <ul t-if="this.state.panel.results.length" class="o_ag_rm_results list-unstyled">
+                                <li t-foreach="this.state.panel.results" t-as="result" t-key="result.id">
                                     <button type="button" class="o_ag_rm_result btn btn-link" t-on-click="() => this.addBlocker(result)">
-                                        <strong t-out="result.key"/> <t t-out="result.name"/><t t-if="state.data.multi">, <t t-out="result.project"/></t>
+                                        <strong t-out="result.key"/> <t t-out="result.name"/><t t-if="this.state.data.multi">, <t t-out="result.project"/></t>
                                     </button>
                                 </li>
                             </ul>
@@ -254,9 +254,9 @@
                         <p t-else="" class="text-muted">Only Agile managers and contributors can change blockers.</p>
                     </t>
                     <div class="o_ag_rm_panel_notice" role="status" aria-live="polite">
-                        <t t-if="state.panel.notice" t-out="state.panel.notice"/>
-                        <button t-if="state.panel.undoId" type="button" class="btn btn-link btn-sm o_ag_rm_undo" t-on-click="undoRemove">Undo</button>
-                        <button t-if="state.panel.moved" type="button" class="btn btn-link btn-sm o_ag_rm_undo_move" t-on-click="undoMove">Undo move</button>
+                        <t t-if="this.state.panel.notice" t-out="this.state.panel.notice"/>
+                        <button t-if="this.state.panel.undoId" type="button" class="btn btn-link btn-sm o_ag_rm_undo" t-on-click="this.undoRemove">Undo</button>
+                        <button t-if="this.state.panel.moved" type="button" class="btn btn-link btn-sm o_ag_rm_undo_move" t-on-click="this.undoMove">Undo move</button>
                     </div>
                 </aside>
             </div>

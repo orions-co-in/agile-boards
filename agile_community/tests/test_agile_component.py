@@ -117,6 +117,8 @@ class TestAgileProjectComponent(TransactionCase):
             "name": "Private component", "project_id": private_project.id,
         })
         private_project.write({"privacy_visibility": "followers"})
+        self.env.flush_all()
+        self.env.invalidate_all()
 
         self.assertFalse(private_project.with_user(system_user).has_access("read"))
         self.assertFalse(component.with_user(system_user).has_access("read"))

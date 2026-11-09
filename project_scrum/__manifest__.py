@@ -4,7 +4,7 @@
 
 {
     "name": "Project Scrum",
-    "version": "19.0.1.6.0",
+    "version": "20.0.1.6.0",
     "category": "Project",
     "website": "https://github.com/OCA/project-agile",
     "author": "Binhex, Odoo Community Association (OCA)",
@@ -14,13 +14,12 @@
     "summary": "This addon allow use the scrum methodology in projects",
     "depends": ["project"],
     "data": [
-        "security/project_sprint_security.xml",
-        "security/ir.model.access.csv",
         "wizard/project_sprint_wizard_views.xml",
         "wizard/project_sprint_correction_views.xml",
         "views/project_sprint_views.xml",
         "views/project_task_views.xml",
         "views/project_views.xml",
+        'security/ir.access.csv',
     ],
     "maintainers": ["adasatorres"],
 }

@@ -161,15 +161,15 @@ class TestAgileIssueTemplate(TransactionCase):
         self.assertTrue(template.with_user(contributor).has_access("read"))
         self.assertFalse(self.project.with_user(contributor).has_access("read"))
         recurrence = issue.recurrence_id
-        with self.assertRaisesRegex(AccessError, "native Odoo Project access"):
+        with self.assertRaises(AccessError):
             recurrence.with_user(contributor).write({"repeat_interval": 2})
-        with self.assertRaisesRegex(AccessError, "native Odoo Project access"):
+        with self.assertRaises(AccessError):
             recurrence.with_user(contributor).unlink()
-        with self.assertRaisesRegex(AccessError, "native Odoo Project access"):
+        with self.assertRaises(AccessError):
             template.with_user(contributor).write({
                 "agile_acceptance_criteria": "Unauthorized template edit",
             })
-        with self.assertRaisesRegex(AccessError, "native Odoo Project access"):
+        with self.assertRaises(AccessError):
             template.with_user(contributor).action_create_from_template()
 
     def test_contributor_can_instantiate_but_not_configure_a_template(self):

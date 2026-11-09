@@ -18,16 +18,16 @@
                 <field name="can_manage_agile_release" invisible="1" groups="project.group_project_user"/>
                 <field name="active" invisible="1"/>
                 <div class="oe_button_box" name="button_box" invisible="not is_agile_release">
-                    <button name="action_view_release_issues" type="object" class="oe_stat_button" icon="fa-list">
+                    <button name="action_view_release_issues" type="object" class="oe_stat_button" icon="format_list_bulleted">
                         <field name="issue_count" widget="statinfo" string="Issues"/>
                     </button>
-                    <button name="action_view_release_blockers" type="object" class="oe_stat_button" icon="fa-exclamation-triangle" invisible="not open_issue_count">
+                    <button name="action_view_release_blockers" type="object" class="oe_stat_button" icon="warning" invisible="not open_issue_count">
                         <field name="open_issue_count" widget="statinfo" string="Open"/>
                     </button>
-                    <button name="action_view_affected_issues" type="object" class="oe_stat_button" icon="fa-bug" invisible="not affected_issue_count">
+                    <button name="action_view_affected_issues" type="object" class="oe_stat_button" icon="bug_report" invisible="not affected_issue_count">
                         <field name="affected_issue_count" widget="statinfo" string="Found here"/>
                     </button>
-                    <button name="action_open_release_burndown" type="object" class="oe_stat_button" icon="fa-line-chart" string="Burndown" groups="project.group_project_user"/>
+                    <button name="action_open_release_burndown" type="object" class="oe_stat_button" icon="show_chart" string="Burndown" groups="project.group_project_user"/>
                 </div>
                 <group invisible="not is_agile_release">
                     <group string="Release planning" class="o_agile_label_col">

@@ -1,11 +1,13 @@
+import { signal } from "@odoo/owl";
 /** @odoo-module alias=web_timeline.TimelineController **/
 /**
  * Copyright 2023 Onestein - Anjeel Haria
  * Copyright 2024 Tecnativa - Carlos López
  * License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
  */
-import {Component, useRef} from "@odoo/owl";
+import { Component, usePlugin } from "@odoo/owl";
 import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
+
 import {FormViewDialog} from "@web/views/view_dialogs/form_view_dialog";
 import {Layout} from "@web/search/layout";
 import {SearchBar} from "@web/search/search_bar/search_bar";
@@ -17,6 +19,7 @@ import {useModel} from "@web/model/model";
 import {useSearchBarToggler} from "@web/search/search_bar/search_bar_toggler";
 import {useService} from "@web/core/utils/hooks";
 import {useSetupAction} from "@web/search/action_hook";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 const {DateTime} = luxon;
 
@@ -25,9 +28,9 @@ export class TimelineController extends Component {
      * @override
      */
     setup() {
-        this.rootRef = useRef("root");
+        this.rootRef = signal.ref();
         this.model = useModel(this.props.Model, this.props.modelParams);
-        useSetupAction({rootRef: useRef("root")});
+        useSetupAction({rootRef: this.rootRef});
         this.searchBarToggler = useSearchBarToggler();
         this.date_start = this.props.modelParams.date_start;
         this.date_stop = this.props.modelParams.date_stop;
@@ -36,7 +39,7 @@ export class TimelineController extends Component {
         this.moveQueue = [];
         this.debouncedInternalMove = useDebounced(this.internalMove, 0);
         this.dialogService = useService("dialog");
-        this.actionService = useService("action");
+        this.actionService = usePlugin(ActionPlugin);
     }
     get rendererProps() {
         return {

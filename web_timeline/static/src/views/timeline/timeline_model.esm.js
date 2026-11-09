@@ -3,7 +3,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
  */
 import {serializeDate, serializeDateTime} from "@web/core/l10n/dates";
-import {KanbanCompiler} from "@web/views/kanban/kanban_compiler";
+import {CardCompiler} from "@web/views/card/card_compiler";
 import {KeepLast} from "@web/core/utils/concurrency";
 import {Model} from "@web/model/model";
 import {evaluate} from "@web/core/py_js/py";
@@ -26,7 +26,7 @@ export class TimelineModel extends Model {
         this.date_delay = this.params.date_delay;
         this.colors = this.params.colors;
         this.last_group_bys = this.params.default_group_by.split(",");
-        const templates = useViewCompiler(KanbanCompiler, this.params.templateDocs);
+        const templates = useViewCompiler(CardCompiler, this.params.templateDocs);
         this.recordTemplate = templates["timeline-item"];
 
         this.keepLast = new KeepLast();

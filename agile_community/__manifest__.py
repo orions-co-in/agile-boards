@@ -1,7 +1,7 @@
 {
     "name": "Agile Boards",
     "summary": "Scrum and Kanban boards, backlog, sprints, releases and reports inside Odoo Project",
-    "version": "19.0.2.0.0",
+    "version": "20.0.2.0.0",
     "category": "Services/Project",
     "author": "Orions",
     "license": "AGPL-3",
@@ -13,11 +13,12 @@
         "static/description/reports.png",
     ],
     "post_init_hook": "post_init_hook",
-    "depends": ["project", "project_scrum", "project_version", "web_timeline"],
+    "depends": ["project", "mail_tracking", "project_scrum", "project_version", "web_timeline"],
     "assets": {
         "web.assets_backend": [
             "agile_community/static/src/scss/agile_accessibility.scss",
             "agile_community/static/src/estimate_unit.js",
+            "agile_community/static/src/agile_model.js",
             "agile_community/static/src/scss/agile_timeline.scss",
             "agile_community/static/src/scss/agile_board_preferences.scss",
             "agile_community/static/src/scss/agile_tokens.scss",
@@ -58,7 +59,6 @@
     },
     "data": [
         "security/agile_security.xml",
-        "security/ir.model.access.csv",
         "data/agile_community_data.xml",
         "data/agile_metrics_data.xml",
         "data/agile_workflow_data.xml",
@@ -85,9 +85,6 @@
         "wizard/agile_workflow_template_views.xml",
         "wizard/agile_move_project_views.xml",
         "wizard/agile_resolution_views.xml",
-        "security/agile_release_security.xml",
-        "security/agile_audit_security.xml",
-        "security/agile_metrics_security.xml",
         "views/agile_release_views.xml",
         "views/agile_wording_views.xml",
         "views/agile_metrics_views.xml",
@@ -97,6 +94,7 @@
         "wizard/agile_sprint_start_views.xml",
         "wizard/agile_release_confirm_views.xml",
         "wizard/agile_log_time_views.xml",
+        'security/ir.access.csv',
     ],
     "installable": True,
     "application": True,

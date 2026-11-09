@@ -1,22 +1,23 @@
-import { Component, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, proxy, useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+
 
 /** Add an issue at the bottom of a section: pick a type, type a title, optionally pick an assignee, press Enter. */
 export class AgileQuickCreate extends Component {
     static template = "agile_community.QuickCreate";
-    static props = {
-        groupKey: String,
-        label: String,
-        types: Array,
-        members: { type: Array, optional: true },
-        typeId: { type: Number, optional: true },
-        onTypeChange: Function,
-        onCreate: Function,
-    };
+    props = useProps({
+        groupKey: t.string(),
+        label: t.string(),
+        types: t.array(),
+        members: t.array().optional(),
+        typeId: t.number().optional(),
+        onTypeChange: t.function(),
+        onCreate: t.function()});
 
     setup() {
-        this.inputRef = useRef("input");
-        this.state = useState({ title: "", error: "", saving: false, userId: 0 });
+        this.inputRef = signal.ref();
+        this.state = proxy({ title: "", error: "", saving: false, userId: 0 });
     }
 
     get typeId() {

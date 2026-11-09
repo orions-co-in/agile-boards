@@ -1,6 +1,5 @@
-from datetime import timedelta
-
-import pytz
+from datetime import UTC, timedelta
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
@@ -142,8 +141,8 @@ class ProjectSprint(models.Model):
             if project and project.agile_enabled:
                 utc_now = fields.Datetime.now()
                 if not utc_now.tzinfo:
-                    utc_now = pytz.UTC.localize(utc_now)
-                timezone = pytz.timezone(project.agile_timezone or "UTC")
+                    utc_now = utc_now.replace(tzinfo=UTC)
+                timezone = ZoneInfo(project.agile_timezone or "UTC")
                 today = utc_now.astimezone(timezone).date()
                 # A new sprint follows the project's latest one instead of overlapping it (NU-04).
                 latest = self.search(

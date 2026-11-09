@@ -1,3 +1,4 @@
+from odoo import Command
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests.common import TransactionCase, new_test_user
 from .pro_guard import needs_pro
@@ -18,7 +19,9 @@ class TestAgileRbacMerge(TransactionCase):
         cls.team = {}
         for role in ("manager", "contributor", "reviewer", "stakeholder"):
             user = new_test_user(env, login="rbac_%s" % role, groups="project.group_project_user")
-            cls.project.sudo().message_subscribe(partner_ids=user.partner_id.ids)
+            cls.project.sudo().write({"allowed_internal_user_ids": [Command.link(user.id)]})
+            cls.env.flush_all()
+            cls.env.invalidate_all()
             Member.create({"project_id": cls.project.id, "user_id": user.id, "role": role})
             cls.team[role] = user
         cls.outsider = new_test_user(env, login="rbac_outsider", groups="project.group_project_user")
@@ -48,7 +51,9 @@ class TestAgileRbacMerge(TransactionCase):
         # Decision: the ceiling does not override Odoo's own project privacy.
         self.project.sudo().privacy_visibility = "followers"
         self.assertFalse(self._issues(self.agile_admin))
-        self.project.sudo().message_subscribe(partner_ids=self.agile_admin.partner_id.ids)
+        self.project.sudo().write({"allowed_internal_user_ids": [Command.link(self.agile_admin.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.assertIn(self.issue, self._issues(self.agile_admin))
 
     def test_not_agile_project_gives_none(self):
@@ -84,7 +89,9 @@ class TestAgileRbacMerge(TransactionCase):
 
     def test_implicit_manager_can_manage_team_and_is_not_a_row(self):
         newbie = new_test_user(self.env, login="rbac_newbie", groups="project.group_project_user")
-        self.project.sudo().message_subscribe(partner_ids=newbie.partner_id.ids)
+        self.project.sudo().write({"allowed_internal_user_ids": [Command.link(newbie.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         Member = self.env["agile.project.member"]
         for admin in (self.odoo_admin, self.agile_admin):
             member = Member.with_user(admin).create(

@@ -1,7 +1,9 @@
-import { Component, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { buildModel, hasMove, recordKey, reorder, sequencesFor } from "./workflow_canvas_helpers";
 
@@ -179,14 +181,14 @@ const NEED_NAMES_FALLBACK = [];
  */
 export class AgileWorkflowDiagram extends Component {
     static template = "agile_community.WorkflowDiagram";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
-        this.rootRef = useRef("root");
-        this.svgRef = useRef("svg");
+        this.rootRef = signal.ref();
+        this.svgRef = signal.ref();
         this.orm = useService("orm");
         this.categories = CATEGORY_CHOICES;
-        this.state = useState({ sel: null, drag: null, message: "", undo: [], adding: null, ask: null, moveTo: "", actionType: "priority" });
+        this.state = proxy({ sel: null, drag: null, message: "", undo: [], adding: null, ask: null, moveTo: "", actionType: "priority" });
     }
 
     get statusList() {
@@ -281,7 +283,7 @@ export class AgileWorkflowDiagram extends Component {
 
     /** Take the person to the list row the picture shows, and flash it (read-only picture). */
     show(fieldName, text) {
-        const form = this.rootRef.el.closest(".o_form_view");
+        const form = this.rootRef().closest(".o_form_view");
         const rows = [...(form?.querySelectorAll(`.o_field_widget[name="${fieldName}"] tr.o_data_row`) || [])];
         const row = rows.find((el) => el.innerText.includes(text));
         if (!row) {
@@ -321,7 +323,7 @@ export class AgileWorkflowDiagram extends Component {
     // ---- pointer: drag a box, or drag from its dot ----
 
     point(ev) {
-        const svg = this.svgRef.el;
+        const svg = this.svgRef();
         const rect = svg.getBoundingClientRect();
         const box = svg.viewBox.baseVal;
         return [((ev.clientX - rect.left) * box.width) / rect.width, ((ev.clientY - rect.top) * box.height) / rect.height];
@@ -348,7 +350,7 @@ export class AgileWorkflowDiagram extends Component {
             return;
         }
         const [px] = this.point(ev);
-        this.svgRef.el.setPointerCapture?.(ev.pointerId);
+        this.svgRef().setPointerCapture?.(ev.pointerId);
         this.state.drag = port
             ? { mode: "link", key, over: null, line: null }
             : { mode: "move", key, x: box.x, offset: px - box.x, moved: false, startX: box.x };

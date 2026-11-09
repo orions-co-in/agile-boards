@@ -1,9 +1,10 @@
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { Layout } from "@web/search/layout";
 import { AgileLozenge } from "@agile_community/components/kit/agile_kit";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // The four tabs of the top-menu My Work, limited to one project (D-805).
 export const YOUR_WORK_TABS = [
@@ -34,12 +35,12 @@ export class AgileYourWork extends Component {
     static template = "agile_community.YourWork";
     static displayName = _t("Your work");
     static components = { Layout, AgileLozenge };
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.state = useState({ loading: true, error: null, data: null, tab: "assigned" });
+        this.action = usePlugin(ActionPlugin);
+        this.state = proxy({ loading: true, error: null, data: null, tab: "assigned" });
         this.tabs = YOUR_WORK_TABS;
         this.display = { controlPanel: {} };
         onMounted(() => this.load());

@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.Overview">
-        <Layout display="display" className="'o_ag_overview'">
+        <Layout display="this.display" className="'o_ag_overview'">
             <div class="o_ag_overview_body">
-                <t t-if="state.loading">
+                <t t-if="this.state.loading">
                     <div class="o_ag_skeleton" role="status" aria-label="Loading the overview">
                         <div class="o_ag_skeleton_strip">
                             <span t-foreach="[1,2,3,4,5,6,7,8,9,10]" t-as="n" t-key="n"/>
                         </div>
                     </div>
                 </t>
-                <t t-elif="state.error">
+                <t t-elif="this.state.error">
                     <div class="o_ag_overview_error alert alert-danger" role="alert">
-                        <p class="mb-2" t-out="state.error"/>
-                        <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                        <p class="mb-2" t-out="this.state.error"/>
+                        <button type="button" class="btn btn-secondary" t-on-click="this.load">Retry</button>
                     </div>
                 </t>
                 <t t-else="">
                     <header class="o_ag_overview_head">
-                        <h1 class="o_ag_overview_title" t-out="state.data.project.name"/>
-                        <button type="button" class="btn btn-link" t-on-click="openReports">Delivery reports</button>
+                        <h1 class="o_ag_overview_title" t-out="this.state.data.project.name"/>
+                        <button type="button" class="btn btn-link" t-on-click="this.openReports">Delivery reports</button>
                     </header>
-                    <AgilePulse pulse="state.data" onOpenSprint.bind="openSprint" onPlanSprint.bind="planSprint"/>
+                    <AgilePulse pulse="this.state.data" onOpenSprint.bind="this.openSprint" onPlanSprint.bind="this.planSprint"/>
                     <div class="o_ag_tiles">
-                        <button t-foreach="tiles" t-as="tile" t-key="tile.metric" type="button"
+                        <button t-foreach="this.tiles" t-as="tile" t-key="tile.metric" type="button"
                                 t-attf-class="o_ag_tile {{tile.tone ? 'o_ag_tile_' + tile.tone : ''}}"
                                 t-att-data-metric="tile.metric"
                                 t-on-click="() => this.openTile(tile.metric)">
-                            <span class="o_ag_tile_count" t-out="state.data.counts[tile.metric]"/>
+                            <span class="o_ag_tile_count" t-out="this.state.data.counts[tile.metric]"/>
                             <span class="o_ag_tile_label" t-out="tile.label"/>
                         </button>
                     </div>

@@ -1,4 +1,4 @@
-import { onWillStart, useEffect, useState, useSubEnv } from "@odoo/owl";
+import { onWillStart, proxy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { projectTaskKanbanView } from "@project/views/project_task_kanban/project_task_kanban_view";
@@ -7,6 +7,7 @@ import { AgileBoardBar } from "./agile_board_bar";
 import { AgileBulkBar } from "@agile_community/bulk/agile_bulk_bar";
 import { AgileCardDrawer } from "./agile_card_drawer";
 import { AgileBoardKanbanRenderer } from "./agile_board_renderer";
+import { useLayoutEffect, useSubEnv } from "@web/owl2/utils";
 
 export class AgileBoardKanbanController extends ProjectTaskKanbanController {
     static template = "agile_community.BoardKanbanView";
@@ -14,18 +15,18 @@ export class AgileBoardKanbanController extends ProjectTaskKanbanController {
 
     setup() {
         super.setup();
-        this.board = useState({ swimlane: this.props.context.agile_swimlane || "none" });
-        this.drawer = useState({ resId: null });
+        this.board = proxy({ swimlane: this.props.context.agile_swimlane || "none" });
+        this.drawer = proxy({ resId: null });
         // Select mode (S-931): a click on a card picks it for the bulk bar instead of opening the drawer.
-        this.select = useState({ on: false, ids: [] });
+        this.select = proxy({ on: false, ids: [] });
         useSubEnv({ agileSelect: this.select });
         this.drawerLeave = null;
         // Stage counts for the WIP badges, shared with the column headers.
-        this.boardData = useState({ wip: {}, columns: [], columnGroups: [] });
+        this.boardData = proxy({ wip: {}, columns: [], columnGroups: [] });
         useSubEnv({ agileBoard: this.boardData });
         this.orm = useService("orm");
         onWillStart(() => this.loadWip());
-        useEffect(
+        useLayoutEffect(
             () => {
                 this.loadWip();
             },

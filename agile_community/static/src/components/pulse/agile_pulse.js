@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { deserializeDate } from "@web/core/l10n/dates";
 import { unitWord } from "../../estimate_unit";
@@ -26,14 +26,13 @@ function shortDate(isoDate) {
  */
 export class AgilePulse extends Component {
     static template = "agile_community.Pulse";
-    static props = {
-        pulse: Object,
-        onOpenSprint: { type: Function, optional: true },
-        onPlanSprint: { type: Function, optional: true },
-    };
+    props = useProps({
+        pulse: t.object(),
+        onOpenSprint: t.function().optional(),
+        onPlanSprint: t.function().optional()});
 
     setup() {
-        this.state = useState({ focus: null });
+        this.state = proxy({ focus: null });
     }
 
     get unit() {

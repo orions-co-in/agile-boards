@@ -50,7 +50,8 @@ class ProjectTask(models.Model):
 
 
 class MailActivity(models.Model):
-    _inherit = "mail.activity"
+    _name = "mail.activity"
+    _inherit = ["mail.activity", "agile.scoped.access.mixin"]
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -168,68 +169,10 @@ class MailActivity(models.Model):
                             _("Assign Agile activities only to active internal members of this project.")
                         )
 
-    def _agile_activity_read_allowed(self, activity):
-        for model_name, records in self._agile_activity_links(activities=activity):
-            for record in records:
-                project = record.project_id
-                if project._agile_role_for_user(self.env.user) == "none":
-                    return False
-                if not project.with_user(self.env.user).has_access("read"):
-                    return False
-                if model_name == "project.task":
-                    if not record.with_user(self.env.user).has_access("read"):
-                        return False
-                elif not record.with_user(self.env.user).has_access("read"):
-                    return False
-        return True
-
-    def _check_access(self, operation):
-        result = super()._check_access(operation)
-        if operation != "read" or self.env.su or not self:
-            return result
-        readable = self - result[0] if result else self
-        forbidden = readable.filtered(
-            lambda activity: not self._agile_activity_read_allowed(activity)
-        )
-        if not forbidden:
-            return result
-        if result:
-            return result[0] | forbidden, result[1]
-        return forbidden, lambda: forbidden._make_access_error(operation)
-
-    @api.model
-    def _search(
-        self,
-        domain,
-        offset=0,
-        limit=None,
-        order=None,
-        *,
-        bypass_access=False,
-        **kwargs,
-    ):
-        query = super()._search(
-            domain,
-            offset=offset,
-            limit=limit,
-            order=order,
-            bypass_access=bypass_access,
-            **kwargs,
-        )
-        if self.env.su or bypass_access:
-            return query
-        activity_ids = [
-            row[0]
-            for row in self.env.execute_query(
-                query.select(self._field_to_sql(self._table, "id"))
-            )
-        ]
-        readable = self.browse(activity_ids)._filtered_access("read")
-        return readable._as_query(order)
-
 
 class MailFollowers(models.Model):
-    _inherit = "mail.followers"
+    _name = "mail.followers"
+    _inherit = ["mail.followers", "agile.scoped.access.mixin"]
 
     def _agile_follower_links(self, values_list=None):
         links = set()
@@ -299,88 +242,6 @@ class MailFollowers(models.Model):
                     raise AccessError(
                         _("Only Agile managers, contributors, and reviewers can change other followers.")
                     )
-
-    def _agile_follower_documents(self, followers):
-        linked_records = []
-        for follower in followers.sudo():
-            if follower.res_model not in (
-                "project.task", "project.sprint", "project.version"
-            ) or not follower.res_id:
-                continue
-            document = self.env[follower.res_model].sudo().browse(
-                follower.res_id
-            ).exists()
-            if not document:
-                continue
-            if follower.res_model == "project.task":
-                document = document.filtered(
-                    lambda task: task.agile_issue and task.project_id.agile_enabled
-                )
-            else:
-                document = document.filtered(
-                    lambda record: record.project_id.agile_enabled
-                )
-            if document:
-                linked_records.append((follower, follower.res_model, document))
-        return linked_records
-
-    def _agile_follower_read_allowed(self, follower, model_name, document):
-        project = document.project_id
-        if project._agile_role_for_user(self.env.user) == "none":
-            return False
-        if model_name == "project.task":
-            return document.with_user(self.env.user).has_access("read")
-        return (
-            project.with_user(self.env.user).has_access("read")
-            and document.with_user(self.env.user).has_access("read")
-        )
-
-    def _check_access(self, operation):
-        result = super()._check_access(operation)
-        if operation != "read" or self.env.su or not self:
-            return result
-        readable = self - result[0] if result else self
-        forbidden = self.browse()
-        for follower, model_name, document in self._agile_follower_documents(readable):
-            if not self._agile_follower_read_allowed(
-                follower, model_name, document
-            ):
-                forbidden |= follower
-        if not forbidden:
-            return result
-        if result:
-            return result[0] | forbidden, result[1]
-        return forbidden, lambda: forbidden._make_access_error(operation)
-
-    @api.model
-    def _search(
-        self,
-        domain,
-        offset=0,
-        limit=None,
-        order=None,
-        *,
-        bypass_access=False,
-        **kwargs,
-    ):
-        query = super()._search(
-            domain,
-            offset=offset,
-            limit=limit,
-            order=order,
-            bypass_access=bypass_access,
-            **kwargs,
-        )
-        if self.env.su or bypass_access:
-            return query
-        follower_ids = [
-            row[0]
-            for row in self.env.execute_query(
-                query.select(self._field_to_sql(self._table, "id"))
-            )
-        ]
-        readable = self.browse(follower_ids)._filtered_access("read")
-        return readable._as_query(order)
 
     @api.model_create_multi
     def create(self, vals_list):

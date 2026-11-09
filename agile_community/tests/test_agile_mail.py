@@ -28,8 +28,9 @@ class TestAgileMail(TransactionCase):
         return MAIL.format(sender=sender, to=to, subject=subject, mid=mid, extra=extra, body=body)
 
     def _send(self, **kwargs):
-        task_id = self.env["mail.thread"].message_process(False, self._mail(**kwargs))
-        return self.env["project.task"].browse(task_id)
+        result = self.env["mail.thread"].message_process(False, self._mail(**kwargs))
+        # Odoo 20 returns the record, earlier versions its id.
+        return result if hasattr(result, "ids") else self.env["project.task"].browse(result)
 
     def _tasks(self):
         return self.env["project.task"].search([("project_id", "=", self.project.id)])

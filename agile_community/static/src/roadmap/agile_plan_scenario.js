@@ -1,4 +1,4 @@
-import { Component, onMounted, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUpdateProps, proxy, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -51,11 +51,11 @@ export function compareSummary(data) {
 /** One scenario of a plan view: its epics against the live plan, edit dates, Apply and Restore. */
 export class AgilePlanScenario extends Component {
     static template = "agile_community.PlanScenario";
-    static props = { scenarioId: Number, onChange: Function, onDelete: Function };
+    props = useProps({ scenarioId: t.number(), onChange: t.function(), onDelete: t.function()});
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ data: null, error: null, notice: null, confirm: false, result: null, suggestion: null });
+        this.state = proxy({ data: null, error: null, notice: null, confirm: false, result: null, suggestion: null });
         onMounted(() => this.load(this.props.scenarioId));
         onWillUpdateProps((next) => this.load(next.scenarioId));
     }

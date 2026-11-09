@@ -106,4 +106,4 @@ class TestAgileAccessibility(TransactionCase):
     def test_roadmap_bars_move_with_the_arrow_keys(self):
         with file_open("agile_community/static/src/roadmap/agile_roadmap.xml") as handle:
             text = handle.read()
-        self.assertIn('t-on-keydown="onBarKeydown"', text)
+        self.assertIn('t-on-keydown="this.onBarKeydown"', text)

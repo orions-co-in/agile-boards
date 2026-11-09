@@ -1,5 +1,5 @@
 // Files a report gives away (U-1162): a CSV from the numbers on screen, a PNG of the chart on screen.
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { downloadBlob, downloadText, fileSlug } from "../dashboard/dashboard_export";
 
 const STYLE_PROPS = [
@@ -116,7 +116,7 @@ export function sprintPngBlob(title, subtitle, bars, counts) {
  */
 export class ReportExport extends Component {
     static template = "agile_community.ReportExport";
-    static props = { title: String, table: Function, png: { type: Function, optional: true } };
+    props = useProps({ title: t.string(), table: t.function(), png: t.function().optional()});
 
     downloadCsv() {
         const { columns, rows } = this.props.table();

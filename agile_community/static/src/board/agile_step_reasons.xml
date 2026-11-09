@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.StepReasons">
-        <span class="d-none" t-ref="root" aria-hidden="true"/>
+        <span class="d-none" t-ref="this.rootRef" aria-hidden="true"/>
     </t>
 </templates>

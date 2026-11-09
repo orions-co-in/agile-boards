@@ -1,9 +1,11 @@
-import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { niceMax } from "./agile_cfd";
 import { ReportExport, svgPngBlob } from "./report_export";
 import { unitWord } from "../estimate_unit";
+import {useLayoutEffect} from "@web/owl2/utils";
 
 const CHART = { w: 720, h: 276, left: 48, right: 12, top: 12, bottom: 44 };
 
@@ -41,11 +43,11 @@ export class AgileBurndown extends Component {
 
     static template = "agile_community.Burndown";
     static components = { ReportExport };
-    static props = ["projectId", "kind", "targets", "onOpen", "initialTargetId?"];
+    props = useProps({projectId: t.any(), kind: t.any(), targets: t.any(), onOpen: t.any(), initialTargetId: t.any().optional()});
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             loading: false,
             error: null,
             data: null,
@@ -56,14 +58,14 @@ export class AgileBurndown extends Component {
             table: false,
         });
         // On a phone the chart is wider than the screen; start at its right end, where today is.
-        this.chartBox = useRef("chartBox");
-        useEffect(
+        this.chartBox = signal.ref();
+        useLayoutEffect(
             (box) => {
                 if (box) {
                     box.scrollLeft = box.scrollWidth;
                 }
             },
-            () => [this.chartBox.el, this.state.data]
+            () => [this.chartBox(), this.state.data]
         );
         onMounted(() => this.load());
     }
@@ -89,7 +91,7 @@ export class AgileBurndown extends Component {
     }
 
     exportPng() {
-        return svgPngBlob(this.chartBox.el.querySelector("svg"), this.exportTitle, this.title);
+        return svgPngBlob(this.chartBox().querySelector("svg"), this.exportTitle, this.title);
     }
 
     get layout() {

@@ -2,8 +2,8 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.ReportExport">
         <span class="o_ag_report_export">
-            <button type="button" class="btn btn-secondary o_ag_export_csv" t-on-click="downloadCsv">Download CSV</button>
-            <button t-if="props.png" type="button" class="btn btn-secondary o_ag_export_png" t-on-click="downloadPng">Download PNG</button>
+            <button type="button" class="btn btn-secondary o_ag_export_csv" t-on-click="this.downloadCsv">Download CSV</button>
+            <button t-if="this.props.png" type="button" class="btn btn-secondary o_ag_export_png" t-on-click="this.downloadPng">Download PNG</button>
         </span>
     </t>
 </templates>

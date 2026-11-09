@@ -57,7 +57,7 @@ export class AgileCalendarModel extends CalendarModel {
             isStriked: false,
             isTimeHidden: true,
             isMonth: this.meta.scale === "month",
-            isSmall: this.env.isSmall,
+            isSmall: window.matchMedia("(max-width: 767.98px)").matches,
             agileSpan: span,
             rawRecord: span,
         };

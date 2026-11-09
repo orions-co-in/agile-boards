@@ -74,9 +74,9 @@
     </record>
     <record id="view_task_kanban" model="ir.ui.view">
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="project.view_task_kanban" />
+        <field name="inherit_id" ref="project.view_task_card" />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='project_id']" position="after">
                 <field name="sprint_id" invisible="not project_id.use_scrum" />
                 <field name="story_points_estimated" invisible="not project_id.use_scrum" />
                 <field

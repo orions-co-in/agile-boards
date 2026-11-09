@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.RowSheet">
-        <Dialog size="'sm'" title="props.title" footer="false">
-            <div class="list-group o_ag_row_sheet" role="menu" t-ref="list">
-                <button t-foreach="props.actions" t-as="action" t-key="action.id" type="button" role="menuitem"
+        <Dialog size="'sm'" title="this.props.title" footer="false">
+            <div class="list-group o_ag_row_sheet" role="menu" t-ref="this.listRef">
+                <button t-foreach="this.props.actions" t-as="action" t-key="action.id" type="button" role="menuitem"
                         class="list-group-item list-group-item-action"
                         t-on-click="() => this.select(action)" t-out="action.label"/>
             </div>

@@ -1,4 +1,4 @@
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -7,6 +7,7 @@ import { AgilePulse } from "@agile_community/components/pulse/agile_pulse";
 import { AgileAvatar } from "@agile_community/components/kit/agile_kit";
 import { ago, barWidth, flowLines } from "./summary_helpers";
 import { unitShort, unitWord } from "../estimate_unit";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 // Count tiles in reading order: everything open, then what needs attention, then what is missing.
 export const SUMMARY_TILES = [
@@ -77,12 +78,12 @@ export class AgileSummary extends Component {
     static template = "agile_community.Summary";
     static displayName = _t("Summary");
     static components = { Layout, AgilePulse, AgileAvatar };
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
-        this.state = useState({
+        this.action = usePlugin(ActionPlugin);
+        this.state = proxy({
             loading: true, error: null, data: null, sprintId: 0,
             layout: DEFAULT_LAYOUT, flowDay: null, editing: false, confirmReset: false, saveError: "", notice: "", announce: "",
         });

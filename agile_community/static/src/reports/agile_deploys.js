@@ -1,8 +1,10 @@
-import { Component, onMounted, useRef, useState } from "@odoo/owl";
+import { signal } from "@odoo/owl";
+import { Component, onMounted, proxy, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { niceMax } from "./agile_cfd";
 import { ReportExport, svgPngBlob } from "./report_export";
+
 
 const CHART = { w: 720, h: 276, left: 48, right: 12, top: 12, bottom: 44 };
 
@@ -53,11 +55,11 @@ export function deploySummary(data) {
 export class AgileDeploys extends Component {
     static template = "agile_community.Deploys";
     static components = { ReportExport };
-    static props = ["projectId"];
+    props = useProps({projectId: t.any()});
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             loading: true,
             error: null,
             data: null,
@@ -68,7 +70,7 @@ export class AgileDeploys extends Component {
             hover: null,
             table: false,
         });
-        this.chartBox = useRef("chartBox");
+        this.chartBox = signal.ref();
         onMounted(() => this.load());
     }
 
@@ -95,7 +97,7 @@ export class AgileDeploys extends Component {
     }
 
     exportPng() {
-        return svgPngBlob(this.chartBox.el.querySelector("svg"), this.exportTitle, this.summary);
+        return svgPngBlob(this.chartBox().querySelector("svg"), this.exportTitle, this.summary);
     }
 
     async load() {

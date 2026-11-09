@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="agile_community.BoardKanbanRenderer" t-inherit="project.ProjectTaskKanbanRenderer" t-inherit-mode="primary">
-        <xpath expr="//t[@t-foreach='getGroupsOrRecords()']" position="before">
-            <div t-if="phoneTabs" class="o_ag_tabs" role="tablist" aria-label="Columns">
-                <button t-foreach="phoneTabs" t-as="tab" t-key="tab.id" type="button" role="tab"
+        <xpath expr="//t[@t-foreach='this.getGroupsOrRecords()']" position="before">
+            <div t-if="this.phoneTabs" class="o_ag_tabs" role="tablist" aria-label="Columns">
+                <button t-foreach="this.phoneTabs" t-as="tab" t-key="tab.id" type="button" role="tab"
                         class="o_ag_tab" t-att-aria-selected="tab.active ? 'true' : 'false'"
                         t-att-tabindex="tab.active ? 0 : -1" t-on-click="() => this.selectTab(tab.id)">
                     <span class="o_ag_tab_name" t-out="tab.name"/>
@@ -11,21 +11,21 @@
                     <span t-if="tab.wip" t-attf-class="o_ag_tab_wip o_ag_wip_{{tab.wip.kind}}" t-out="tab.wip.text"/>
                 </button>
             </div>
-            <div t-if="swimlaneMode" class="o_ag_swimlanes flex-grow-1" role="table" aria-label="Board by swimlane">
-                <div class="o_ag_lane_head" role="row" t-att-style="laneStyle">
-                    <div t-foreach="laneGroups" t-as="group" t-key="group.id" class="o_ag_lane_col" role="columnheader">
-                        <span><span class="o_ag_lane_col_title" t-out="group.displayName"/> <span class="o_ag_lane_col_count" t-out="unitCount(group)"/></span>
+            <div t-if="this.swimlaneMode" class="o_ag_swimlanes flex-grow-1" role="table" aria-label="Board by swimlane">
+                <div class="o_ag_lane_head" role="row" t-att-style="this.laneStyle">
+                    <div t-foreach="this.laneGroups" t-as="group" t-key="group.id" class="o_ag_lane_col" role="columnheader">
+                        <span><span class="o_ag_lane_col_title" t-out="group.displayName"/> <span class="o_ag_lane_col_count" t-out="this.unitCount(group)"/></span>
                         <t t-if="group.merged">
                             <span t-foreach="group.members" t-as="member" t-key="member.id" class="o_ag_member_head">
-                                <span t-out="member.displayName"/> <span t-out="member.list.records.length + getGroupUnloadedCount(member)"/>
-                                <t t-set="memberFacts" t-value="columnFacts(member)"/>
+                                <span t-out="member.displayName"/> <span t-out="member.list.records.length + this.getGroupUnloadedCount(member)"/>
+                                <t t-set="memberFacts" t-value="this.columnFacts(member)"/>
                                 <span t-if="memberFacts.wip" t-attf-class="o_ag_wip o_ag_wip_{{memberFacts.wip.kind}}" role="status">
                                     <span t-if="memberFacts.wip.icon" aria-hidden="true" t-out="memberFacts.wip.icon"/> <t t-out="memberFacts.wip.text"/>
                                 </span>
                             </span>
                         </t>
                         <t t-else="">
-                            <t t-set="facts" t-value="columnFacts(group)"/>
+                            <t t-set="facts" t-value="this.columnFacts(group)"/>
                             <span t-if="facts.blocked" class="o_ag_blocked_count"><span aria-hidden="true">⚑</span> <t t-out="facts.blocked"/> blocked</span>
                             <span t-if="facts.wip" t-attf-class="o_ag_wip o_ag_wip_{{facts.wip.kind}}" role="status">
                                 <span t-if="facts.wip.icon" aria-hidden="true" t-out="facts.wip.icon"/> <t t-out="facts.wip.text"/>
@@ -33,74 +33,74 @@
                         </t>
                     </div>
                 </div>
-                <section t-foreach="lanes" t-as="lane" t-key="lane.key" class="o_ag_lane" role="rowgroup"
+                <section t-foreach="this.lanes" t-as="lane" t-key="lane.key" class="o_ag_lane" role="rowgroup"
                          t-att-data-lane="lane.label">
-                    <button t-if="!singleLane" type="button" class="o_ag_lane_title" t-att-aria-expanded="isCollapsed(lane) ? 'false' : 'true'"
+                    <button t-if="!this.singleLane" type="button" class="o_ag_lane_title" t-att-aria-expanded="this.isCollapsed(lane) ? 'false' : 'true'"
                             t-on-click="() => this.toggleLane(lane)">
-                        <i t-attf-class="fa fa-fw {{isCollapsed(lane) ? 'fa-caret-right' : 'fa-caret-down'}}" aria-hidden="true"/>
+                        <i t-attf-class="oi oi-fw {{this.isCollapsed(lane) ? '' : ''}}" aria-hidden="true" t-attf-data-icon="{{this.isCollapsed(lane) ? 'arrow_right' : 'arrow_drop_down'}}"/>
                         <b t-out="lane.label"/>
                         <span class="o_ag_lane_meta">
                             <t t-out="lane.count"/> <t t-if="lane.count === 1">issue</t><t t-else="">issues</t><t t-if="lane.points">, <t t-out="lane.points"/> points</t>
                         </span>
                     </button>
-                    <div t-if="singleLane or !isCollapsed(lane)" class="o_ag_lane_row" role="row" t-att-style="laneStyle">
+                    <div t-if="this.singleLane or !this.isCollapsed(lane)" class="o_ag_lane_row" role="row" t-att-style="this.laneStyle">
                         <div t-foreach="lane.cells" t-as="cell" t-key="cell.group.id" class="o_ag_lane_cell" role="cell"
                              t-att-data-id="cell.group.id" t-att-data-lane="lane.label">
-                          <t t-set="rowWip" t-value="cellWip(cell)"/>
+                          <t t-set="rowWip" t-value="this.cellWip(cell)"/>
                           <span t-if="rowWip" t-attf-class="o_ag_wip o_ag_cell_wip o_ag_wip_{{rowWip.kind}}" role="status">
                               <span t-if="rowWip.icon" aria-hidden="true" t-out="rowWip.icon"/> <t t-out="rowWip.text"/>
                           </span>
                           <div t-foreach="cell.records" t-as="record" t-key="record.id" class="o_ag_lane_item" t-att-data-id="record.id">
-                            <span t-if="cell.group.merged" class="o_ag_status_chip" t-out="statusName(record)"/>
+                            <span t-if="cell.group.merged" class="o_ag_status_chip" t-out="this.statusName(record)"/>
                             <KanbanRecord
-                                archInfo="props.archInfo"
-                                Compiler="props.Compiler"
+                                archInfo="this.props.archInfo"
+                                Compiler="this.props.Compiler"
                                 canResequence="false"
-                                forceGlobalClick="props.forceGlobalClick"
+                                forceGlobalClick="this.props.forceGlobalClick"
                                 group="cell.group"
-                                groupByField="props.list.groupByField"
-                                getSelection.bind="getSelection"
-                                toggleSelection.bind="toggleSelection"
-                                deleteRecord="props.deleteRecord"
-                                archiveRecord.bind="archiveRecord"
-                                openRecord="props.openRecord"
-                                readonly="props.readonly"
+                                groupByField="this.props.list.groupByField"
+                                getSelection.bind="this.getSelection"
+                                toggleSelection.bind="this.toggleSelection"
+                                deleteRecord="this.props.deleteRecord"
+                                archiveRecord.bind="this.archiveRecord"
+                                openRecord="this.props.openRecord"
+                                readonly="this.props.readonly"
                                 record="record"
-                                progressBarState="props.progressBarState"
-                                selectionAvailable="state.selectionAvailable"
+                                progressBarState="this.props.progressBarState"
+                                selectionAvailable="this.state.selectionAvailable"
                             />
                           </div>
                         </div>
                     </div>
                 </section>
-                <p t-if="hiddenCount" class="o_ag_lane_more text-muted">
-                    <t t-out="hiddenCount"/> more issues are not shown. Narrow the board with the filters, or turn swimlanes off to load more.
+                <p t-if="this.hiddenCount" class="o_ag_lane_more text-muted">
+                    <t t-out="this.hiddenCount"/> more issues are not shown. Narrow the board with the filters, or turn swimlanes off to load more.
                 </p>
-                <p t-if="!lanes.length" class="o_ag_lane_more text-muted">No issues match the filters.</p>
+                <p t-if="!this.lanes.length" class="o_ag_lane_more text-muted">No issues match the filters.</p>
             </div>
         </xpath>
         <xpath expr="//div[hasclass('o_kanban_renderer')]" position="attributes">
-            <attribute name="t-on-keydown">onCardKeydown</attribute>
-            <attribute name="t-on-click">onMoveToClick</attribute>
+            <attribute name="t-on-keydown">this.onCardKeydown</attribute>
+            <attribute name="t-on-click">this.onMoveToClick</attribute>
         </xpath>
         <xpath expr="//div[hasclass('o_kanban_renderer')]" position="inside">
-            <div t-if="sheet.recordId" class="o_ag_sheet_backdrop" t-on-click="closeSheet"/>
-            <div t-if="sheet.recordId" class="o_ag_sheet" role="dialog" aria-modal="true" t-att-aria-label="sheet.title"
-                 t-on-keydown="onSheetKeydown" tabindex="-1" t-ref="sheet">
-                <h2 class="o_ag_sheet_title" t-out="sheet.title"/>
-                <p t-if="!sheet.moves.length" class="text-muted">
-                    <t t-if="sheet.loading">Loading…</t><t t-else="">No moves are open to you from here.</t>
+            <div t-if="this.sheet.recordId" class="o_ag_sheet_backdrop" t-on-click="this.closeSheet"/>
+            <div t-if="this.sheet.recordId" class="o_ag_sheet" role="dialog" aria-modal="true" t-att-aria-label="this.sheet.title"
+                 t-on-keydown="this.onSheetKeydown" tabindex="-1" t-ref="this.sheetRef">
+                <h2 class="o_ag_sheet_title" t-out="this.sheet.title"/>
+                <p t-if="!this.sheet.moves.length" class="text-muted">
+                    <t t-if="this.sheet.loading">Loading…</t><t t-else="">No moves are open to you from here.</t>
                 </p>
-                <button t-foreach="sheet.moves" t-as="move" t-key="move.stage_id" type="button" class="o_ag_sheet_move"
+                <button t-foreach="this.sheet.moves" t-as="move" t-key="move.stage_id" type="button" class="o_ag_sheet_move"
                         t-on-click="() => this.chooseMove(move)">
                     <b t-out="move.name"/> <span class="text-muted">to <t t-out="move.stage"/></span>
                     <small t-if="move.reason" class="d-block text-muted o_ag_sheet_reason" t-out="move.reason"/>
                 </button>
-                <button type="button" class="o_ag_sheet_close btn btn-secondary" t-on-click="closeSheet">Close</button>
+                <button type="button" class="o_ag_sheet_close btn btn-secondary" t-on-click="this.closeSheet">Close</button>
             </div>
         </xpath>
-        <xpath expr="//t[@t-foreach='getGroupsOrRecords()']" position="attributes">
-            <attribute name="t-foreach">swimlaneMode ? [] : getGroupsOrRecords()</attribute>
+        <xpath expr="//t[@t-foreach='this.getGroupsOrRecords()']" position="attributes">
+            <attribute name="t-foreach">this.swimlaneMode ? [] : this.getGroupsOrRecords()</attribute>
         </xpath>
     </t>
 </templates>

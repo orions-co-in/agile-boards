@@ -6,6 +6,9 @@ from psycopg2 import IntegrityError
 
 @tagged("post_install", "-at_install")
 class TestProjectSprint(BaseCommon):
+    # Odoo 20 runs these tests as a plain test user, so give it the roles the 19.0 superuser had.
+    _test_user_groups = ("base.group_user", "project.group_project_manager", "analytic.group_analytic_accounting")
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

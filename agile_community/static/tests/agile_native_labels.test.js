@@ -17,13 +17,13 @@ test("unnamed fold carets and the panel toggle get names; named ones are left al
             <div><button class="o_toggle_fold"></button><span class="o_search_panel_label_title"> Sprint </span></div>
             <div><button class="o_toggle_fold" aria-label="Keep me"></button><span class="o_search_panel_label_title">Epic</span></div>
         </div>
-        <button><i class="oi oi-panel-right"></i></button>
-        <button aria-label="Already named"><i class="oi oi-panel-right"></i></button>`);
+        <button><i class="oi" data-icon="dock_to_left"></i></button>
+        <button aria-label="Already named"><i class="oi" data-icon="dock_to_left"></i></button>`);
     labelNativeControls(root);
     const [first, second] = root.querySelectorAll(".o_toggle_fold");
     expect(first.getAttribute("aria-label")).toBe("Show or hide Sprint");
     expect(second.getAttribute("aria-label")).toBe("Keep me");
-    const [panel, named] = root.querySelectorAll("button > i.oi-panel-right");
+    const [panel, named] = root.querySelectorAll("button > i[data-icon='dock_to_left']");
     expect(panel.parentElement.getAttribute("aria-label")).toBe("Show or hide the filter panel");
     expect(named.parentElement.getAttribute("aria-label")).toBe("Already named");
 });

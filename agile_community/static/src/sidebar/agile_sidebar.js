@@ -1,4 +1,4 @@
-import { Component, markup, onMounted, useState } from "@odoo/owl";
+import { Component, markup, onMounted, proxy, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { isDisplayStandalone } from "@web/core/browser/feature_detection";
 import { useBus, useService } from "@web/core/utils/hooks";
@@ -6,6 +6,7 @@ import { _t } from "@web/core/l10n/translation";
 import { rememberProjectTab } from "@agile_community/form/project_tab_memory";
 import { BOTTOM_KEYS, SIDEBAR_ENTRIES, sidebarTarget } from "./sidebar_helpers";
 import { openShortcutHelp } from "@agile_community/shortcuts/agile_shortcuts";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 const BODY_CLASS = "o_ag_has_sidebar";
 
@@ -15,13 +16,13 @@ const BODY_CLASS = "o_ag_has_sidebar";
  */
 export class AgileSidebar extends Component {
     static template = "agile_community.Sidebar";
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
+        this.action = usePlugin(ActionPlugin);
         this.dialog = useService("dialog");
-        this.state = useState({ data: null, entry: null, more: false });
+        this.state = proxy({ data: null, entry: null, more: false });
         this.token = 0;
         useBus(this.env.bus, "ACTION_MANAGER:UI-UPDATED", () => this.refresh());
         useBus(this.env.bus, "AGILE:SIDEBAR-REFRESH", () => this.refresh());

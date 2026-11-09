@@ -109,6 +109,7 @@ class AgileProjectMember(models.Model):
                         role=member._fields["role"].convert_to_export(member.role, member),
                     )
                 )
+        self._agile_forget_access()
         return members
 
     def write(self, vals):
@@ -147,6 +148,7 @@ class AgileProjectMember(models.Model):
                         new=member.role,
                     )
                 )
+        self._agile_forget_access()
         return result
 
     def unlink(self):
@@ -173,7 +175,14 @@ class AgileProjectMember(models.Model):
                         role=member.role,
                     )
                 )
-        return super().unlink()
+        result = super().unlink()
+        self._agile_forget_access()
+        return result
+
+    def _agile_forget_access(self):
+        """Odoo 20 keeps who may read a record for the whole transaction; the team changed, so forget it."""
+        self.env.flush_all()
+        self.env.transaction.invalidate_access_cache()
 
     def _check_project_manager(self, project):
         if not project or not project.agile_enabled:

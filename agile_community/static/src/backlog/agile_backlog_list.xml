@@ -2,47 +2,47 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.BacklogListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary">
         <xpath expr="//div[hasclass('o_list_renderer')]/*[1]" position="before">
-            <section t-if="planActions.length" class="o_ag_plan_strip d-md-none" aria-label="Sprint planning">
-                <div t-foreach="planActions" t-as="item" t-key="item.sprint.id" class="o_ag_plan_strip_row">
+            <section t-if="this.planActions.length" class="o_ag_plan_strip d-md-none" aria-label="Sprint planning">
+                <div t-foreach="this.planActions" t-as="item" t-key="item.sprint.id" class="o_ag_plan_strip_row">
                     <span class="o_ag_plan_strip_name"><b t-out="item.sprint.name"/> <span t-out="item.chip.text"/></span>
                     <button type="button" class="btn btn-secondary btn-sm o_ag_plan_strip_action"
                             t-on-click="() => this.runSprintAction(item.sprint, item.chip.action)" t-out="item.chip.label"/>
                 </div>
             </section>
-            <section t-if="info.data" class="o_ag_filters" aria-label="Filter the backlog">
-                <t t-foreach="pickLists"
+            <section t-if="this.info.data" class="o_ag_filters" aria-label="Filter the backlog">
+                <t t-foreach="this.pickLists"
                    t-as="pick" t-key="pick[0]">
                     <Dropdown menuClass="'o_ag_multi_menu'">
-                        <button type="button" t-attf-class="btn btn-secondary btn-sm o_ag_multi {{multiIds(pick[0]).length ? 'o_ag_multi_on' : ''}}"
-                                t-att-data-kind="pick[0]" t-out="multiSummary(pick[0], pick[2], pick[3])"/>
+                        <button type="button" t-attf-class="btn btn-secondary btn-sm o_ag_multi {{this.multiIds(pick[0]).length ? 'o_ag_multi_on' : ''}}"
+                                t-att-data-kind="pick[0]" t-out="this.multiSummary(pick[0], pick[2], pick[3])"/>
                         <t t-set-slot="content">
                             <label t-foreach="pick[3]" t-as="choice" t-key="choice.id" class="o_ag_multi_row">
-                                <input type="checkbox" t-att-checked="multiIds(pick[0]).includes(choice.id)"
+                                <input type="checkbox" t-att-checked="this.multiIds(pick[0]).includes(choice.id)"
                                        t-on-change="() => this.toggleMulti(pick[0], pick[1], pick[2], pick[3], choice.id)"/>
                                 <span t-out="choice.label"/>
                                 <span t-if="choice.count !== undefined" class="o_ag_multi_count text-muted" t-out="choice.count"/>
                             </label>
-                            <button t-if="multiIds(pick[0]).length" type="button" class="btn btn-link btn-sm o_ag_multi_clear"
+                            <button t-if="this.multiIds(pick[0]).length" type="button" class="btn btn-link btn-sm o_ag_multi_clear"
                                     t-on-click="() => this.clearMulti(pick[0])">Clear</button>
                         </t>
                     </Dropdown>
                 </t>
             </section>
-            <section t-if="epics.data" class="o_ag_epics" aria-label="Epics">
-                <button type="button" class="btn btn-link o_ag_epics_toggle" t-att-aria-expanded="epics.open ? 'true' : 'false'"
-                        t-on-click="toggleEpics">
-                    <i t-attf-class="fa fa-fw {{epics.open ? 'fa-caret-down' : 'fa-caret-right'}}" aria-hidden="true"/>
-                    Epics (<t t-out="epicList.length"/>)
+            <section t-if="this.epics.data" class="o_ag_epics" aria-label="Epics">
+                <button type="button" class="btn btn-link o_ag_epics_toggle" t-att-aria-expanded="this.epics.open ? 'true' : 'false'"
+                        t-on-click="this.toggleEpics">
+                    <i t-attf-class="oi oi-fw {{this.epics.open ? '' : ''}}" aria-hidden="true" t-attf-data-icon="{{this.epics.open ? 'arrow_drop_down' : 'arrow_right'}}"/>
+                    Epics (<t t-out="this.epicList.length"/>)
                 </button>
-                <t t-if="epics.open">
-                    <p t-if="!epicList.length" class="o_ag_epics_empty text-muted mb-0">
+                <t t-if="this.epics.open">
+                    <p t-if="!this.epicList.length" class="o_ag_epics_empty text-muted mb-0">
                         No epics yet. Create an epic issue to group related work and follow its progress here.
                     </p>
                     <ul t-else="" class="o_ag_epic_list list-unstyled">
-                        <li t-foreach="epicList" t-as="epic" t-key="epic.id">
-                            <t t-set="progress" t-value="epicProgress(epic)"/>
-                            <button type="button" t-attf-class="o_ag_epic {{activeEpicId === epic.id ? 'o_ag_epic_active' : ''}}"
-                                    t-att-aria-pressed="activeEpicId === epic.id ? 'true' : 'false'"
+                        <li t-foreach="this.epicList" t-as="epic" t-key="epic.id">
+                            <t t-set="progress" t-value="this.epicProgress(epic)"/>
+                            <button type="button" t-attf-class="o_ag_epic {{this.activeEpicId === epic.id ? 'o_ag_epic_active' : ''}}"
+                                    t-att-aria-pressed="this.activeEpicId === epic.id ? 'true' : 'false'"
                                     t-att-data-epic-id="epic.id"
                                     t-on-click="() => this.selectEpic(epic)">
                                 <span class="o_ag_epic_name">
@@ -66,37 +66,37 @@
             </section>
         </xpath>
         <xpath expr="//div[hasclass('o_list_renderer')]" position="inside">
-            <section t-if="emptyBacklog" class="o_ag_empty_backlog o_view_nocontent_inline text-center py-4" aria-label="Empty backlog">
+            <section t-if="this.emptyBacklog" class="o_ag_empty_backlog o_view_nocontent_inline text-center py-4" aria-label="Empty backlog">
                 <p class="h5 mb-1">No issues yet</p>
-                <p class="text-muted mb-3">The Backlog is empty. <t t-if="emptyGroup">Add the first issue below.</t></p>
-                <div t-if="emptyGroup" class="o_ag_quick_row text-start">
-                    <AgileQuickCreate t-key="quickGroupKey(emptyGroup)"
-                                      groupKey="quickGroupKey(emptyGroup)"
-                                      label="groupName(emptyGroup)"
-                                      types="info.data.task_types"
-                                      members="info.data.members"
-                                      typeId="quickTypeId()"
-                                      onTypeChange.bind="setQuickType"
-                                      onCreate="(vals) => this.createIssue(emptyGroup, vals)"/>
+                <p class="text-muted mb-3">The Backlog is empty. <t t-if="this.emptyGroup">Add the first issue below.</t></p>
+                <div t-if="this.emptyGroup" class="o_ag_quick_row text-start">
+                    <AgileQuickCreate t-key="this.quickGroupKey(this.emptyGroup)"
+                                      groupKey="this.quickGroupKey(this.emptyGroup)"
+                                      label="this.groupName(this.emptyGroup)"
+                                      types="this.info.data.task_types"
+                                      members="this.info.data.members"
+                                      typeId="this.quickTypeId()"
+                                      onTypeChange.bind="this.setQuickType"
+                                      onCreate="(vals) => this.createIssue(this.emptyGroup, vals)"/>
                 </div>
             </section>
-            <div class="visually-hidden o_ag_live" role="status" aria-live="polite" t-out="announcer.text"/>
-            <AgileBulkBar t-if="bulkProjectId" t-key="bulkProjectId" projectId="bulkProjectId"
-                          ids="selectedIds" onDone.bind="onBulkDone" onClear.bind="clearSelection"/>
+            <div class="visually-hidden o_ag_live" role="status" aria-live="polite" t-out="this.announcer.text"/>
+            <AgileBulkBar t-if="this.bulkProjectId" t-key="this.bulkProjectId" projectId="this.bulkProjectId"
+                          ids="this.selectedIds" onDone.bind="this.onBulkDone" onClear.bind="this.clearSelection"/>
         </xpath>
     </t>
 
     <t t-name="agile_community.BacklogRows" t-inherit="web.ListRenderer.Rows" t-inherit-mode="primary">
         <xpath expr="//t[@t-if='!group.isFolded']" position="inside">
-            <tr t-if="quickAllowed(group)" class="o_ag_quick_row">
-                <td t-att-colspan="nbCols">
-                    <AgileQuickCreate t-key="quickGroupKey(group)"
-                                      groupKey="quickGroupKey(group)"
-                                      label="groupName(group)"
-                                      types="info.data.task_types"
-                                      members="info.data.members"
-                                      typeId="quickTypeId()"
-                                      onTypeChange.bind="setQuickType"
+            <tr t-if="this.quickAllowed(group)" class="o_ag_quick_row">
+                <td t-att-colspan="this.nbCols">
+                    <AgileQuickCreate t-key="this.quickGroupKey(group)"
+                                      groupKey="this.quickGroupKey(group)"
+                                      label="this.groupName(group)"
+                                      types="this.info.data.task_types"
+                                      members="this.info.data.members"
+                                      typeId="this.quickTypeId()"
+                                      onTypeChange.bind="this.setQuickType"
                                       onCreate="(vals) => this.createIssue(group, vals)"/>
                 </td>
             </tr>
@@ -104,10 +104,10 @@
     </t>
 
     <t t-name="agile_community.BacklogButtons">
-        <button t-if="isScrum" type="button" class="btn btn-secondary o_ag_toggle_completed"
-                t-att-aria-pressed="completedHidden ? 'false' : 'true'"
-                t-on-click="toggleCompleted">
-            <t t-if="completedHidden">Show completed sprints</t>
+        <button t-if="this.isScrum" type="button" class="btn btn-secondary o_ag_toggle_completed"
+                t-att-aria-pressed="this.completedHidden ? 'false' : 'true'"
+                t-on-click="this.toggleCompleted">
+            <t t-if="this.completedHidden">Show completed sprints</t>
             <t t-else="">Hide completed sprints</t>
         </button>
     </t>
@@ -115,40 +115,40 @@
     <t t-name="agile_community.BacklogGroupRow" t-inherit="web.ListRenderer.GroupRow" t-inherit-mode="primary">
         <xpath expr="//th/div" position="replace">
             <div class="o_ag_group d-flex align-items-center flex-wrap gap-2">
-                <span t-attf-class="o_group_caret fa fa-fw {{group.isFolded ? 'fa-caret-right' : 'fa-caret-down' }}"
-                      t-attf-style="--o-list-group-level: {{getGroupLevel(group)}}"/>
-                <t t-if="!isSprintGroup(group)">
+                <span t-attf-class="oi oi-fw o_group_caret {{group.isFolded ? '' : '' }}"
+                      t-attf-style="--o-list-group-level: {{this.getGroupLevel(group)}}" t-attf-data-icon="{{group.isFolded ? 'arrow_right' : 'arrow_drop_down' }}"/>
+                <t t-if="!this.isSprintGroup(group)">
                     <span t-out="group.displayName"/> (<span t-out="group.count"/>)
                 </t>
-                <t t-elif="isBacklogGroup(group)">
-                    <input t-if="canEdit and group.list.records.length" type="checkbox" class="o_ag_group_select" t-att-checked="groupSelected(group)"
+                <t t-elif="this.isBacklogGroup(group)">
+                    <input t-if="this.canEdit and group.list.records.length" type="checkbox" class="o_ag_group_select" t-att-checked="this.groupSelected(group)"
                            aria-label="Select all issues in the Backlog" t-on-click.stop="" t-on-change="(ev) => this.toggleGroupSelection(group, ev)"/>
                     <b class="o_ag_group_name">Backlog</b>
-                    <span class="o_ag_group_meta" t-out="backlogText()"/>
+                    <span class="o_ag_group_meta" t-out="this.backlogText()"/>
                 </t>
                 <t t-else="">
-                    <t t-set="sprint" t-value="sprintFor(group)"/>
-                    <input t-if="canEdit and group.list.records.length" type="checkbox" class="o_ag_group_select" t-att-checked="groupSelected(group)"
-                           t-att-aria-label="'Select all issues in ' + groupName(group)" t-on-click.stop="" t-on-change="(ev) => this.toggleGroupSelection(group, ev)"/>
-                    <b class="o_ag_group_name" t-out="groupName(group)"/>
+                    <t t-set="sprint" t-value="this.sprintFor(group)"/>
+                    <input t-if="this.canEdit and group.list.records.length" type="checkbox" class="o_ag_group_select" t-att-checked="this.groupSelected(group)"
+                           t-att-aria-label="'Select all issues in ' + this.groupName(group)" t-on-click.stop="" t-on-change="(ev) => this.toggleGroupSelection(group, ev)"/>
+                    <b class="o_ag_group_name" t-out="this.groupName(group)"/>
                     <t t-if="sprint">
-                        <span t-attf-class="o_ag_sprint_state o_ag_sprint_{{sprint.state}}" t-out="stateLabel(sprint)"/>
-                        <span class="o_ag_group_meta" t-out="dates(sprint)"/>
+                        <span t-attf-class="o_ag_sprint_state o_ag_sprint_{{sprint.state}}" t-out="this.stateLabel(sprint)"/>
+                        <span class="o_ag_group_meta" t-out="this.dates(sprint)"/>
                         <span t-if="sprint.goal and sprint.state !== 'done'" class="o_ag_group_goal text-truncate"
                               t-att-title="sprint.goal" t-out="sprint.goal"/>
                         <span class="o_ag_group_spacer"/>
                         <span t-attf-class="o_ag_group_points {{sprint.over_capacity ? 'o_ag_over' : ''}}"
-                              t-out="pointsText(sprint)"/>
+                              t-out="this.pointsText(sprint)"/>
                         <span t-if="sprint.state !== 'done'" role="img"
                               t-attf-class="o_ag_ribbon {{sprint.over_capacity ? 'o_ag_over' : ''}}"
-                              t-att-aria-label="ribbonLabel(sprint)">
-                            <i t-foreach="ribbonSegments(sprint)" t-as="segment" t-key="segment.status"
+                              t-att-aria-label="this.ribbonLabel(sprint)">
+                            <i t-foreach="this.ribbonSegments(sprint)" t-as="segment" t-key="segment.status"
                                t-attf-class="o_ag_s_{{segment.status}}"
                                t-attf-style="width: {{segment.width}}%" t-att-title="segment.label"/>
                         </span>
                         <span t-if="sprint.unestimated_count and sprint.state !== 'done'" class="o_ag_group_meta"
-                              t-out="unestimatedText(sprint.unestimated_count)"/>
-                        <t t-set="chip" t-value="planChip(sprint)"/>
+                              t-out="this.unestimatedText(sprint.unestimated_count)"/>
+                        <t t-set="chip" t-value="this.planChip(sprint)"/>
                         <t t-if="chip">
                             <span t-attf-class="o_ag_plan_chip {{chip.tone ? 'o_ag_plan_' + chip.tone : ''}}"
                                   role="status" t-out="chip.text"/>
@@ -173,13 +173,13 @@
                         <button t-if="sprint.state === 'done'" type="button" class="btn btn-link btn-sm"
                                 t-on-click.stop="() => this.openSprint(sprint)">Open sprint</button>
                     </t>
-                    <t t-elif="info.error">
+                    <t t-elif="this.info.error">
                         <span class="o_ag_group_meta">Sprint details unavailable</span>
-                        <button type="button" class="btn btn-link btn-sm" t-on-click.stop="retryInfo">Retry</button>
+                        <button type="button" class="btn btn-link btn-sm" t-on-click.stop="this.retryInfo">Retry</button>
                     </t>
                 </t>
-                <div t-if="showGroupPager(group)" t-on-click.stop="" class="ms-auto">
-                    <Pager t-props="getGroupPagerProps(group)"/>
+                <div t-if="this.showGroupPager(group)" t-on-click.stop="" class="ms-auto">
+                    <Pager t-props="this.getGroupPagerProps(group)"/>
                 </div>
             </div>
         </xpath>

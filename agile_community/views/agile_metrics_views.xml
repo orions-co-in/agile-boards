@@ -10,17 +10,17 @@
                     <field name="can_view_agile_metrics" invisible="1"/>
                     <div class="row g-2 mb-3" name="agile_metrics_button_box">
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-tasks" context="{'agile_metric_filter': 'open'}">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="checklist" context="{'agile_metric_filter': 'open'}">
                                 <field name="agile_open_issue_count" widget="statinfo" string="&#160;Open issues"/>
                             </button>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-exclamation-triangle" context="{'agile_metric_filter': 'blocked'}">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="warning" context="{'agile_metric_filter': 'blocked'}">
                                 <field name="agile_blocked_issue_count" widget="statinfo" string="&#160;Blocked"/>
                             </button>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <button name="action_view_agile_current_sprint" type="object" class="oe_stat_button w-100 h-100" icon="fa-flag">
+                            <button name="action_view_agile_current_sprint" type="object" class="oe_stat_button w-100 h-100" icon="flag" icon_class="oi-filled">
                                 <div class="o_stat_info">
                                     <field name="agile_current_sprint_progress" class="o_stat_value text-wrap d-block"/>
                                     <span class="o_stat_text d-block">Current sprint</span>
@@ -28,7 +28,7 @@
                             </button>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-clock-o" context="{'agile_metric_filter': 'overdue'}">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="schedule" context="{'agile_metric_filter': 'overdue'}">
                                 <field name="agile_overdue_issue_count" widget="statinfo" string="&#160;Overdue"/>
                             </button>
                         </div>
@@ -178,7 +178,7 @@
                 <field name="throughput_points" string="Throughput points" sum="Completed points"/>
                 <field name="cycle_time_days" avg="Average cycle time (days)"/>
                 <field name="task_id" optional="hide"/>
-                <button name="action_open_issue" type="object" string="Open issue" icon="fa-external-link" invisible="not task_id"/>
+                <button name="action_open_issue" type="object" string="Open issue" icon="open_in_new" invisible="not task_id"/>
             </list>
         </field>
     </record>
@@ -318,7 +318,7 @@
         <field name="inherit_id" ref="project_scrum.project_sprint_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_metric_history" type="object" class="oe_stat_button" icon="fa-line-chart">
+                <button name="action_view_metric_history" type="object" class="oe_stat_button" icon="show_chart">
                     <div class="o_stat_info"><span class="o_stat_text">Burndown history</span></div>
                 </button>
             </xpath>

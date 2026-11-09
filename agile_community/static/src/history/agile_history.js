@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
@@ -20,11 +20,11 @@ export function historyTabs() {
  */
 export class AgileHistory extends Component {
     static template = "agile_community.History";
-    static props = { ...standardFieldProps };
+    props = useProps({ ...standardFieldProps });
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ loading: true, error: null, data: null, tab: "all" });
+        this.state = proxy({ loading: true, error: null, data: null, tab: "all" });
         this.loadedFor = null;
         this.ensureLoaded();
     }

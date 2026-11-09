@@ -31,15 +31,15 @@
                 <templates>
                     <t t-name="timeline-item">
                         <div class="o_agile_timeline_item">
-                            <small><t t-esc="record.item_type"/> · </small>
+                            <small><t t-out="record.item_type"/> · </small>
                             <strong t-if="record.issue_key">
-                                <t t-esc="record.issue_key"/> —
+                                <t t-out="record.issue_key"/> —
                             </strong>
-                            <span><t t-esc="record.display_name"/></span>
+                            <span><t t-out="record.display_name"/></span>
                             <small t-if="record.is_derived" title="Dates come from the child issues and sprints">(from child issues)</small>
                             <small t-if="record.agile_is_epic">
-                                <t t-esc="record.child_done_count"/>/
-                                <t t-esc="record.child_issue_count"/> complete
+                                <t t-out="record.child_done_count"/>/
+                                <t t-out="record.child_issue_count"/> complete
                             </small>
                         </div>
                     </t>

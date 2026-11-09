@@ -5,7 +5,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project" />
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='extra_settings']" position="inside">
+            <xpath expr="//group[@name='other_section']" position="inside">
                 <field
                     name="use_scrum"
                     string="Use Scrum"
@@ -39,7 +39,7 @@
                     name="action_sprints"
                     type="object"
                     groups="project.group_project_manager"
-                    icon="fa-hourglass"
+                    icon="hourglass_empty"
                     invisible="not use_scrum"
                 >
                     <div class="o_field_widget o_stat_info">
@@ -56,7 +56,7 @@
                     name="action_backlog"
                     type="object"
                     groups="project.group_project_manager"
-                    icon="fa-archive"
+                    icon="archive"
                     invisible="not use_scrum"
                 >
                     <div class="o_field_widget o_stat_info">

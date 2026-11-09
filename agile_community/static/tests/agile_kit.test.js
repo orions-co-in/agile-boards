@@ -16,7 +16,7 @@ defineMailModels();
 test("lozenge shows label with a status icon and falls back to backlog", async () => {
     await mountWithCleanup(AgileLozenge, { props: { label: "Done", category: "done" } });
     expect(".o_ag_lozenge").toHaveClass("o_ag_s_done");
-    expect(".o_ag_lozenge .fa-check").toHaveCount(1);
+    expect(".o_ag_lozenge [data-icon='check']").toHaveCount(1);
     await mountWithCleanup(AgileLozenge, { props: { label: "?", category: "bogus" } });
     expect(".o_ag_lozenge.o_ag_s_backlog").toHaveCount(1);
 });

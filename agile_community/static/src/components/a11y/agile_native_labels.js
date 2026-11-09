@@ -15,7 +15,7 @@ export function labelNativeControls(root) {
             ?.textContent?.trim();
         button.setAttribute("aria-label", title ? _t("Show or hide %s", title) : _t("Show or hide"));
     }
-    for (const icon of root.querySelectorAll("button > i.oi-panel-right")) {
+    for (const icon of root.querySelectorAll("button > i[data-icon='dock_to_left']")) {
         const button = icon.parentElement;
         if (!button.hasAttribute("aria-label")) {
             button.setAttribute("aria-label", _t("Show or hide the filter panel"));

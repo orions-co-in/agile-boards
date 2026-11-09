@@ -154,7 +154,8 @@ class AgileTaskType(models.Model):
 
 class ProjectTask(models.Model):
     _inherit = "project.task"
-    _rec_names_search = ["issue_key", "name", "agile_old_key_ids.key"]
+
+    _rec_names_search = ("issue_key", "name", "agile_old_key_ids.key")
 
     @api.model
     def _read_group_stage_ids(self, stages, domain):

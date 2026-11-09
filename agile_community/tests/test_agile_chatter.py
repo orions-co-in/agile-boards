@@ -102,14 +102,14 @@ class TestAgileChatter(TransactionCase):
         self,
     ):
         self.project.write({"privacy_visibility": "followers"})
-        self.project.message_subscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.link(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.issue.write({"user_ids": [Command.link(self.reviewer.id)]})
         message = self.issue.message_post(body="Private review history.")
-        self.project.message_unsubscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.unlink(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
 
         self.assertTrue(self.issue.with_user(self.reviewer).has_access("read"))
         self.assertFalse(self.project.with_user(self.reviewer).has_access("read"))
@@ -119,18 +119,18 @@ class TestAgileChatter(TransactionCase):
         self,
     ):
         self.project.write({"privacy_visibility": "followers"})
-        self.project.message_subscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.link(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.issue.write({"user_ids": [Command.link(self.reviewer.id)]})
         activity = self.issue.activity_schedule(
             "mail.mail_activity_data_todo",
             user_id=self.reviewer.id,
             summary="Private review follow-up",
         )
-        self.project.message_unsubscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.unlink(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
 
         self.assertTrue(self.issue.with_user(self.reviewer).has_access("read"))
         self.assertFalse(self.project.with_user(self.reviewer).has_access("read"))
@@ -354,13 +354,13 @@ class TestAgileChatter(TransactionCase):
             "res_id": self.issue.id,
         })
         self.project.write({"privacy_visibility": "followers"})
-        self.project.message_subscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.link(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.issue.write({"user_ids": [Command.link(self.reviewer.id)]})
-        self.project.message_unsubscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.unlink(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
 
         self.assertTrue(self.issue.with_user(self.reviewer).has_access("read"))
         self.assertFalse(self.project.with_user(self.reviewer).has_access("read"))
@@ -370,13 +370,13 @@ class TestAgileChatter(TransactionCase):
         self,
     ):
         self.project.write({"privacy_visibility": "followers"})
-        self.project.message_subscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.link(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
         self.issue.write({"user_ids": [Command.link(self.reviewer.id)]})
-        self.project.message_unsubscribe(
-            partner_ids=[self.reviewer.partner_id.id]
-        )
+        self.project.write({"allowed_internal_user_ids": [Command.unlink(self.reviewer.id)]})
+        self.env.flush_all()
+        self.env.invalidate_all()
 
         self.assertTrue(self.issue.with_user(self.reviewer).has_access("read"))
         self.assertFalse(self.project.with_user(self.reviewer).has_access("read"))

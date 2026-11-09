@@ -16,7 +16,7 @@ class ProjectTask(models.Model):
             [
                 ("model", "=", "project.task"),
                 ("res_id", "=", self.id),
-                ("message_type", "in", ["comment", "notification"]),
+                ("message_type", "in", ["comment", "notification", "tracking"]),
             ],
             order="id desc",
             limit=HISTORY_LIMIT,

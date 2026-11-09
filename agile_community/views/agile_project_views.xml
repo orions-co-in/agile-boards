@@ -6,7 +6,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='extra_settings']" position="inside">
+            <xpath expr="//group[@name='other_section']" position="inside">
                 <group string="Agile" groups="project.group_project_manager">
                     <field name="agile_enabled" help="Add issue types and workflow on this existing Project. Native tasks stay native until you explicitly prepare them as Agile issues."/>
                 </group>

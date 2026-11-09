@@ -2,8 +2,8 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.PushSwitch">
         <div class="o_ag_push_switch" role="group" aria-label="Phone notifications">
-            <p class="o_ag_push_text mb-2" role="status" t-out="info.text"/>
-            <button t-if="info.kind === 'off'" type="button" class="btn btn-secondary o_ag_push_on" t-on-click="turnOn">Turn on phone notifications</button>
+            <p class="o_ag_push_text mb-2" role="status" t-out="this.info.text"/>
+            <button t-if="this.info.kind === 'off'" type="button" class="btn btn-secondary o_ag_push_on" t-on-click="this.turnOn">Turn on phone notifications</button>
         </div>
     </t>
 </templates>

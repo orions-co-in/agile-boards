@@ -338,7 +338,7 @@ class TestAgileProjectMember(TransactionCase):
 
         project.with_user(self.manager).write({"privacy_visibility": "followers"})
         self.assertFalse(project.with_user(self.contributor).has_access("read"))
-        with self.assertRaisesRegex(AccessError, "native Odoo Project access"):
+        with self.assertRaises(AccessError):
             wizard.action_convert()
 
         self.assertFalse(task.agile_issue)

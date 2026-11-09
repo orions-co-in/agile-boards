@@ -5,48 +5,48 @@
             <h1 class="o_ag_reports_title">How often do we deploy?</h1>
             <div class="o_ag_reports_controls">
                 <label class="o_ag_reports_control"><span>From</span>
-                    <input type="date" class="form-control" t-att-value="state.from" t-on-change="(ev) => this.onChange('from', ev)"/></label>
+                    <input type="date" class="form-control" t-att-value="this.state.from" t-on-change="(ev) => this.onChange('from', ev)"/></label>
                 <label class="o_ag_reports_control"><span>To</span>
-                    <input type="date" class="form-control" t-att-value="state.to" t-on-change="(ev) => this.onChange('to', ev)"/></label>
-                <label t-if="state.data and state.data.environments.length" class="o_ag_reports_control"><span>Environment</span>
+                    <input type="date" class="form-control" t-att-value="this.state.to" t-on-change="(ev) => this.onChange('to', ev)"/></label>
+                <label t-if="this.state.data and this.state.data.environments.length" class="o_ag_reports_control"><span>Environment</span>
                     <select class="form-select o_ag_deploys_environment" t-on-change="(ev) => this.onChange('environment', ev)">
-                        <option value="" t-att-selected="!state.environment">All environments</option>
-                        <option t-foreach="state.data.environments" t-as="name" t-key="name" t-att-value="name"
-                                t-att-selected="state.environment === name" t-out="name"/>
+                        <option value="" t-att-selected="!this.state.environment">All environments</option>
+                        <option t-foreach="this.state.data.environments" t-as="name" t-key="name" t-att-value="name"
+                                t-att-selected="this.state.environment === name" t-out="name"/>
                     </select></label>
                 <label class="o_ag_reports_control"><span>Group by</span>
                     <select class="form-select o_ag_deploys_period" t-on-change="(ev) => this.onChange('period', ev)">
-                        <option value="day" t-att-selected="state.period === 'day'">Day</option>
-                        <option value="week" t-att-selected="state.period === 'week'">Week</option>
-                        <option value="month" t-att-selected="state.period === 'month'">Month</option>
+                        <option value="day" t-att-selected="this.state.period === 'day'">Day</option>
+                        <option value="week" t-att-selected="this.state.period === 'week'">Week</option>
+                        <option value="month" t-att-selected="this.state.period === 'month'">Month</option>
                     </select></label>
-                <ReportExport t-if="state.data and state.data.any" title="exportTitle" table.bind="exportTable" png.bind="exportPng"/>
+                <ReportExport t-if="this.state.data and this.state.data.any" title="this.exportTitle" table.bind="this.exportTable" png.bind="this.exportPng"/>
             </div>
         </header>
-        <div t-if="state.error" class="alert alert-danger" role="alert">
-            <p class="mb-2" t-out="state.error"/>
-            <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+        <div t-if="this.state.error" class="alert alert-danger" role="alert">
+            <p class="mb-2" t-out="this.state.error"/>
+            <button type="button" class="btn btn-secondary" t-on-click="this.load">Retry</button>
         </div>
-        <p t-elif="state.data and !state.data.any" class="o_ag_reports_empty">
+        <p t-elif="this.state.data and !this.state.data.any" class="o_ag_reports_empty">
             No deployments have been recorded yet. In the project form's Git section, send your code host's deployment events to the project's webhook:
             GitHub "Deployment statuses", or GitLab "Deployment events". Only finished deployments (succeeded or failed) are counted.
         </p>
-        <t t-elif="state.data and layout">
-            <p class="o_ag_reports_delivered" t-out="summary"/>
-            <div t-ref="chartBox" t-attf-class="o_ag_cfd {{state.loading ? 'o_ag_cfd_loading' : ''}}">
-                <svg class="o_ag_cfd_chart o_ag_deploys_chart" t-attf-viewBox="0 0 {{layout.chart.w}} {{layout.chart.h}}" role="img"
+        <t t-elif="this.state.data and this.layout">
+            <p class="o_ag_reports_delivered" t-out="this.summary"/>
+            <div t-ref="this.chartBox" t-attf-class="o_ag_cfd {{this.state.loading ? 'o_ag_cfd_loading' : ''}}">
+                <svg class="o_ag_cfd_chart o_ag_deploys_chart" t-attf-viewBox="0 0 {{this.layout.chart.w}} {{this.layout.chart.h}}" role="img"
                      aria-label="Deployments per period. The numbers table has the same figures."
-                     t-on-mousemove="onMove" t-on-mouseleave="onLeave">
+                     t-on-mousemove="this.onMove" t-on-mouseleave="this.onLeave">
                     <g class="o_ag_cfd_axis">
-                        <text class="o_ag_axis_title" t-att-x="layout.chart.left + (layout.chart.w - layout.chart.left - layout.chart.right) / 2" t-att-y="layout.chart.h - 3" text-anchor="middle" t-out="'Period starting'"/>
-                        <text class="o_ag_axis_title" transform="rotate(-90)" t-att-x="-(layout.chart.top + (layout.chart.h - layout.chart.top - layout.chart.bottom) / 2)" y="10" text-anchor="middle" t-out="'Deploys'"/>
-                        <line t-att-x1="layout.chart.left" t-att-x2="layout.chart.w - layout.chart.right" t-att-y1="layout.y(0)" t-att-y2="layout.y(0)"/>
-                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(layout.top) + 4" text-anchor="end" t-out="layout.top"/>
-                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(0)" text-anchor="end">0</text>
-                        <text t-att-x="layout.chart.left" t-att-y="layout.chart.h - 20" t-out="state.data.buckets[0].date"/>
-                        <text t-if="state.data.buckets.length > 1" t-att-x="layout.chart.w - layout.chart.right" t-att-y="layout.chart.h - 20" text-anchor="end" t-out="state.data.buckets[state.data.buckets.length - 1].date"/>
+                        <text class="o_ag_axis_title" t-att-x="this.layout.chart.left + (this.layout.chart.w - this.layout.chart.left - this.layout.chart.right) / 2" t-att-y="this.layout.chart.h - 3" text-anchor="middle" t-out="'Period starting'"/>
+                        <text class="o_ag_axis_title" transform="rotate(-90)" t-att-x="-(this.layout.chart.top + (this.layout.chart.h - this.layout.chart.top - this.layout.chart.bottom) / 2)" y="10" text-anchor="middle" t-out="'Deploys'"/>
+                        <line t-att-x1="this.layout.chart.left" t-att-x2="this.layout.chart.w - this.layout.chart.right" t-att-y1="this.layout.y(0)" t-att-y2="this.layout.y(0)"/>
+                        <text t-att-x="this.layout.chart.left - 6" t-att-y="this.layout.y(this.layout.top) + 4" text-anchor="end" t-out="this.layout.top"/>
+                        <text t-att-x="this.layout.chart.left - 6" t-att-y="this.layout.y(0)" text-anchor="end">0</text>
+                        <text t-att-x="this.layout.chart.left" t-att-y="this.layout.chart.h - 20" t-out="this.state.data.buckets[0].date"/>
+                        <text t-if="this.state.data.buckets.length > 1" t-att-x="this.layout.chart.w - this.layout.chart.right" t-att-y="this.layout.chart.h - 20" text-anchor="end" t-out="this.state.data.buckets[this.state.data.buckets.length - 1].date"/>
                     </g>
-                    <g t-foreach="layout.bars" t-as="bar" t-key="bar_index">
+                    <g t-foreach="this.layout.bars" t-as="bar" t-key="bar_index">
                         <rect class="o_ag_deploys_ok" t-att-x="bar.x" t-att-y="bar.doneY" t-att-width="bar.width" t-att-height="bar.doneHeight"/>
                         <rect t-if="bar.bucket.failed" class="o_ag_deploys_failed" t-att-x="bar.x" t-att-y="bar.failedY" t-att-width="bar.width" t-att-height="bar.failedHeight"/>
                     </g>
@@ -56,18 +56,18 @@
                     <li><i class="o_ag_cfd_swatch o_ag_deploys_swatch_failed"/><span>Failed</span></li>
                 </ul>
                 <p class="o_ag_cfd_readout" aria-live="polite">
-                    <t t-if="hoverBucket"><strong t-out="hoverBucket.date"/>: <t t-out="hoverBucket.count"/> deployed<t t-if="hoverBucket.failed">, <t t-out="hoverBucket.failed"/> failed</t>.</t>
+                    <t t-if="this.hoverBucket"><strong t-out="this.hoverBucket.date"/>: <t t-out="this.hoverBucket.count"/> deployed<t t-if="this.hoverBucket.failed">, <t t-out="this.hoverBucket.failed"/> failed</t>.</t>
                     <t t-else="">Point at the chart for the counts of a period.</t>
                 </p>
             </div>
-            <button type="button" class="btn btn-link o_ag_cfd_toggle" t-att-aria-expanded="state.table ? 'true' : 'false'" t-on-click="toggleTable">
-                <t t-if="state.table">Hide the numbers</t><t t-else="">Show the numbers</t>
+            <button type="button" class="btn btn-link o_ag_cfd_toggle" t-att-aria-expanded="this.state.table ? 'true' : 'false'" t-on-click="this.toggleTable">
+                <t t-if="this.state.table">Hide the numbers</t><t t-else="">Show the numbers</t>
             </button>
-            <div t-if="state.table" class="o_ag_cfd_table_wrap">
+            <div t-if="this.state.table" class="o_ag_cfd_table_wrap">
                 <table class="table table-sm o_ag_reports_table">
                     <thead><tr><th>Period starting</th><th class="text-end">Deployed</th><th class="text-end">Failed</th></tr></thead>
                     <tbody>
-                        <tr t-foreach="state.data.buckets" t-as="bucket" t-key="bucket.date">
+                        <tr t-foreach="this.state.data.buckets" t-as="bucket" t-key="bucket.date">
                             <td t-out="bucket.date"/>
                             <td class="text-end" t-out="bucket.count"/>
                             <td class="text-end" t-out="bucket.failed"/>
