@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Shortcuts"><span class="d-none" aria-hidden="true"/></t>
+    <t t-name="agile_community.ShortcutHelp">
+        <Dialog title="'Keyboard shortcuts'" size="'md'">
+            <p class="text-muted">Plain keys, used when you are not typing in a field.</p>
+            <table class="table table-sm o_ag_shortcuts_table">
+                <thead><tr><th scope="col">Keys</th><th scope="col">What it does</th><th scope="col">Where</th></tr></thead>
+                <tbody>
+                    <tr t-foreach="shortcuts" t-as="item" t-key="item.keys">
+                        <td><kbd t-out="item.keys"/></td>
+                        <td t-out="item.label"/>
+                        <td class="text-muted" t-out="item.where"/>
+                    </tr>
+                </tbody>
+            </table>
+            <t t-set-slot="footer">
+                <button type="button" class="btn btn-primary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

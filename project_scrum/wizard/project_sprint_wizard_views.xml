@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_sprint_close_form" model="ir.ui.view">
+        <field name="name">project.sprint.close.form</field>
+        <field name="model">project.sprint.close</field>
+        <field name="arch" type="xml">
+            <form string="Complete Sprint">
+                <div class="alert alert-info" role="note">
+                    Review every unfinished issue below. Before the sprint is completed, return those issues to the backlog or move them to another planned sprint. The completed sprint keeps its commitment and delivery summary.
+                </div>
+                <group>
+                    <field name="sprint_id" invisible="1" />
+                    <field name="project_id" invisible="1" />
+                    <field name="name" />
+                    <field name="committed_count" />
+                    <field name="done_count" />
+                </group>
+                <group string="Unfinished issues">
+                    <field name="unfinished_task_ids" widget="many2many_tags" string="Unfinished issues" />
+                    <field name="disposition" widget="radio" />
+                    <field
+                        name="destination_sprint_id"
+                        domain="[('project_id', '=', project_id), ('state', '=', 'draft'), ('id', '!=', sprint_id)]"
+                        options="{'no_create': True}"
+                        placeholder="Choose a planned sprint"
+                        invisible="disposition != 'sprint'"
+                        required="disposition == 'sprint'"
+                    />
+                </group>
+                <footer>
+                    <button name="action_complete" type="object" string="Complete Sprint" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_project_sprint_close" model="ir.actions.act_window">
+        <field name="name">Complete Sprint</field>
+        <field name="res_model">project.sprint.close</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_project_sprint_close_form" />
+        <field name="target">new</field>
+        <field name="context">{'default_sprint_id': active_id}</field>
+    </record>
+    <record id="view_project_sprint_scope_change_form" model="ir.ui.view">
+        <field name="name">project.sprint.scope.change.wizard.form</field>
+        <field name="model">project.sprint.scope.change.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Sprint Plan">
+                <div class="alert alert-info" role="note">
+                    Explain why the confirmed plan is changing. The new plan becomes a separate revision; the earlier commitment and issue-add/remove history remain available.
+                </div>
+                <group>
+                    <field name="sprint_id" invisible="1" />
+                    <field name="reason" placeholder="Explain why the plan needs to change..." />
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Save New Plan" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_project_sprint_scope_change" model="ir.actions.act_window">
+        <field name="name">Update Sprint Plan</field>
+        <field name="res_model">project.sprint.scope.change.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_project_sprint_scope_change_form" />
+        <field name="target">new</field>
+        <field name="context">{'default_sprint_id': active_id}</field>
+    </record>
+</odoo>

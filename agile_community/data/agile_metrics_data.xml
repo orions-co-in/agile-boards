@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_agile_daily_metric_snapshot" model="ir.cron">
+        <field name="name">Agile: capture daily delivery metrics</field>
+        <field name="model_id" ref="model_agile_metric_snapshot"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_capture_daily_snapshots()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="priority">6</field>
+    </record>
+</odoo>

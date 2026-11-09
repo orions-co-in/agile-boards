@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_project_overview_metrics" model="ir.ui.view">
+        <field name="name">project.project.form.agile.overview.metrics</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="agile_overview" string="Agile Overview" invisible="not agile_enabled or not can_view_agile_metrics">
+                    <field name="can_view_agile_metrics" invisible="1"/>
+                    <div class="row g-2 mb-3" name="agile_metrics_button_box">
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-tasks" context="{'agile_metric_filter': 'open'}">
+                                <field name="agile_open_issue_count" widget="statinfo" string="&#160;Open issues"/>
+                            </button>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-exclamation-triangle" context="{'agile_metric_filter': 'blocked'}">
+                                <field name="agile_blocked_issue_count" widget="statinfo" string="&#160;Blocked"/>
+                            </button>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button name="action_view_agile_current_sprint" type="object" class="oe_stat_button w-100 h-100" icon="fa-flag">
+                                <div class="o_stat_info">
+                                    <field name="agile_current_sprint_progress" class="o_stat_value text-wrap d-block"/>
+                                    <span class="o_stat_text d-block">Current sprint</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button name="action_view_agile_metric_issues" type="object" class="oe_stat_button w-100 h-100" icon="fa-clock-o" context="{'agile_metric_filter': 'overdue'}">
+                                <field name="agile_overdue_issue_count" widget="statinfo" string="&#160;Overdue"/>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- One row of buttons of the same height, then the note under them. -->
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <button name="action_open_agile_overview" type="object" string="Open overview" class="btn-primary"/>
+                        <button name="action_open_agile_reports" type="object" string="Reports" class="btn-primary"/>
+                        <button name="action_view_agile_reports" type="object" string="Open delivery reports" class="btn-secondary"/>
+                    </div>
+                    <div class="text-muted">Counts include active leaf issues you can access. Daily history starts when Agile metrics are enabled; past issues are not presented as historical snapshots.</div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="agile_metric_snapshot_line_search" model="ir.ui.view">
+        <field name="name">agile.metric.snapshot.line.search</field>
+        <field name="model">agile.metric.snapshot.line</field>
+        <field name="arch" type="xml">
+            <search string="Delivery History">
+                <field name="project_id"/>
+                <field name="sprint_id"/>
+                <field name="issue_key" readonly="1"/>
+                <field name="issue_name"/>
+                <field name="status"/>
+                <field name="capture_kind" optional="show"/>
+                <filter name="snapshot_date" string="Snapshot date" date="snapshot_date"/>
+                <filter name="sprint_history" string="Sprint history" domain="[('sprint_id', '!=', False)]"/>
+                <filter name="project_history" string="Project flow" domain="[('sprint_id', '=', False)]"/>
+                <group>
+                    <filter name="project_id" string="Project" context="{'group_by': 'project_id'}"/>
+                    <filter name="sprint_id" string="Sprint" context="{'group_by': 'sprint_id'}"/>
+                    <filter name="snapshot_date" string="Snapshot day" context="{'group_by': 'snapshot_date:day'}"/>
+                    <filter name="status" string="Workflow status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="agile_metric_snapshot_line_list" model="ir.ui.view">
+        <field name="name">agile.metric.snapshot.line.list</field>
+        <field name="model">agile.metric.snapshot.line</field>
+        <field name="arch" type="xml">
+            <list string="Delivery History" create="0" edit="0" delete="0" open_form_view="1">
+                <field name="snapshot_date"/>
+                <field name="captured_at" optional="hide"/>
+                <field name="project_id"/>
+                <field name="sprint_id" optional="show"/>
+                <field name="issue_key" readonly="1"/>
+                <field name="issue_name"/>
+                <field name="status"/>
+                <field name="is_blocked" optional="show"/>
+                <field name="is_overdue" optional="show"/>
+                <field name="estimated" optional="hide"/>
+                <field name="story_points" sum="Points" optional="show"/>
+                <field name="remaining_points" sum="Remaining points" optional="show"/>
+                <field name="scope_change_count" optional="show"/>
+                <field name="task_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_metric_snapshot_line_form" model="ir.ui.view">
+        <field name="name">agile.metric.snapshot.line.form</field>
+        <field name="model">agile.metric.snapshot.line</field>
+        <field name="arch" type="xml">
+            <form string="Issue at Snapshot" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_issue" type="object" string="Open current issue" class="oe_highlight" invisible="not task_id"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="issue_key" readonly="1"/>
+                        <field name="issue_name"/>
+                        <field name="project_id"/>
+                        <field name="sprint_id"/>
+                        <field name="snapshot_date"/>
+                        <field name="captured_at"/>
+                        <field name="status"/>
+                        <field name="is_blocked"/>
+                        <field name="is_overdue"/>
+                        <field name="estimated"/>
+                        <field name="story_points"/>
+                        <field name="remaining_points"/>
+                        <field name="task_id" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="agile_metric_snapshot_line_graph" model="ir.ui.view">
+        <field name="name">agile.metric.snapshot.line.graph</field>
+        <field name="model">agile.metric.snapshot.line</field>
+        <field name="arch" type="xml">
+            <graph string="Daily Sprint Burndown" type="line">
+                <field name="captured_at" interval="hour" type="row"/>
+                <field name="status" type="col"/>
+                <field name="remaining_points" type="measure"/>
+                <field name="scope_change_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="agile_metric_snapshot_line_pivot" model="ir.ui.view">
+        <field name="name">agile.metric.snapshot.line.pivot</field>
+        <field name="model">agile.metric.snapshot.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Daily Delivery Flow">
+                <field name="snapshot_date" interval="day" type="row"/>
+                <field name="status" type="col"/>
+                <field name="issue_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="agile_issue_metric_event_search" model="ir.ui.view">
+        <field name="name">agile.issue.metric.event.search</field>
+        <field name="model">agile.issue.metric.event</field>
+        <field name="arch" type="xml">
+            <search string="Throughput and Cycle Time">
+                <field name="project_id"/>
+                <field name="issue_key" readonly="1"/>
+                <field name="issue_name"/>
+                <filter name="completed" string="First completed" domain="[('event_type', '=', 'completed')]"/>
+                <filter name="event_at" string="Event date" date="event_at"/>
+                <group>
+                    <filter name="project_id" string="Project" context="{'group_by': 'project_id'}"/>
+                    <filter name="event_at" string="Event day" context="{'group_by': 'event_at:day'}"/>
+                    <filter name="event_type" string="Milestone" context="{'group_by': 'event_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="agile_issue_metric_event_list" model="ir.ui.view">
+        <field name="name">agile.issue.metric.event.list</field>
+        <field name="model">agile.issue.metric.event</field>
+        <field name="arch" type="xml">
+            <list string="Throughput and Cycle Time" create="0" edit="0" delete="0" open_form_view="1">
+                <field name="event_at"/>
+                <field name="project_id"/>
+                <field name="issue_key" readonly="1"/>
+                <field name="issue_name"/>
+                <field name="event_type"/>
+                <field name="throughput_points" string="Throughput points" sum="Completed points"/>
+                <field name="cycle_time_days" avg="Average cycle time (days)"/>
+                <field name="task_id" optional="hide"/>
+                <button name="action_open_issue" type="object" string="Open issue" icon="fa-external-link" invisible="not task_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_issue_metric_event_form" model="ir.ui.view">
+        <field name="name">agile.issue.metric.event.form</field>
+        <field name="model">agile.issue.metric.event</field>
+        <field name="arch" type="xml">
+            <form string="Issue Milestone" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_issue" type="object" string="Open current issue" class="oe_highlight" invisible="not task_id"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="issue_key" readonly="1"/>
+                        <field name="issue_name"/>
+                        <field name="project_id"/>
+                        <field name="event_type"/>
+                        <field name="event_at"/>
+                        <field name="story_points"/>
+                        <field name="throughput_points"/>
+                        <field name="cycle_time_days"/>
+                        <field name="task_id" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="agile_issue_metric_event_graph" model="ir.ui.view">
+        <field name="name">agile.issue.metric.event.graph</field>
+        <field name="model">agile.issue.metric.event</field>
+        <field name="arch" type="xml">
+            <graph string="First Issue Milestones" type="bar">
+                <field name="event_at" interval="hour" type="row"/>
+                <field name="event_type" type="col"/>
+                <field name="cycle_time_days" type="measure"/>
+                <field name="throughput_points" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="project_sprint_velocity_graph" model="ir.ui.view">
+        <field name="name">project.sprint.velocity.graph</field>
+        <field name="model">project.sprint</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <graph string="Completed Story Points by Sprint" type="bar">
+                <field name="name" type="row"/>
+                <field name="committed_points_at_close" type="measure"/>
+                <field name="completed_points" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="project_sprint_velocity_list" model="ir.ui.view">
+        <field name="name">project.sprint.velocity.list</field>
+        <field name="model">project.sprint</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Sprint Velocity" create="0" edit="0" delete="0">
+                <field name="project_id"/>
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="committed_task_count" sum="Committed issues"/>
+                <field name="completed_task_count" sum="Completed issues"/>
+                <field name="committed_points_at_close" sum="Committed points"/>
+                <field name="completed_points" sum="Completed points"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_issue_metric_event_action" model="ir.actions.act_window">
+        <field name="name">Throughput and Cycle Time</field>
+        <field name="res_model">agile.issue.metric.event</field>
+        <field name="view_mode">graph,list,form</field>
+        <field name="search_view_id" ref="agile_issue_metric_event_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing delivered yet</p>
+            <p>Issues appear here once they are done or canceled.</p>
+        </field>
+    </record>
+    <record id="agile_metric_snapshot_action" model="ir.actions.act_window">
+        <field name="name">Daily Delivery Flow</field>
+        <field name="res_model">agile.metric.snapshot.line</field>
+        <field name="view_mode">pivot,list,graph</field>
+        <field name="search_view_id" ref="agile_metric_snapshot_line_search"/>
+        <field name="domain">[('sprint_id', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No daily history yet</p>
+            <p>A snapshot is taken once a day, so this fills in as days pass.</p>
+        </field>
+    </record>
+    <record id="agile_metric_burndown_action" model="ir.actions.act_window">
+        <field name="name">Sprint Burndown</field>
+        <field name="res_model">agile.metric.snapshot.line</field>
+        <field name="view_mode">graph,list,pivot</field>
+        <field name="search_view_id" ref="agile_metric_snapshot_line_search"/>
+        <field name="domain">[('sprint_id', '!=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No sprint history yet</p>
+            <p>Start a sprint and come back after the first daily snapshot to see points left per day.</p>
+        </field>
+    </record>
+    <record id="agile_sprint_velocity_action" model="ir.actions.act_window">
+        <field name="name">Sprint Velocity</field>
+        <field name="res_model">project.sprint</field>
+        <field name="view_mode">graph,list</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No completed sprints yet</p>
+            <p>Velocity compares committed and completed points for each closed sprint. Close a sprint to see the first bar.</p>
+        </field>
+    </record>
+    <!-- The read-only velocity views must not become the default Sprint list. -->
+    <record id="agile_sprint_velocity_action_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="project_sprint_velocity_graph"/>
+        <field name="act_window_id" ref="agile_sprint_velocity_action"/>
+    </record>
+    <record id="agile_sprint_velocity_action_list" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="project_sprint_velocity_list"/>
+        <field name="act_window_id" ref="agile_sprint_velocity_action"/>
+    </record>
+
+    <menuitem id="menu_agile_metric_snapshot" name="Daily Delivery Flow" parent="project.menu_project_report" action="agile_metric_snapshot_action" sequence="30" groups="project.group_project_user"/>
+    <menuitem id="menu_agile_metric_burndown" name="Sprint Burndown" parent="project.menu_project_report" action="agile_metric_burndown_action" sequence="31" groups="project.group_project_user"/>
+    <menuitem id="menu_agile_issue_metric_event" name="Throughput and Cycle Time" parent="project.menu_project_report" action="agile_issue_metric_event_action" sequence="32" groups="project.group_project_user"/>
+    <menuitem id="menu_agile_sprint_velocity" name="Sprint Velocity" parent="project.menu_project_report" action="agile_sprint_velocity_action" sequence="33" groups="project.group_project_user"/>
+
+    <record id="project_sprint_form_metric_history" model="ir.ui.view">
+        <field name="name">project.sprint.form.metric.history</field>
+        <field name="model">project.sprint</field>
+        <field name="inherit_id" ref="project_scrum.project_sprint_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_metric_history" type="object" class="oe_stat_button" icon="fa-line-chart">
+                    <div class="o_stat_info"><span class="o_stat_text">Burndown history</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

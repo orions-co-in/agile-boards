@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.BoardBar">
+        <div t-attf-class="o_ag_board_bar {{state.barOpen ? 'o_ag_bar_open' : ''}}" t-ref="root" role="toolbar" aria-label="Board filters">
+            <button type="button" class="btn btn-secondary btn-sm o_ag_bar_toggle" t-att-aria-expanded="state.barOpen ? 'true' : 'false'"
+                    t-on-click="toggleBar"><i class="fa fa-sliders" aria-hidden="true"/> Filters and views</button>
+            <div class="o_ag_chips">
+                <button t-if="state.query and state.query.domain" type="button" class="o_ag_chip" data-chip="query"
+                        t-att-aria-pressed="queryOn ? 'true' : 'false'" t-on-click="toggleQuery">Query: <t t-out="state.query.name"/></button>
+                <span t-if="state.query and !state.query.domain" class="o_ag_chip o_ag_query_broken" data-chip-note="query" role="status">
+                    The query <t t-out="state.query.name"/> cannot run, so every issue shows.
+                </span>
+                <button type="button" class="o_ag_chip" data-chip="mine" t-att-aria-pressed="isOn('mine') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('mine')">Mine</button>
+                <button type="button" class="o_ag_chip" data-chip="blocked" t-att-aria-pressed="isOn('blocked') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('blocked')">Blocked</button>
+                <button type="button" class="o_ag_chip" data-chip="flagged" t-att-aria-pressed="isOn('flagged') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('flagged')">Flagged</button>
+                <button t-if="hasFilter('review')" type="button" class="o_ag_chip" data-chip="review" t-att-aria-pressed="isOn('review') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('review')">Review requested</button>
+                <button t-if="hasFilter('due')" type="button" class="o_ag_chip" data-chip="due" t-att-aria-pressed="isOn('due') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('due')">Due soon</button>
+                <button t-if="showCanceled" type="button" class="o_ag_chip" data-chip="canceled" t-att-aria-pressed="isOn('canceled') ? 'true' : 'false'"
+                        t-on-click="() => this.toggleChip('canceled')">Show canceled</button>
+                <label t-if="state.types.length" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Type</span>
+                    <select class="o_ag_select" data-pick="type" t-on-change="(ev) => this.onPick('type', ev)">
+                        <option value="">All types</option>
+                        <option t-foreach="state.types" t-as="type" t-key="type.id" t-att-value="type.id"
+                                t-att-selected="isPicked('type', type.id)" t-out="type.name"/>
+                    </select>
+                </label>
+                <div t-if="state.sprints.length > 1" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Sprint</span>
+                    <Dropdown menuClass="'o_ag_multi_menu'">
+                        <button type="button" t-attf-class="btn btn-secondary btn-sm o_ag_multi {{pickedSprints().length ? 'o_ag_multi_on' : ''}}"
+                                data-pick="sprint" t-out="sprintSummary()"/>
+                        <t t-set-slot="content">
+                            <label t-foreach="state.sprints" t-as="sprint" t-key="sprint.id" class="o_ag_multi_row">
+                                <input type="checkbox" t-att-checked="pickedSprints().includes(sprint.id)"
+                                       t-on-change="() => this.toggleSprint(sprint.id)"/>
+                                <span t-out="sprint.name"/>
+                            </label>
+                            <button t-if="pickedSprints().length" type="button" class="btn btn-link btn-sm o_ag_multi_clear"
+                                    t-on-click="() => this.setSprints([])">Clear</button>
+                        </t>
+                    </Dropdown>
+                </div>
+                <label t-if="state.epics.length" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Epic</span>
+                    <select class="o_ag_select" data-pick="epic" t-on-change="(ev) => this.onPick('epic', ev)">
+                        <option value="">All epics</option>
+                        <option t-foreach="state.epics" t-as="epic" t-key="epic.id" t-att-value="epic.id"
+                                t-att-selected="isPicked('epic', epic.id)">
+                            <t t-out="epic.issue_key"/> <t t-out="epic.name"/>
+                        </option>
+                    </select>
+                </label>
+                <label t-if="state.boards.length > 1" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Board</span>
+                    <select class="o_ag_select" data-pick="board" t-on-change="onBoardPick">
+                        <option t-foreach="state.boards" t-as="board" t-key="board.id" t-att-value="board.id"
+                                t-att-selected="isCurrentBoard(board)" t-out="board.name"/>
+                    </select>
+                </label>
+                <t t-if="state.canEditQuery">
+                    <button type="button" class="o_ag_chip" data-chip-action="copy-board" t-on-click="copyBoard">Copy board</button>
+                    <button type="button" class="o_ag_chip" data-chip-action="manage-boards" t-on-click="manageBoards">Manage boards</button>
+                </t>
+                <label t-if="state.canEditQuery and state.queryChoices.length" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Board query</span>
+                    <select class="o_ag_select" data-pick="query" t-on-change="onQueryPick">
+                        <option value="">No query</option>
+                        <option t-foreach="state.queryChoices" t-as="choice" t-key="choice.id" t-att-value="choice.id"
+                                t-att-selected="state.query and state.query.id === choice.id" t-out="choice.name"/>
+                    </select>
+                </label>
+                <label t-if="!env.isSmall" class="o_ag_pick">
+                    <span class="o_ag_pick_label">Swimlanes</span>
+                    <select class="o_ag_select o_ag_lane_select" data-pick="swimlane" t-on-change="onLaneSelect">
+                        <option t-foreach="swimlanes" t-as="lane" t-key="lane.value" t-att-value="lane.value"
+                                t-att-selected="props.swimlane === lane.value" t-out="lane.label"/>
+                        <optgroup t-if="state.laneFilters.length" label="Saved filters">
+                            <option t-foreach="state.laneFilters" t-as="saved" t-key="saved.id" t-att-value="'filter:' + saved.id"
+                                    t-att-selected="laneFilterValue === 'filter:' + saved.id" t-out="saved.name"/>
+                        </optgroup>
+                    </select>
+                </label>
+            </div>
+            <div class="o_ag_views">
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="o_ag_chip o_ag_views_btn">Views</button>
+                    <t t-set-slot="content">
+                        <div t-foreach="state.views" t-as="view" t-key="view.name" class="o_ag_view_row">
+                            <DropdownItem class="'o_ag_view_apply flex-grow-1'" onSelected="() => this.applyView(view)" t-out="view.name"/>
+                            <button type="button" class="btn btn-link btn-sm o_ag_view_delete" t-att-aria-label="'Delete the view ' + view.name"
+                                    t-on-click.stop="() => this.deleteView(view)">Delete</button>
+                        </div>
+                        <p t-if="!state.views.length" class="text-muted px-3 mb-1">No saved views yet.</p>
+                        <DropdownItem class="'o_ag_view_save'" onSelected="() => this.startSaveView()">Save the current view…</DropdownItem>
+                    </t>
+                </Dropdown>
+                <form t-if="state.saving" class="o_ag_view_form" t-on-submit.prevent="saveView">
+                    <input type="text" class="form-control form-control-sm o_ag_view_name" maxlength="40" aria-label="Name of the view"
+                           placeholder="Name of the view" t-model="state.viewName" t-on-keydown.stop=""/>
+                    <button type="submit" class="btn btn-primary btn-sm o_ag_view_confirm">Save</button>
+                    <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.state.saving = false">Cancel</button>
+                    <span t-if="state.viewError" class="text-danger o_ag_view_error" role="alert" t-out="state.viewError"/>
+                </form>
+                <span class="visually-hidden" role="status" aria-live="polite" t-out="state.announce"/>
+            </div>
+            <button type="button" class="o_ag_chip o_ag_compact_btn" data-chip-action="compact"
+                    t-att-aria-pressed="state.compact ? 'true' : 'false'" t-on-click="toggleCompact">Compact cards</button>
+            <button type="button" class="o_ag_chip o_ag_insights_btn" data-chip-action="insights"
+                    t-att-aria-pressed="state.insightsOpen ? 'true' : 'false'" aria-controls="o_ag_insights_panel"
+                    t-on-click="toggleInsights">Insights</button>
+            <button t-if="props.onSelect" type="button" class="o_ag_chip o_ag_select_mode" t-att-aria-pressed="props.selecting ? 'true' : 'false'"
+                    t-on-click="props.onSelect"><t t-if="props.selecting">Done selecting</t><t t-else="">Select</t></button>
+        <section t-if="state.insightsOpen" id="o_ag_insights_panel" class="o_ag_insights" aria-label="Board insights">
+            <p t-if="state.insightsFailed" class="o_ag_insights_note text-muted" role="alert">Insights could not load. Try again.
+                <button type="button" class="btn btn-link btn-sm" t-on-click="loadInsights">Retry</button></p>
+            <t t-elif="state.insights">
+                <div class="o_ag_insight o_ag_insight_age">
+                    <h3 class="o_ag_insight_title">Work in progress</h3>
+                    <p class="o_ag_insight_value"><t t-out="state.insights.in_progress.count"/> issues, <t t-out="state.insights.in_progress.average_days"/> working days old on average</p>
+                    <ol t-if="state.insights.in_progress.oldest.length" class="o_ag_insight_list">
+                        <li t-foreach="state.insights.in_progress.oldest" t-as="item" t-key="item.id">
+                            <span class="o_ag_insight_key" t-out="item.key"/> <span t-out="item.name"/> <strong t-out="item.days + ' d'"/>
+                        </li>
+                    </ol>
+                    <p t-else="" class="text-muted">Nothing in progress.</p>
+                </div>
+                <div class="o_ag_insight o_ag_insight_cycle">
+                    <h3 class="o_ag_insight_title">Cycle time, last 8 weeks</h3>
+                    <p class="o_ag_insight_value" t-out="trendText"/>
+                    <div class="o_ag_insight_bars" role="img" t-att-aria-label="trendText">
+                        <span t-foreach="cycleBars" t-as="bar" t-key="bar.week" class="o_ag_insight_bar"
+                              t-att-title="bar.label" t-attf-style="height: {{bar.height}}%"/>
+                    </div>
+                </div>
+                <div class="o_ag_insight o_ag_insight_blocked">
+                    <h3 class="o_ag_insight_title">Blocked</h3>
+                    <p class="o_ag_insight_value"><t t-out="state.insights.blocked.count"/> blocked</p>
+                    <button t-if="state.insights.blocked.count" type="button" class="o_ag_chip" t-on-click="() => this.toggleChip('blocked')">
+                        <t t-if="isOn('blocked')">Show all issues</t><t t-else="">Show only blocked</t>
+                    </button>
+                </div>
+            </t>
+        </section>
+        </div>
+    </t>
+</templates>

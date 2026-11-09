@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Plan">
+        <section class="o_ag_plan" aria-label="Plan">
+            <div t-if="state.error" class="alert alert-danger" role="alert">
+                <p class="mb-2" t-out="state.error"/>
+                <button type="button" class="btn btn-secondary" t-on-click="() => this.load(props)">Retry</button>
+            </div>
+            <p t-elif="state.loading and !state.data" class="text-muted" role="status">Loading the plan...</p>
+            <t t-elif="state.data">
+                <div class="o_ag_plan_bar">
+                    <button t-if="state.data.can_create" type="button" class="btn btn-primary o_ag_plan_new_initiative" t-on-click="() => this.openNew('initiative')">
+                        New <t t-out="label('initiative').toLowerCase()"/></button>
+                    <button t-if="state.data.can_create" type="button" class="btn btn-secondary o_ag_plan_new_theme" t-on-click="() => this.openNew('theme')">
+                        New <t t-out="label('theme').toLowerCase()"/></button>
+                    <button t-if="state.data.can_rename" type="button" class="btn btn-link o_ag_plan_rename" t-on-click="openRename">Rename levels</button>
+                    <button type="button" class="btn btn-secondary o_ag_plan_download_csv" t-on-click="downloadCsv">Download CSV</button>
+                    <button t-if="!ui.isSmall" type="button" class="btn btn-secondary o_ag_plan_print" t-on-click="printLayout">Print layout</button>
+                    <span class="o_ag_plan_limit text-muted" t-out="state.data.item_count + ' of ' + state.data.limits.items + ' plan items'"/>
+                </div>
+                <div class="o_ag_plan_bar o_ag_plan_scenarios">
+                    <label>Scenario <select class="form-select o_ag_plan_scenario_pick" t-on-change="onPickScenario">
+                            <option value="0" t-att-selected="!state.scenario">Baseline (live plan)</option>
+                            <option t-foreach="state.scenarios" t-as="scn" t-key="scn.id" t-att-value="scn.id" t-att-selected="state.scenario === scn.id" t-out="scn.name"/></select></label>
+                    <button t-if="state.data.can_create" type="button" class="btn btn-secondary o_ag_plan_new_scenario" t-on-click="() => this.state.naming = ''">New scenario</button>
+                </div>
+                <form t-if="state.naming !== null" class="o_ag_plan_form o_ag_plan_scenario_form" t-on-submit.prevent="createScenario">
+                    <label>Scenario name <input class="form-control o_ag_plan_scenario_name" maxlength="80" t-model="state.naming"/></label>
+                    <p class="text-muted o_ag_plan_hint">It starts as a copy of the live dates of the epics in this view. The live plan does not change until you apply it.</p>
+                    <button type="submit" class="btn btn-primary o_ag_plan_scenario_create">Create</button>
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.state.naming = null">Cancel</button>
+                </form>
+                <div t-if="state.scenario" class="btn-group o_ag_plan_scenario_view" role="group" aria-label="Scenario view">
+                    <button type="button" t-attf-class="btn btn-secondary o_ag_plan_view_compare {{state.scenarioView === 'compare' ? 'active' : ''}}"
+                            t-att-aria-pressed="state.scenarioView === 'compare' ? 'true' : 'false'" t-on-click="() => this.state.scenarioView = 'compare'">Compare</button>
+                    <button type="button" t-attf-class="btn btn-secondary o_ag_plan_view_board {{state.scenarioView === 'board' ? 'active' : ''}}"
+                            t-att-aria-pressed="state.scenarioView === 'board' ? 'true' : 'false'" t-on-click="() => this.state.scenarioView = 'board'">Program board</button>
+                </div>
+                <AgilePlanBoard t-if="state.scenario and state.scenarioView === 'board'" scenarioId="state.scenario" onChange="() => this.reloadAfterApply()"/>
+                <AgilePlanScenario t-elif="state.scenario" scenarioId="state.scenario" onChange="() => this.reloadAfterApply()" onDelete="() => this.onScenarioDeleted()"/>
+                <p t-if="state.notice" class="o_ag_plan_notice" role="status" aria-live="polite" t-out="state.notice"/>
+
+                <form t-if="state.labels" class="o_ag_plan_form o_ag_plan_labels" t-on-submit.prevent="saveRename">
+                    <label>Top level <input class="form-control" maxlength="30" t-model="state.labels.theme"/></label>
+                    <label>Second level <input class="form-control" maxlength="30" t-model="state.labels.initiative"/></label>
+                    <button type="submit" class="btn btn-primary">Save names</button>
+                    <button type="button" class="btn btn-secondary" t-on-click="() => this.state.labels = null">Cancel</button>
+                </form>
+
+                <form t-if="state.form" class="o_ag_plan_form o_ag_plan_item_form" t-on-submit.prevent="save">
+                    <h2 class="h5" t-out="(state.form.id ? 'Change ' : 'New ') + label(state.form.level).toLowerCase()"/>
+                    <label>Name <input class="form-control o_ag_plan_name" maxlength="120" t-model="state.form.name"/></label>
+                    <label t-if="state.form.level === 'initiative' and themes.length">Under <select class="form-select" t-model="state.form.parent_id">
+                            <option value="">No <t t-out="label('theme').toLowerCase()"/></option>
+                            <option t-foreach="themes" t-as="choice" t-key="choice.id" t-att-value="choice.id" t-out="choice.name"/></select></label>
+                    <label>Owner <select class="form-select" t-model="state.form.owner_id">
+                            <option value="">Nobody</option>
+                            <option t-foreach="state.data.people" t-as="person" t-key="person.id" t-att-value="person.id" t-out="person.name"/></select></label>
+                    <label>Start <input type="date" class="form-control" t-model="state.form.date_start"/></label>
+                    <label>End <input type="date" class="form-control" t-model="state.form.date_end"/></label>
+                    <p class="text-muted o_ag_plan_hint">Leave the dates empty to use the dates of the epics.</p>
+                    <button type="submit" class="btn btn-primary o_ag_plan_save">Save</button>
+                    <button type="button" class="btn btn-secondary" t-on-click="closeForm">Cancel</button>
+                </form>
+
+                <div t-if="isEmpty" class="o_ag_plan_empty">
+                    <p>No plan items yet. Use "New <t t-out="label('initiative').toLowerCase()"/>" to group epics, and "New <t t-out="label('theme').toLowerCase()"/>" to group those. Nothing changes in your projects.</p>
+                    <p t-if="!state.data.can_create" class="text-muted">Ask a project manager to create the first one.</p>
+                </div>
+                <ul t-else="" class="o_ag_plan_tree list-unstyled" role="tree" aria-label="Plan">
+                    <t t-foreach="rows" t-as="row" t-key="row_index">
+                        <li t-if="row.type === 'item'" t-attf-class="o_ag_plan_item level_{{row.item.level}}" role="treeitem"
+                            t-attf-style="--depth: {{row.depth}}" t-att-aria-expanded="hasBody(row.item) ? (isOpen(row.item) ? 'true' : 'false') : false" t-att-data-id="row.item.id">
+                            <button t-if="hasBody(row.item)" type="button" class="o_ag_rm_chevron"
+                                    t-att-aria-label="'Show what is in ' + row.item.name" t-on-click="() => this.toggle(row.item)" t-out="isOpen(row.item) ? '▾' : '▸'"/>
+                            <span t-else="" class="o_ag_rm_chevron_gap"/>
+                            <div class="o_ag_plan_body">
+                                <div class="o_ag_plan_head">
+                                    <span class="badge text-bg-light o_ag_plan_level" t-out="label(row.item.level)"/>
+                                    <strong class="o_ag_plan_title" t-out="row.item.name"/>
+                                    <span t-if="row.item.owner" class="text-muted" t-out="row.item.owner"/>
+                                </div>
+                                <div class="o_ag_plan_meta">
+                                    <t t-set="span" t-value="dates(row.item)"/>
+                                    <span t-if="span" class="o_ag_plan_dates" t-att-class="span.fromEpics ? 'o_ag_plan_from_epics' : ''">
+                                        <t t-out="span.start"/> to <t t-out="span.end"/><t t-if="span.fromEpics"> (from epics)</t></span>
+                                    <span class="o_ag_plan_progress_text" t-out="progress(row.item)"/>
+                                    <progress t-if="row.item.total" max="100" t-att-value="fill(row.item)" t-att-aria-label="progress(row.item)"/>
+                                    <span class="text-muted" t-out="row.item.epic_count + (row.item.epic_count === 1 ? ' epic' : ' epics')"/>
+                                    <span t-if="row.item.hidden_total" class="text-muted o_ag_plan_hidden" t-out="'plus ' + row.item.hidden_total + (row.item.hidden_total === 1 ? ' epic you cannot see' : ' epics you cannot see')"/>
+                                </div>
+                                <div t-if="row.item.can_edit or state.data.can_rename" class="o_ag_plan_actions">
+                                    <button t-if="row.item.can_edit" type="button" class="btn btn-link btn-sm o_ag_plan_edit" t-att-aria-label="'Change ' + row.item.name" t-on-click="() => this.openEdit(row.item)">Change</button>
+                                    <button t-if="state.data.can_rename" type="button" class="btn btn-link btn-sm o_ag_plan_delete" t-att-aria-label="'Delete ' + row.item.name" t-on-click="() => this.remove(row.item)">Delete</button>
+                                    <label t-if="state.data.unplanned.length and state.data.can_create" class="o_ag_plan_add">
+                                        <span class="visually-hidden">Add an epic to <t t-out="row.item.name"/></span>
+                                        <select class="form-select form-select-sm o_ag_plan_add_epic" t-on-change="(ev) => this.onAssign(row.item, ev)">
+                                            <option value="">Add an epic...</option>
+                                            <option t-foreach="state.data.unplanned" t-as="epic" t-key="epic.id" t-att-value="epic.id" t-out="epic.key + ' ' + epic.name"/>
+                                        </select></label>
+                                </div>
+                            </div>
+                        </li>
+                        <li t-else="" class="o_ag_plan_epic" role="treeitem" t-attf-style="--depth: {{row.depth}}">
+                            <span class="o_ag_rm_chevron_gap"/>
+                            <div class="o_ag_plan_body">
+                                <div class="o_ag_plan_head">
+                                    <strong t-out="row.epic.key"/> <span t-out="row.epic.name"/>
+                                    <span class="badge text-bg-light" t-out="row.epic.project"/>
+                                </div>
+                                <div class="o_ag_plan_meta">
+                                    <span t-if="row.epic.start" t-out="planDate(row.epic.start) + ' to ' + planDate(row.epic.end || row.epic.start)"/>
+                                    <span class="o_ag_plan_progress_text" t-out="progress(row.epic)"/>
+                                    <button type="button" class="btn btn-link btn-sm o_ag_plan_remove_epic" t-att-aria-label="'Take ' + row.epic.key + ' out of ' + row.item.name"
+                                            t-on-click="() => this.assign(row.epic.id, false)">Take out</button>
+                                </div>
+                            </div>
+                        </li>
+                    </t>
+                </ul>
+
+                <section t-if="state.data.unplanned.length" class="o_ag_plan_unplanned">
+                    <h2 class="h5">Epics not in the plan</h2>
+                    <ul class="list-unstyled">
+                        <li t-foreach="state.data.unplanned" t-as="epic" t-key="epic.id" class="o_ag_plan_epic o_ag_plan_unplanned_epic">
+                            <div class="o_ag_plan_body">
+                                <div class="o_ag_plan_head"><strong t-out="epic.key"/> <span t-out="epic.name"/> <span class="badge text-bg-light" t-out="epic.project"/></div>
+                                <div t-if="state.data.can_create and state.data.choices.length" class="o_ag_plan_actions">
+                                    <label><span class="visually-hidden">Place <t t-out="epic.key"/> in the plan</span>
+                                        <select class="form-select form-select-sm o_ag_plan_place" t-on-change="(ev) => this.onPlace(epic, ev)">
+                                            <option value="">Place in...</option>
+                                            <option t-foreach="state.data.choices" t-as="choice" t-key="choice.id" t-att-value="choice.id" t-out="label(choice.level) + ': ' + choice.name"/>
+                                        </select></label>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </t>
+        </section>
+    </t>
+</templates>

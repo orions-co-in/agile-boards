@@ -1,0 +1,28 @@
+.o_ag_bulk {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 5;
+    padding: var(--ag-space-2) var(--ag-space-4);
+    border-block-start: 1px solid var(--ag-line);
+    background: var(--ag-surface);
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, .08);
+}
+.o_ag_bulk_row { display: flex; flex-wrap: wrap; gap: var(--ag-space-2); align-items: center; margin-block: var(--ag-space-1); }
+.o_ag_bulk_count { min-inline-size: 6rem; }
+.o_ag_bulk_why { margin: var(--ag-space-1) 0 0; max-block-size: 10rem; overflow-y: auto; font-size: .875rem; }
+.o_ag_card_selected {
+    position: relative;
+    outline: 3px solid var(--ag-focus, #017e84);
+    outline-offset: -3px;
+    &::after {
+        content: "\2713";
+        position: absolute;
+        inset-block-start: .25rem;
+        inset-inline-end: .5rem;
+        font-weight: bold;
+        color: var(--ag-focus, #017e84);
+    }
+}
+@media (max-width: 575.98px) {
+    .o_ag_bulk { inset-block-end: 3.5rem; }
+}

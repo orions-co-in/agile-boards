@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.BulkBar">
+        <section t-if="count or state.result" class="o_ag_bulk" role="region" aria-label="Change the selected issues">
+            <div t-if="count" class="o_ag_bulk_row">
+                <b class="o_ag_bulk_count" t-out="countText"/>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_assign" t-att-disabled="state.busy">Assign to…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem onSelected="() => this.run('assignee', false, '')">Nobody</DropdownItem>
+                        <DropdownItem t-foreach="state.options.members" t-as="person" t-key="person.id"
+                                      onSelected="() => this.run('assignee', person.id, person.name)" t-out="person.name"/>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_sprint" t-att-disabled="state.busy">Move to sprint…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem onSelected="() => this.run('sprint', false, '')">Backlog</DropdownItem>
+                        <DropdownItem t-foreach="state.options.sprints" t-as="sprint" t-key="sprint.id"
+                                      onSelected="() => this.run('sprint', sprint.id, sprint.name)" t-out="sprint.name"/>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_status" t-att-disabled="state.busy">Set status…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem t-foreach="state.options.statuses" t-as="status" t-key="status.id"
+                                      onSelected="() => this.run('status', status.id, status.name)" t-out="status.name"/>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_label" t-att-disabled="state.busy">Label…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem t-foreach="state.options.tags" t-as="tag" t-key="'a' + tag.id"
+                                      onSelected="() => this.run('label_add', tag.id, tag.name)">Add <t t-out="tag.name"/></DropdownItem>
+                        <DropdownItem t-foreach="state.options.tags" t-as="tag" t-key="'r' + tag.id"
+                                      onSelected="() => this.run('label_remove', tag.id, tag.name)">Remove <t t-out="tag.name"/></DropdownItem>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_type" t-att-disabled="state.busy">Type…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem t-foreach="state.options.types" t-as="type" t-key="type.id"
+                                      onSelected="() => this.run('type', type.id, type.name)" t-out="type.name"/>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_priority" t-att-disabled="state.busy">Priority…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem t-foreach="state.options.priorities" t-as="priority" t-key="priority.id"
+                                      onSelected="() => this.run('priority', priority.id, priority.name)" t-out="priority.name"/>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_due" t-att-disabled="state.busy">Due date…</button>
+                    <t t-set-slot="content">
+                        <label class="o_ag_bulk_date dropdown-item">Pick a date
+                            <input type="date" class="form-control form-control-sm o_ag_bulk_date_input" t-on-change="onDue"/></label>
+                        <DropdownItem onSelected="() => this.run('due', false, '')">Clear the due date</DropdownItem>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_ag_multi_menu'">
+                    <button type="button" class="btn btn-secondary btn-sm o_ag_bulk_watch" t-att-disabled="state.busy">Watch…</button>
+                    <t t-set-slot="content">
+                        <DropdownItem onSelected="() => this.run('watch', false, '')">Watch these issues</DropdownItem>
+                        <DropdownItem onSelected="() => this.run('unwatch', false, '')">Stop watching</DropdownItem>
+                    </t>
+                </Dropdown>
+                <button t-if="count" type="button" class="btn btn-link btn-sm o_ag_bulk_clear" t-on-click="props.onClear">Clear</button>
+            </div>
+            <div t-if="state.confirm" class="o_ag_bulk_row o_ag_bulk_confirm" role="alertdialog" aria-label="Confirm">
+                <span>Move <t t-out="state.confirm.count"/> issues out of <t t-out="state.confirm.sprint"/>? Their points leave the sprint.</span>
+                <button type="button" class="btn btn-primary btn-sm o_ag_bulk_confirm_yes" t-on-click="confirmMove">Move</button>
+                <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.state.confirm = null">Cancel</button>
+            </div>
+            <div t-if="state.result" class="o_ag_bulk_row o_ag_bulk_result" role="status" aria-live="polite">
+                <span class="o_ag_bulk_text" t-out="state.result.text"/>
+                <button t-if="state.result.refused.length" type="button" class="btn btn-link btn-sm o_ag_bulk_why_btn"
+                        t-att-aria-expanded="state.whyOpen ? 'true' : 'false'" t-on-click="() => this.state.whyOpen = !this.state.whyOpen">See why</button>
+                <button t-if="state.result.restore.length" type="button" class="btn btn-link btn-sm o_ag_bulk_undo" t-on-click="undo">Undo</button>
+                <span t-if="state.result.noUndo" class="text-muted">Status moves cannot be undone here.</span>
+                <button type="button" class="btn btn-link btn-sm o_ag_bulk_dismiss" t-on-click="dismiss">Dismiss</button>
+            </div>
+            <ul t-if="state.whyOpen and state.result and state.result.refused.length" class="o_ag_bulk_why list-unstyled">
+                <li t-foreach="state.result.refused" t-as="item" t-key="item.id">
+                    <b t-out="item.key"/> <t t-out="item.name"/>: <span t-out="item.reason"/>
+                </li>
+            </ul>
+        </section>
+    </t>
+</templates>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.MoveToDialog">
+        <Dialog size="'sm'" title="props.title" footer="false">
+            <div class="list-group o_ag_move_targets" role="menu" t-ref="list">
+                <t t-if="props.targets.length">
+                    <button t-foreach="props.targets" t-as="target" t-key="target.id" type="button" role="menuitem"
+                            class="list-group-item list-group-item-action"
+                            t-on-click="() => this.select(target)" t-out="target.label"/>
+                </t>
+                <p t-else="" class="text-muted m-0">There is nowhere else to move this issue.</p>
+            </div>
+        </Dialog>
+    </t>
+</templates>

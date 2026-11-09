@@ -1,0 +1,77 @@
+.o_ag_lozenge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ag-space-1);
+    padding: 0 var(--ag-space-2);
+    border: 1px solid currentColor;
+    border-radius: var(--ag-radius-control);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    white-space: nowrap;
+    color: var(--ag-s-backlog);
+
+    &.o_ag_s_backlog { color: var(--ag-s-backlog); }
+    &.o_ag_s_ready { color: var(--ag-s-ready); }
+    &.o_ag_s_progress { color: var(--ag-s-progress); }
+    &.o_ag_s_review { color: var(--ag-s-review); }
+    &.o_ag_s_done { color: var(--ag-s-done); }
+    &.o_ag_s_canceled { color: var(--ag-s-canceled); text-decoration: line-through; }
+}
+
+.o_ag_avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 50%;
+    background: var(--ag-plum);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex: none;
+}
+
+.o_ag_chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ag-space-1);
+    max-inline-size: 100%;
+    padding: 0 var(--ag-space-2);
+    border: 1px solid var(--ag-line);
+    border-radius: 1rem;
+    background: var(--ag-surface);
+    color: var(--ag-ink);
+    font-size: 0.75rem;
+    line-height: 1.5rem;
+
+    &.o_ag_chip_button {
+        min-block-size: var(--ag-target);
+        cursor: pointer;
+    }
+    &.o_ag_chip_active {
+        border-color: var(--ag-teal);
+        color: var(--ag-teal);
+    }
+    &:focus-visible {
+        outline: 2px solid var(--ag-focus);
+        outline-offset: 2px;
+    }
+}
+
+.o_ag_type_dot {
+    display: inline-block;
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+    border-radius: 50%;
+    background: var(--ag-t-task);
+    &.o_ag_t_epic { background: var(--ag-t-epic); }
+    &.o_ag_t_story { background: var(--ag-t-story); }
+    &.o_ag_t_task { background: var(--ag-t-task); }
+    &.o_ag_t_bug { background: var(--ag-t-bug); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_ag_chip, .o_ag_lozenge { transition: none; }
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Lozenge">
+        <span t-attf-class="o_ag_lozenge o_ag_s_{{category}}">
+            <i t-attf-class="fa {{icon}}" aria-hidden="true"/>
+            <span t-out="props.label"/>
+        </span>
+    </t>
+
+    <t t-name="agile_community.Avatar">
+        <span class="o_ag_avatar" role="img" t-att-aria-label="label" t-att-title="label">
+            <t t-out="initials"/>
+        </span>
+    </t>
+
+    <t t-name="agile_community.Chip">
+        <button t-if="props.onClick" type="button"
+                t-attf-class="o_ag_chip o_ag_chip_button {{props.active ? 'o_ag_chip_active' : ''}}"
+                t-att-aria-pressed="props.active ? 'true' : 'false'"
+                t-on-click="props.onClick">
+            <t t-out="props.label"/>
+        </button>
+        <span t-else="" t-attf-class="o_ag_chip {{props.active ? 'o_ag_chip_active' : ''}}">
+            <t t-out="props.label"/>
+        </span>
+    </t>
+
+    <t t-name="agile_community.TypeDot">
+        <span t-attf-class="o_ag_type_dot o_ag_t_{{type}}" role="img"
+              t-att-aria-label="props.label or type" t-att-title="props.label or type"/>
+    </t>
+</templates>

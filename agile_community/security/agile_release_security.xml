@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="agile_project_version_company_rule" model="ir.rule">
+            <field name="name">Project versions: allowed companies</field>
+            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="domain_force">[('project_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="agile_release_audit_company_rule" model="ir.rule">
+            <field name="name">Agile release history: allowed companies</field>
+            <field name="model_id" ref="model_agile_community_release_audit"/>
+            <field name="domain_force">[('release_id.project_id.company_id', 'in', company_ids + [False])]</field>
+        </record>
+        <record id="agile_project_version_visibility_rule" model="ir.rule">
+            <field name="name">Agile releases: team-only for Agile projects</field>
+            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="domain_force">[
+                '|',
+                    ('project_id.agile_enabled', '=', False),
+                    '&amp;',
+                        (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                        '|',
+                            ('project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                            ('project_id.message_partner_ids', 'in', [user.partner_id.id])
+            ]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="agile_project_version_manager_rule" model="ir.rule">
+            <field name="name">Agile releases: Project Managers see all</field>
+            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="domain_force">[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]</field>
+            <field name="groups" eval="[(4, ref('project.group_project_manager'))]"/>
+        </record>
+        <record id="agile_release_audit_visibility_rule" model="ir.rule">
+            <field name="name">Release history: follow Project visibility</field>
+            <field name="model_id" ref="model_agile_community_release_audit"/>
+            <field name="domain_force">[
+                '|',
+                    '&amp;', ('release_id.project_id.agile_enabled', '=', False),
+                        '|', ('release_id.project_id.privacy_visibility', 'in', ['employees', 'portal']), ('release_id.project_id.message_partner_ids', 'in', [user.partner_id.id]),
+                    '&amp;', ('release_id.project_id.agile_enabled', '=', True),
+                        '&amp;',
+                            (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('release_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)]),
+                            '|',
+                                ('release_id.project_id.privacy_visibility', 'in', ['employees', 'portal']),
+                                ('release_id.project_id.message_partner_ids', 'in', [user.partner_id.id])
+            ]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="agile_release_audit_manager_rule" model="ir.rule">
+            <field name="name">Release history: Project Managers see all</field>
+            <field name="model_id" ref="model_agile_community_release_audit"/>
+            <field name="domain_force">[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('release_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]</field>
+            <field name="groups" eval="[(4, ref('project.group_project_manager'))]"/>
+        </record>
+    </data>
+</odoo>

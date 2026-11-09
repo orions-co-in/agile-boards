@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_board_list" model="ir.ui.view">
+        <field name="name">agile.board.list</field>
+        <field name="model">agile.board</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="query_id"/>
+                <field name="column_ids" widget="many2many_tags"/>
+                <field name="swimlane"/>
+            </list>
+        </field>
+    </record>
+    <record id="agile_board_form" model="ir.ui.view">
+        <field name="name">agile.board.form</field>
+        <field name="model">agile.board</field>
+        <field name="arch" type="xml">
+            <form string="Board">
+                <sheet>
+                    <group>
+                        <field name="project_id" invisible="1"/>
+                        <field name="name" placeholder="For example Payments squad"/>
+                        <field name="query_id" options="{'no_create': True}"/>
+                        <field name="column_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        <field name="swimlane" placeholder="none, assignee, epic, priority, component or label"/>
+                    </group>
+                    <separator string="Merged columns"/>
+                    <div class="text-muted mb-2">Put two or more workflow statuses in one column. When you add columns here they replace "Columns shown". Cards keep their own status and show it on the card; a card dropped into a merged column lands in its landing status. Statuses left out stay hidden on this board. Boards with merged columns use the grid layout on desktop and tablet; on a phone each status keeps its own tab.</div>
+                    <field name="column_group_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="stage_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   domain="[('project_ids', 'in', parent.project_id)]"/>
+                            <field name="landing_stage_id" options="{'no_create': True}"
+                                   domain="[('id', 'in', stage_ids)]"/>
+                        </list>
+                    </field>
+                    <div class="text-muted">A board is only a lens: issue access rules still apply. The Default board is today's board and cannot be changed or deleted here; the project's own query for it is set in the board's filter bar.</div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

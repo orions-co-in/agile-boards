@@ -1,0 +1,70 @@
+.o_ag_permissions {
+    .o_ag_perm_body {
+        padding: 1rem;
+        max-inline-size: 60rem;
+    }
+
+    .o_ag_perm_schemes {
+        margin-block: 1rem;
+        border: 0;
+        padding: 0;
+
+        legend {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+    }
+
+    .o_ag_perm_cards {
+        display: grid;
+        gap: .75rem;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+
+    .o_ag_perm_card {
+        display: block;
+        cursor: pointer;
+        border: 1px solid var(--border-color, #ced4da);
+        border-radius: .375rem;
+        padding: .75rem;
+
+        &.o_ag_perm_card_on {
+            border-color: var(--primary, #714b67);
+            box-shadow: inset 0 0 0 1px var(--primary, #714b67);
+        }
+
+        .o_ag_perm_sentence {
+            display: block;
+            margin-block-start: .25rem;
+            font-size: .875rem;
+        }
+    }
+
+    .o_ag_perm_table {
+        inline-size: 100%;
+        margin-block-end: 1rem;
+
+        th, td {
+            padding: .4rem .5rem;
+            border-block-end: 1px solid var(--border-color, #dee2e6);
+            text-align: start;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .o_ag_perm_table thead {
+            display: none;
+        }
+
+        .o_ag_perm_table tr, .o_ag_perm_table th, .o_ag_perm_table td {
+            display: block;
+        }
+    }
+
+    .o_ag_perm_save {
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+}

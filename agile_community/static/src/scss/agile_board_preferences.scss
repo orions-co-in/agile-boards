@@ -1,0 +1,39 @@
+.o_agile_kanban main[data-agile-density="compact"] {
+    padding: 0.5rem !important;
+
+    > .fs-5 {
+        font-size: 1rem !important;
+    }
+
+    .o_agile_task_actions .btn {
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+// R-1102: a coloured edge chosen by the project's "Colour cards by" setting.
+$agile-tag-colors: #7c8794, #d9534f, #e8873b, #e0b82e, #4aa3a0, #3b6fb5, #7b5ea7, #4aa66f, #2f8f9d, #c0507a, #5d6975, #8a6d3b;
+
+.o_agile_kanban main[data-agile-color] {
+    border-left: 5px solid transparent;
+    padding-left: 0.75rem !important;
+}
+.o_agile_kanban main {
+    &[data-agile-color="urgent"], &[data-agile-color="overdue"] { border-left-color: #c62f3d; }
+    &[data-agile-color="high"], &[data-agile-color="soon"] { border-left-color: #d98a00; }
+    @for $i from 1 through length($agile-tag-colors) {
+        &[data-agile-color="tag-#{$i - 1}"] { border-left-color: nth($agile-tag-colors, $i); }
+    }
+}
+
+// U-1455: the board's Compact cards chip hides the quiet lines and tightens the cards.
+.o_ag_compact .o_kanban_record main {
+    padding: 0.4rem !important;
+
+    .o_ag_card_days, .o_ag_card_custom, .o_ag_card_votes, .o_ag_card_lock {
+        display: none !important;
+    }
+
+    .o_agile_task_actions .btn {
+        padding: 0.15rem 0.35rem;
+    }
+}

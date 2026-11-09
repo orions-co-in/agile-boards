@@ -1,0 +1,84 @@
+.o_ag_overview {
+    background: var(--ag-paper);
+}
+
+.o_ag_overview_body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ag-space-4);
+    max-inline-size: 72rem;
+    margin-inline: auto; // centred on wide screens instead of hugging the left edge
+    padding: var(--ag-space-4);
+}
+
+.o_ag_overview_head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--ag-space-3);
+    flex-wrap: wrap;
+}
+
+.o_ag_overview_title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ag-ink);
+}
+
+.o_ag_tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--ag-space-3);
+}
+
+.o_ag_tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ag-space-1);
+    min-block-size: var(--ag-target);
+    padding: var(--ag-space-3) var(--ag-space-4);
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+    color: var(--ag-ink);
+    text-align: start;
+    cursor: pointer;
+
+    &:hover { border-color: var(--ag-teal); }
+    &:focus-visible {
+        outline: 2px solid var(--ag-focus);
+        outline-offset: 2px;
+    }
+    &.o_ag_tile_danger .o_ag_tile_count { color: var(--ag-red); }
+    &.o_ag_tile_warning .o_ag_tile_count { color: var(--ag-amber-text); }
+}
+
+.o_ag_tile_count {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_ag_tile_label {
+    font-size: 0.8125rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_skeleton_strip {
+    display: flex;
+    gap: 3px;
+
+    span {
+        flex: 1 1 0;
+        block-size: 3rem;
+        background: var(--ag-line);
+        border-radius: 3px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_ag_tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

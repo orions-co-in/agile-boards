@@ -1,0 +1,337 @@
+.o_list_renderer .o_ag_group {
+    font-weight: normal;
+    color: var(--ag-ink);
+    min-block-size: var(--ag-target);
+    font-variant-numeric: tabular-nums;
+}
+
+// Rows of completed sprints cannot be dragged, so their handle is hidden.
+.o_ag_row_locked .o_row_handle {
+    visibility: hidden;
+}
+
+.o_ag_group_name {
+    font-size: 1rem;
+}
+
+.o_ag_group_meta, .o_ag_group_goal {
+    color: var(--ag-muted);
+    font-size: 0.8125rem;
+}
+
+.o_ag_group_goal {
+    max-inline-size: 18rem;
+}
+
+.o_ag_group_spacer {
+    flex: 1 1 auto;
+}
+
+.o_ag_sprint_state {
+    padding: 0 var(--ag-space-2);
+    border: 1px solid currentColor;
+    border-radius: var(--ag-radius-control);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    color: var(--ag-muted);
+
+    &.o_ag_sprint_in_progress { color: var(--ag-teal); }
+    &.o_ag_sprint_draft { color: var(--ag-s-ready); }
+}
+
+.o_ag_group_points {
+    font-size: 0.8125rem;
+    &.o_ag_over { color: var(--ag-red); font-weight: 600; }
+}
+
+// Capacity ribbon: planned points split by status; red outline plus words when over capacity.
+.o_ag_ribbon {
+    display: inline-flex;
+    inline-size: 8rem;
+    block-size: 8px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--ag-line);
+
+    i { display: block; block-size: 100%; }
+    .o_ag_s_backlog { background: var(--ag-s-backlog); }
+    .o_ag_s_ready { background: var(--ag-s-ready); }
+    .o_ag_s_progress { background: var(--ag-s-progress); }
+    .o_ag_s_review { background: var(--ag-s-review); }
+    .o_ag_s_done { background: var(--ag-s-done); }
+    &.o_ag_over { outline: 2px solid var(--ag-red); }
+}
+
+.o_ag_plan_chip {
+    font-size: 0.8125rem;
+    color: var(--ag-muted);
+    &.o_ag_plan_danger { color: var(--ag-red); font-weight: 600; }
+}
+
+// Phone: the table scrolls sideways, so the sprint header stays pinned to the viewport and wraps,
+// and secondary columns drop out (the issue form shows them).
+@media (max-width: 767.98px) {
+    .o_ag_ribbon { inline-size: 100%; order: 10; }
+    .o_ag_group_goal { display: none; }
+    .o_list_renderer .o_ag_group {
+        position: sticky;
+        inset-inline-start: 0;
+        inline-size: calc(100vw - 2rem);
+    }
+}
+
+// Cells that open an editor on click show it on hover; only once the user may edit.
+.o_ag_can_edit tr.o_data_row:not(.o_ag_row_locked) {
+    td[name="story_points"], td[name="user_ids"], td[name="agile_task_type_id"] {
+        cursor: text;
+        &:hover { box-shadow: inset 0 -1px 0 0 var(--ag-teal); }
+    }
+}
+
+.o_ag_quick_row td {
+    padding-block: var(--ag-space-1);
+    background: var(--ag-paper);
+}
+
+// One line: type, title (takes the spare width), assignee.
+.o_ag_quick_type, .o_ag_quick_assignee {
+    inline-size: auto;
+    flex: 0 0 auto;
+}
+.o_ag_quick_type { min-inline-size: 6rem; }
+.o_ag_quick_assignee { min-inline-size: 10rem; max-inline-size: 14rem; }
+.o_ag_quick_input { inline-size: auto; min-inline-size: 0; }
+
+.o_ag_inline_popover .o_ag_inline {
+    min-inline-size: 14rem;
+}
+
+// An unestimated issue shows a dash, never zero; the empty cell stays clickable.
+.o_agile_backlog td.o_data_cell[name="story_points"]:empty::before {
+    content: "\2013";
+    color: var(--ag-muted);
+}
+
+// Sprint and assignee multi-select lists above the epics.
+.o_ag_filters {
+    display: flex;
+    gap: var(--ag-space-2);
+    padding: var(--ag-space-2) var(--ag-space-4);
+    border-block-end: 1px solid var(--ag-line);
+    background: var(--ag-surface);
+}
+.o_ag_multi_on { border-color: var(--ag-teal); color: var(--ag-teal); font-weight: 600; }
+.o_ag_multi_menu {
+    min-inline-size: 14rem;
+    max-block-size: 20rem;
+    overflow-y: auto;
+    padding: .25rem 0;
+}
+.o_ag_multi_row {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin: 0;
+    padding: .375rem .75rem;
+    cursor: pointer;
+    &:hover { background: var(--ag-hover, rgba(0, 0, 0, .05)); }
+}
+.o_ag_multi_count {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+}
+.o_ag_multi_clear { margin-inline-start: .5rem; }
+
+// Epic panel: one tile per epic with a progress bar; the chosen epic filters the backlog.
+.o_ag_epics {
+    position: sticky;
+    inset-inline-start: 0;
+    padding: var(--ag-space-2) var(--ag-space-4);
+    border-block-end: 1px solid var(--ag-line);
+    background: var(--ag-surface);
+}
+
+.o_ag_epics_toggle {
+    padding: 0;
+    color: var(--ag-ink);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.o_ag_epic_list {
+    display: flex;
+    gap: var(--ag-space-3);
+    margin: var(--ag-space-2) 0 0;
+    padding: 0 0 var(--ag-space-1);
+    overflow-x: auto;
+}
+
+.o_ag_epic {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--ag-space-1);
+    inline-size: 15rem;
+    min-block-size: var(--ag-target);
+    padding: var(--ag-space-2) var(--ag-space-3);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+    background: var(--ag-surface);
+    color: var(--ag-ink);
+    text-align: start;
+    cursor: pointer;
+
+    &:hover { border-color: var(--ag-teal); }
+    &:focus-visible { outline: 2px solid var(--ag-focus); outline-offset: 2px; }
+    &.o_ag_epic_active {
+        border-color: var(--ag-teal);
+        box-shadow: inset 0 0 0 1px var(--ag-teal);
+    }
+}
+
+.o_ag_epic_name {
+    display: flex;
+    gap: var(--ag-space-2);
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.o_ag_epic_key {
+    color: var(--ag-muted);
+    font-weight: normal;
+}
+
+.o_ag_epic_bar {
+    display: block;
+    block-size: 6px;
+    border-radius: 2px;
+    background: var(--ag-line);
+    overflow: hidden;
+
+    i { display: block; block-size: 100%; background: var(--ag-s-done); }
+}
+
+.o_ag_epic_text {
+    color: var(--ag-muted);
+    font-size: 0.75rem;
+}
+
+// Phone: the handle cell becomes the row's menu button (44 px target), shown as three dots.
+@media (max-width: 767.98px) {
+    .o_agile_backlog td.o_handle_cell {
+        cursor: pointer;
+        min-inline-size: 44px;
+        text-align: center;
+
+        .o_row_handle { display: none; }
+
+        &::before {
+            content: "\22EF";
+            font-size: 1.25rem;
+            color: var(--ag-muted);
+        }
+    }
+}
+
+// Tablet and phone: the search panel takes a third of the width, so only the essential columns stay.
+@media (max-width: 991.98px) {
+    .o_agile_backlog {
+        th[data-name="agile_task_type_id"], td[name="agile_task_type_id"],
+        th[data-name="parent_id"], td[name="parent_id"],
+        th[data-name="user_ids"], td[name="user_ids"] {
+            // !important: Odoo's own cell rule sets display on the avatar cell.
+            display: none !important;
+        }
+
+        // Odoo fixes the column widths when the table first draws (all columns equal), which is
+        // wider than a phone once three columns are gone. Let the browser share the space instead.
+        table.o_list_table {
+            table-layout: auto !important;
+            inline-size: 100% !important;
+            min-inline-size: 0 !important;
+
+            th { inline-size: auto !important; }
+        }
+
+        // The optional-columns picker has nothing to offer here and would cover the Status header.
+        th.o_list_actions_header,
+        tr.o_group_header > th:last-child:not(.o_group_name),
+        tr.o_data_row > td:last-child {
+            display: none !important;
+        }
+
+        td[name="name"] {
+            white-space: normal !important;
+            min-inline-size: 5rem;
+        }
+
+        td[name="issue_key"] { font-size: 0.75rem; }
+
+        // Titles wrap to two or three lines; centre the other cells on them instead of mixing
+        // top- and bottom-aligned cells in one row.
+        tr.o_data_row > td { vertical-align: middle !important; }
+        td[name="agile_status"] { padding-inline-end: 0.75rem; }
+
+        // Tighter cells so Status fits next to the title without sideways scrolling.
+        thead th { font-size: 0.75rem; padding-inline: 0.25rem; }
+        td.o_data_cell { padding-inline: 0.2rem; }
+        td[name="agile_status"] .badge { font-size: 0.75rem; }
+    }
+}
+
+// Phone: the group pager ("1-3 / 3") pushes the toolbar onto a second row and steps through sprint
+// groups, which are all on one screen anyway. Hide it and make the toggle button compact, so the
+// issues start higher up.
+@media (max-width: 767.98px) {
+    .o_agile_backlog .o_control_panel {
+        .o_cp_pager {
+            display: none;
+        }
+
+        .o_ag_toggle_completed {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+}
+
+// UI-16: Points keep clear of the Assignee, and the list stops stretching on very wide screens
+// so Blocked, Epic and Points stay near the title.
+.o_agile_backlog {
+    td.o_data_cell[name="story_points"], th[data-name="story_points"] {
+        padding-inline-end: 1.5rem;
+    }
+    @media (min-width: 1600px) {
+        .o_list_renderer { max-inline-size: 96rem; }
+    }
+}
+
+// Phone: the planned sprint's next step stays above the rows (Q-601).
+.o_ag_plan_strip {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ag-space-2, 8px);
+    padding: var(--ag-space-2, 8px) var(--ag-space-3, 12px);
+    background: var(--ag-surface, #fff);
+    border-bottom: 1px solid var(--ag-line, #dde1e6);
+}
+.o_ag_plan_strip_row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ag-space-3, 12px);
+    font-size: .875rem;
+}
+.o_ag_plan_strip_action { flex: none; min-block-size: var(--ag-target, 2.5rem); }
+
+.o_ag_epic_list > li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.o_ag_epic_report { padding-inline: var(--ag-space-1); }
+
+.o_ag_group_select { margin-inline-end: var(--ag-space-2); }

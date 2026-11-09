@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.AgileQueryField">
+        <div class="o_agile_query">
+            <div class="o_agile_query_mode btn-group btn-group-sm" role="group" aria-label="Editor">
+                <button type="button" class="btn btn-outline-secondary" t-att-class="{ active: state.mode === 'basic' }"
+                        t-att-aria-pressed="state.mode === 'basic' ? 'true' : 'false'" t-att-disabled="!state.basicOk"
+                        t-on-click="() => this.setMode('basic')">Basic</button>
+                <button type="button" class="btn btn-outline-secondary" t-att-class="{ active: state.mode === 'advanced' }"
+                        t-att-aria-pressed="state.mode === 'advanced' ? 'true' : 'false'"
+                        t-on-click="() => this.setMode('advanced')">Advanced</button>
+            </div>
+            <div t-if="!state.basicOk" class="o_agile_query_note text-muted">
+                Basic cannot show this query because it uses <t t-out="blockerText or 'something Basic does not offer'"/>. Edit it in the bar.
+            </div>
+            <div t-if="state.mode === 'basic' and state.basicOk" class="o_agile_query_rows">
+                <div t-foreach="state.rows" t-as="row" t-key="row_index" class="o_agile_query_row">
+                    <select class="form-select" aria-label="Field" t-on-change="(ev) => this.onRowField(row, ev)"
+                            t-att-disabled="props.readonly">
+                        <option t-foreach="state.options" t-as="option" t-key="option.field" t-att-value="option.field"
+                                t-att-selected="option.field === row.field" t-esc="option.label"/>
+                    </select>
+                    <select class="form-select" aria-label="Condition" t-on-change="(ev) => this.onRowOp(row, ev)"
+                            t-att-disabled="props.readonly">
+                        <option t-foreach="optionFor(row.field)?.ops or []" t-as="op" t-key="op.op" t-att-value="op.op"
+                                t-att-selected="op.op === row.op" t-esc="op.label"/>
+                    </select>
+                    <t t-if="!row.op.startsWith('IS ')">
+                        <select t-if="optionFor(row.field)?.values" class="form-select" aria-label="Value"
+                                t-on-change="(ev) => this.onRowValue(row, ev)" t-att-disabled="props.readonly">
+                            <option t-foreach="valuesFor(row)" t-as="value" t-key="value" t-att-value="value"
+                                    t-att-selected="value === row.value" t-esc="value"/>
+                        </select>
+                        <input t-else="" type="text" class="form-control" aria-label="Value" t-att-value="row.value"
+                               placeholder="2026-10-27, today, -7d" t-att-readonly="props.readonly or undefined"
+                               t-on-change="(ev) => this.onRowValue(row, ev)"/>
+                    </t>
+                    <button t-if="!props.readonly" type="button" class="btn btn-link o_agile_query_remove"
+                            t-att-aria-label="'Remove condition ' + (row_index + 1)" t-on-click="() => this.removeRow(row_index)">×</button>
+                </div>
+                <div t-if="!props.readonly" class="o_agile_query_add">
+                    <span class="text-muted">Add a condition:</span>
+                    <button t-foreach="state.options" t-as="option" t-key="option.field" type="button"
+                            class="btn btn-sm btn-outline-secondary o_agile_query_chip" t-on-click="() => this.addRow(option)"
+                            t-esc="option.label"/>
+                </div>
+                <div t-if="state.sort" class="o_agile_query_sort text-muted">
+                    Sorted: <t t-out="state.sort.replace('ORDER BY ', '')"/>
+                    <button t-if="!props.readonly" type="button" class="btn btn-link btn-sm o_agile_query_clear_sort" t-on-click="clearSort">Remove sort</button>
+                </div>
+                <label t-if="state.rows.length > 1" class="o_agile_query_any">
+                    <input type="checkbox" t-att-checked="state.matchAny" t-att-disabled="props.readonly"
+                           t-on-change="onMatchAny"/> Match any of these
+                </label>
+            </div>
+            <div class="o_agile_query_bar" t-att-class="{ 'o_agile_query_bar_hidden': state.mode === 'basic' and state.basicOk }">
+                <input type="text" class="o_agile_query_input form-control form-control-lg"
+                       t-ref="input" t-att-value="state.text" t-att-readonly="props.readonly or undefined"
+                       role="combobox" aria-autocomplete="list" aria-label="Query"
+                       t-att-aria-expanded="state.open ? 'true' : 'false'"
+                       t-att-aria-controls="listId" aria-describedby="agile_query_status"
+                       t-att-aria-invalid="state.error ? 'true' : 'false'"
+                       placeholder='status = "In Progress" AND assignee = me'
+                       autocomplete="off" spellcheck="false"
+                       t-on-input="onInput" t-on-keydown="onKeydown" t-on-click="onClick" t-on-blur="onBlur"/>
+                <ul t-if="state.open and state.suggest.items.length" class="o_agile_query_list" role="listbox" t-att-id="listId">
+                    <li t-foreach="state.suggest.items" t-as="item" t-key="item_index" role="option"
+                        t-att-aria-selected="item_index === state.index ? 'true' : 'false'"
+                        t-att-class="{ 'active': item_index === state.index }"
+                        t-on-mousedown.prevent="() => this.accept(item)">
+                        <span class="o_agile_query_word" t-esc="item.label"/>
+                        <span t-if="item.hint" class="o_agile_query_hint" t-esc="item.hint"/>
+                    </li>
+                </ul>
+            </div>
+            <div id="agile_query_status" class="o_agile_query_status" aria-live="polite"
+                 t-att-class="{ 'o_agile_query_error': state.error }">
+                <span class="o_agile_query_count" t-esc="statusText"/>
+                <span t-if="state.ok and state.words" class="o_agile_query_words" t-esc="state.words"/>
+                <button t-if="!state.text and !props.readonly" type="button" class="btn btn-link p-0 o_agile_query_example"
+                        t-on-click="onExample">Try an example</button>
+            </div>
+        </div>
+    </t>
+</templates>

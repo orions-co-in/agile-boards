@@ -1,0 +1,68 @@
+.o_ag_your_work { background: var(--ag-paper); }
+
+.o_ag_yw_body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ag-space-4);
+    max-inline-size: 64rem;
+    margin-inline: auto;
+    padding: var(--ag-space-4);
+}
+.o_ag_yw_scope { font-size: .875rem; font-weight: 400; color: var(--ag-muted); margin-inline-start: var(--ag-space-2); }
+
+.o_ag_yw_tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-block-end: 1px solid var(--ag-line);
+}
+.o_ag_yw_tab {
+    display: flex;
+    align-items: center;
+    gap: var(--ag-space-2);
+    min-block-size: var(--ag-target);
+    padding: 0 var(--ag-space-3);
+    white-space: nowrap;
+    border: 0;
+    border-block-end: 3px solid transparent;
+    background: none;
+    color: var(--ag-ink);
+    &[aria-selected="true"] { border-block-end-color: var(--ag-teal); font-weight: 600; }
+    &:focus-visible { outline: 2px solid var(--ag-focus); outline-offset: -2px; }
+}
+.o_ag_yw_count { font-size: .8125rem; color: var(--ag-muted); font-weight: 400; }
+
+.o_ag_yw_list {
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+}
+.o_ag_yw_row {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr) auto auto 4rem;
+    gap: var(--ag-space-3);
+    align-items: center;
+    inline-size: 100%;
+    min-block-size: var(--ag-target);
+    padding: var(--ag-space-2) var(--ag-space-4);
+    border: 0;
+    border-block-end: 1px solid var(--ag-line);
+    background: none;
+    color: inherit;
+    text-align: start;
+    &:last-of-type { border-block-end: 0; }
+    &:hover { background: var(--ag-paper); }
+    &:focus-visible { outline: 2px solid var(--ag-focus); outline-offset: -2px; }
+}
+.o_ag_yw_key { color: var(--ag-muted); font-size: .8125rem; }
+.o_ag_yw_name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.o_ag_yw_blocked { margin-inline-start: var(--ag-space-2); color: var(--ag-red); font-size: .8125rem; }
+.o_ag_yw_meta { color: var(--ag-muted); font-size: .8125rem; white-space: nowrap; }
+.o_ag_yw_points { text-align: end; color: var(--ag-muted); font-size: .8125rem; white-space: nowrap; }
+.o_ag_yw_empty { margin: 0; padding: var(--ag-space-4); color: var(--ag-muted); }
+
+@media (max-width: 575.98px) {
+    .o_ag_yw_body { padding: var(--ag-space-3); }
+    .o_ag_yw_row { grid-template-columns: minmax(0, 1fr) auto; }
+    .o_ag_yw_key, .o_ag_yw_meta, .o_ag_yw_points { display: none; }
+}

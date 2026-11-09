@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Keep the native Project search bar, extending it with issue identity. -->
+    <record id="project_task_search_agile" model="ir.ui.view">
+        <field name="name">project.task.search.agile</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">['|', ('issue_key', 'ilike', self), ('name', 'ilike', self)]</attribute>
+            </field>
+            <field name="name" position="after">
+                <field name="issue_key" string="Issue Key" filter_domain="[('issue_key', 'ilike', self)]"/>
+                <field name="agile_task_type_id" string="Issue Type"/>
+                <field name="agile_component_id" string="Component"/>
+                <field name="version_id" string="Fix Version"/>
+                <field name="agile_affects_version_ids" string="Affects Version"/>
+                <field name="priority"/>
+                <field name="parent_id" string="Epic"/>
+                <field name="sprint_id" string="Sprint"/>
+                <field name="story_points" string="Story Points"/>
+                <field name="agile_saved_filter_id" string="Saved filter"
+                       domain="[('project_id', '=', context.get('default_project_id'))]"/>
+            </field>
+            <field name="user_ids" position="attributes">
+                <attribute name="string">Assignee</attribute>
+            </field>
+            <xpath expr="//search" position="inside">
+                <filter string="Blocked" name="agile_blocked" domain="[('agile_is_blocked', '=', True)]"/>
+                <filter string="Has votes" name="agile_has_votes" domain="[('agile_vote_count', '&gt;', 0)]"/>
+                <filter string="Flagged" name="agile_flagged" domain="[('agile_flagged', '=', True)]"/>
+                <filter string="Resolved" name="agile_resolved" domain="[('agile_resolution', '!=', False)]"/>
+                <filter string="Resolution" name="agile_group_resolution" context="{'group_by': 'agile_resolution'}"/>
+                <filter string="Show canceled" name="agile_show_canceled" domain="[(1, '=', 1)]" context="{'agile_show_canceled': True}" invisible="not context.get('agile_scrum_mode')"/>
+                <filter string="Overdue" name="agile_overdue" domain="[('date_deadline', '&lt;', 'today'), ('stage_id.agile_status', 'not in', ['done', 'canceled'])]"/>
+                <separator/>
+                <filter string="Backlog" name="agile_backlog" domain="[('stage_id.agile_status', '=', 'backlog')]"/>
+                <filter string="To Do" name="agile_ready" domain="[('stage_id.agile_status', '=', 'ready')]"/>
+                <filter string="In Progress" name="agile_in_progress" domain="[('stage_id.agile_status', '=', 'progress')]"/>
+                <filter string="Review" name="agile_review" domain="[('stage_id.agile_status', '=', 'review')]"/>
+                <filter string="Done" name="agile_done" domain="[('stage_id.agile_status', '=', 'done')]"/>
+                <filter string="Canceled" name="agile_canceled" domain="[('stage_id.agile_status', '=', 'canceled')]"/>
+                <filter string="Active sprint" name="agile_active_sprint" domain="[('sprint_id.state', '=', 'in_progress')]" invisible="not context.get('agile_project_view') or not context.get('agile_scrum_mode')"/>
+                <separator/>
+                <filter string="My Issues" name="agile_quick_my_issues" domain="[('user_ids', 'in', [uid])]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Unassigned" name="agile_quick_unassigned" domain="[('user_ids', '=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="High Priority" name="agile_quick_high_priority" domain="[('priority', 'in', ['2', '3'])]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Has Component" name="agile_quick_has_component" domain="[('agile_component_id', '!=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Has Affects Version" name="agile_quick_has_affects_version" domain="[('agile_affects_version_ids', '!=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Has Fix Version" name="agile_quick_has_fix_version" domain="[('version_id', '!=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Epics" name="agile_quick_epics" domain="[('agile_is_epic', '=', True)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Has Epic" name="agile_quick_has_epic" domain="[('parent_id', '!=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Unestimated" name="agile_quick_unestimated" domain="[('story_points_estimated', '=', False)]" invisible="not context.get('agile_project_view')"/>
+                <filter string="Estimated" name="agile_quick_estimated" domain="[('story_points_estimated', '=', True)]" invisible="not context.get('agile_project_view')"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Issue Type" name="agile_group_by_issue_type" context="{'group_by': 'agile_task_type_id'}"/>
+                <filter string="Component" name="agile_group_by_component" context="{'group_by': 'agile_component_id'}" invisible="not context.get('agile_project_view')"/>
+                <filter string="Fix Version" name="agile_group_by_fix_version" context="{'group_by': 'version_id'}" invisible="not context.get('agile_project_view')"/>
+                <filter string="Assignee" name="agile_group_by_assignee" context="{'group_by': 'user_ids'}" invisible="not context.get('agile_project_view')"/>
+                <filter string="Epic" name="agile_group_by_epic" context="{'group_by': 'parent_id'}" invisible="not context.get('agile_project_view')"/>
+                <filter string="Sprint" name="agile_group_by_sprint" context="{'group_by': 'sprint_id'}" invisible="not context.get('agile_project_view')"/>
+                <filter string="Priority" name="agile_group_by_priority" context="{'group_by': 'priority'}" invisible="not context.get('agile_project_view')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Task form: add issue key above the name, add issue type in the first group -->
+    <record id="view_project_task_form_agile" model="ir.ui.view">
+        <field name="name">project.task.form.agile</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="agile_has_voted" invisible="1"/>
+                <button name="agile_toggle_vote" type="object" class="oe_stat_button" icon="fa-thumbs-up"
+                        invisible="not agile_issue or not id"
+                        title="Vote for this issue, or take your vote back">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><field name="agile_vote_count"/></span>
+                        <span class="o_stat_text" invisible="agile_has_voted">Vote</span>
+                        <span class="o_stat_text" invisible="not agile_has_voted">Voted</span>
+                    </div>
+                </button>
+            </xpath>
+            <!-- Odoo draws the assignee with no label; name it for people and screen readers. -->
+            <field name="user_ids" position="before">
+                <label for="user_ids" string="Assignee"/>
+            </field>
+            <field name="user_ids" position="attributes">
+                <attribute name="nolabel">1</attribute>
+            </field>
+            <!-- Agile issues show Fix Version under Issue details; the version field Odoo adds near the
+                 top would be the same field twice, so it stays only for tasks that are not Agile issues. -->
+            <field name="version_id" position="attributes">
+                <attribute name="invisible">agile_issue</attribute>
+            </field>
+            <xpath expr="//form/header/field[@name='stage_id']" position="before">
+                <field name="can_agile_mark_ready" invisible="1"/>
+                <field name="can_agile_start" invisible="1"/>
+                <field name="can_agile_send_review" invisible="1"/>
+                <field name="can_agile_return" invisible="1"/>
+                <field name="can_agile_complete" invisible="1"/>
+                <field name="can_agile_reopen" invisible="1"/>
+                <field name="can_agile_cancel" invisible="1"/>
+                <field name="can_agile_update_block" invisible="1"/>
+                <field name="can_agile_plan_roadmap" invisible="1"/>
+                <field name="can_agile_clone" invisible="1"/>
+                <field name="can_agile_flag" invisible="1"/>
+                <field name="can_agile_reorder_backlog" invisible="1"/>
+                <button name="action_agile_move_backlog_up" type="object" string="Move up" class="o_agile_transition_action" invisible="not can_agile_reorder_backlog"/>
+                <button name="action_agile_move_backlog_down" type="object" string="Move down" class="o_agile_transition_action" invisible="not can_agile_reorder_backlog"/>
+                <button name="action_agile_mark_ready" type="object" string="Move to To Do" class="oe_highlight o_agile_transition_action" invisible="not can_agile_mark_ready"/>
+                <button name="action_agile_start" type="object" string="Start" class="oe_highlight o_agile_transition_action" invisible="not can_agile_start"/>
+                <button name="action_agile_send_review" type="object" string="Send to Review" class="oe_highlight o_agile_transition_action" invisible="not can_agile_send_review"/>
+                <button name="action_agile_return" type="object" string="Return to Work" class="o_agile_transition_action" invisible="not can_agile_return"/>
+                <button name="action_agile_complete" type="object" string="Complete" class="oe_highlight o_agile_transition_action" invisible="not can_agile_complete or agile_uses_resolution"/>
+                <button name="action_agile_pick_resolution" type="object" context="{'agile_close': 'done'}" string="Complete" class="oe_highlight o_agile_transition_action" invisible="not can_agile_complete or not agile_uses_resolution"/>
+                <button name="action_agile_reopen" type="object" string="Reopen" class="oe_highlight o_agile_transition_action" invisible="not can_agile_reopen"/>
+                <field name="agile_custom_moves" widget="agile_custom_moves" nolabel="1" invisible="not agile_custom_moves"/>
+                <button name="action_agile_cancel" type="object" string="Cancel Issue" class="o_agile_transition_action" invisible="not can_agile_cancel or agile_uses_resolution" confirm="Cancel this issue?"/>
+                <button name="action_agile_pick_resolution" type="object" context="{'agile_close': 'canceled'}" string="Cancel Issue" class="o_agile_transition_action" invisible="not can_agile_cancel or not agile_uses_resolution"/>
+                <field name="agile_can_assign_me" invisible="1"/>
+                <button name="action_agile_assign_to_me" type="object" string="Assign to me" class="o_agile_transition_action" invisible="not agile_can_assign_me"/>
+                <button name="action_agile_open_clone" type="object" string="Clone" class="o_agile_transition_action" invisible="not can_agile_clone"/>
+                <button name="action_agile_toggle_flag" type="object" string="Flag" class="o_agile_transition_action" invisible="not agile_issue or agile_flagged or not can_agile_flag" groups="project.group_project_user"/>
+                <button name="action_agile_toggle_flag" type="object" string="Remove flag" class="o_agile_transition_action" invisible="not agile_flagged or not can_agile_flag" groups="project.group_project_user"/>
+            </xpath>
+            <field name="name" position="before">
+                <field name="agile_project_enabled" invisible="1"/>
+                <field name="agile_issue" invisible="1"/>
+            </field>
+            <xpath expr="//sheet/div[h1/field[@name='name']]" position="before">
+                <field name="issue_key" class="text-primary fw-bold mb-1" style="font-size: 1.1em" readonly="1" invisible="not agile_issue"/>
+            </xpath>
+            <xpath expr="//sheet/group[1]" position="after">
+                <group string="Epic progress" invisible="not agile_issue or not agile_is_epic">
+                    <field name="agile_child_issue_count" readonly="1"/>
+                    <field name="agile_child_done_count" readonly="1"/>
+                    <field name="agile_child_points" readonly="1"/>
+                    <field name="agile_child_unestimated_count" readonly="1"/>
+                </group>
+            </xpath>
+            <!-- Description comes first; time tracking sits in its own tab right after it. -->
+            <xpath expr="//page[@name='description_page']" position="after">
+                <page name="agile_time_tracking" string="Time tracking" invisible="not agile_issue or agile_is_epic">
+                    <group>
+                        <group>
+                            <field name="allocated_hours" string="Original estimate" widget="float_time"/>
+                            <field name="agile_remaining_hours" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="agile_logged_hours" widget="float_time"/>
+                            <field name="agile_log_time_available" invisible="1"/>
+                            <button name="action_agile_log_time" type="object" string="Log work" class="btn-secondary"
+                                    invisible="not agile_log_time_available"/>
+                            <field name="agile_time_progress" widget="percentage" invisible="not allocated_hours"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <!-- Applied last, so it lands directly under the native fields, above Time tracking. -->
+            <!-- Its own full-width block under the native fields, in two columns like Time tracking. -->
+            <xpath expr="//sheet/group[1]" position="after">
+                <group string="Issue details" class="o_agile_issue_fields" invisible="not agile_issue and not (is_template and agile_project_enabled) and (id or not agile_project_enabled)">
+                    <group>
+                        <field name="agile_task_type_id" required="agile_issue or (is_template and agile_project_enabled)" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="agile_component_id" options="{'no_create': True, 'no_create_edit': True}" invisible="not agile_issue and not (is_template and agile_project_enabled)"/>
+                        <field name="version_id" string="Fix Version" domain="[('project_id', '=', project_id)]" options="{'no_create': True, 'no_create_edit': True}" invisible="not agile_issue and not (is_template and agile_project_enabled)"/>
+                        <field name="agile_affects_version_ids" string="Affects Versions" widget="many2many_tags" domain="[('project_id', '=', project_id)]" options="{'no_create': True, 'no_create_edit': True}" invisible="not agile_issue"/>
+                        <field name="agile_is_epic" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="agile_planned_start" groups="project.group_project_user" invisible="not agile_issue" readonly="not can_agile_plan_roadmap"/>
+                        <field name="agile_planned_end" groups="project.group_project_user" invisible="not agile_issue" readonly="not can_agile_plan_roadmap"/>
+                        <field name="agile_can_restrict" invisible="1"/>
+                        <field name="agile_member_user_ids" invisible="1"/>
+                        <field name="agile_restricted" invisible="not agile_issue" readonly="not agile_can_restrict"/>
+                        <field name="agile_visible_user_ids" widget="many2many_tags" string="Who can see it"
+                               invisible="not agile_issue or not agile_restricted" readonly="not agile_can_restrict"
+                               domain="[('id', 'in', agile_member_user_ids)]"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                        <div class="text-muted small" colspan="2" invisible="not agile_issue or not agile_restricted">
+                            Only the people named here, the assignees, the reporter and project managers can open this issue.
+                        </div>
+                        <field name="agile_blocked" invisible="not agile_issue" readonly="not can_agile_update_block"/>
+                        <field name="agile_block_reason" invisible="not agile_issue or not agile_blocked" required="agile_blocked" readonly="not can_agile_update_block"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='sub_tasks_page']/field[@name='child_ids']/list/field[@name='name']" position="before">
+                <field name="issue_key" optional="show" invisible="not parent.agile_issue" readonly="1"/>
+                <field name="agile_task_type_id" optional="show" invisible="not parent.agile_issue"/>
+            </xpath>
+            <xpath expr="//page[@name='sub_tasks_page']/field[@name='child_ids']/list/field[@name='stage_id']" position="after">
+                <field name="story_points" optional="hide" invisible="not parent.agile_issue"/>
+                <field name="story_points_estimated" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//page[@name='sub_tasks_page']" position="after">
+                <page name="agile_acceptance" string="Acceptance" class="o_agile_acceptance" invisible="not agile_issue and not (is_template and agile_project_enabled) and (id or not agile_project_enabled)">
+                    <group>
+                        <field name="agile_acceptance_criteria" nolabel="1" placeholder="Describe the conditions that must be true for this issue to be accepted."/>
+                    </group>
+                    <group string="Acceptance Checklist">
+                        <field name="agile_checklist_item_ids" nolabel="1">
+                            <list editable="bottom" default_order="sequence, id">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name" string="Checklist item"/>
+                                <field name="is_done" string="Done" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+                <page name="agile_issue_links" string="Issue links" invisible="not agile_issue" class="o_agile_issue_links">
+                    <field name="agile_related_issue_ids" widget="agile_links" nolabel="1"/>
+                </page>
+                <page name="agile_documents" string="Documents" invisible="not agile_issue">
+                    <field name="agile_document_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="title"/>
+                            <field name="url" widget="url" options="{'website_path': True}" placeholder="https://..."/>
+                            <field name="kind" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+                <page name="agile_history" string="History" invisible="not agile_issue" class="o_agile_history">
+                    <field name="message_ids" widget="agile_history" nolabel="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='agile_block_reason']" position="after">
+                <field name="agile_flagged" invisible="1"/>
+                <field name="agile_uses_resolution" invisible="1"/>
+                <field name="agile_resolution" invisible="not agile_uses_resolution or not agile_resolution" readonly="not can_agile_update_block"/>
+                <div class="alert alert-warning py-1 px-2 mb-1 o_ag_flag_banner" role="status" invisible="not agile_flagged">
+                    <strong>Flagged</strong>
+                    <span>: </span>
+                    <field name="agile_flag_note" nolabel="1" class="d-inline-block" placeholder="Add a note: why does this need a look?" readonly="not can_agile_update_block"/>
+                </div>
+                <field name="agile_is_blocked" invisible="1"/>
+                <field name="agile_block_reason_display" invisible="1"/>
+                <div class="alert alert-danger py-1 px-2 mb-0" role="status" invisible="not agile_is_blocked or agile_blocked">
+                    <strong>Blocked</strong>
+                    <span>: </span>
+                    <field name="agile_block_reason_display" nolabel="1"/>
+                </div>
+            </xpath>
+            <xpath expr="//sheet//div[hasclass('o_state_container')]" position="attributes">
+                <attribute name="invisible">agile_issue or not active or is_template or has_project_template</attribute>
+            </xpath>
+            <xpath expr="//sheet//div[hasclass('w-md-50', 'w-lg-25')]" position="attributes">
+                <attribute name="invisible">agile_issue or (active and not (is_template or has_project_template))</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Task kanban card: add issue key above the name -->
+    <record id="project_task_kanban_agile" model="ir.ui.view">
+        <field name="name">project.task.kanban.agile</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_scrum.view_task_kanban"/>
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="agile_project_enabled" invisible="1"/>
+                <field name="agile_issue" invisible="1"/>
+                <field name="issue_key" class="text-muted small" invisible="not agile_issue" readonly="1"/>
+            </field>
+            <xpath expr="//kanban" position="inside">
+                <field name="agile_is_blocked"/>
+                <field name="agile_block_reason_display"/>
+                <field name="agile_blocked_by_text"/>
+                <field name="agile_lock_text"/>
+                <field name="agile_task_type_id"/>
+                <field name="agile_task_type_color"/>
+                <field name="can_agile_mark_ready"/>
+                <field name="can_agile_start"/>
+                <field name="can_agile_send_review"/>
+                <field name="can_agile_return"/>
+                <field name="can_agile_complete"/>
+                <field name="can_agile_reopen"/>
+                <field name="can_agile_reorder_backlog"/>
+                <field name="agile_card_show_assignee"/>
+                <field name="agile_card_show_issue_type"/>
+                <field name="agile_card_show_priority"/>
+                <field name="agile_card_show_points"/>
+                <field name="agile_card_show_component"/>
+                <field name="agile_card_show_fix_version"/>
+                <field name="agile_card_show_tags"/>
+                <field name="agile_card_show_deadline"/>
+                <field name="agile_card_density"/>
+                <field name="agile_card_color"/>
+                <field name="agile_card_show_days"/>
+                <field name="agile_days_in_status"/>
+                <field name="agile_card_color_text"/>
+                <field name="agile_lane_assignee"/>
+                <field name="agile_lane_epic"/>
+                <field name="agile_lane_priority"/>
+                <field name="agile_lane_component"/>
+                <field name="agile_lane_label"/>
+                <field name="story_points_estimated"/>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='issue_key']" position="after">
+                <span t-if="record.agile_card_color_text.value" class="visually-hidden" t-out="record.agile_card_color_text.value"/>
+                <field name="agile_task_type_id" widget="badge" options="{'color_field': 'agile_task_type_color'}" class="mb-1" invisible="not agile_issue or not agile_card_show_issue_type"/>
+                <field name="agile_component_id" widget="badge" class="mb-1" invisible="not agile_issue or not agile_card_show_component"/>
+                <field name="version_id" string="Fix Version" widget="badge" class="mb-1" invisible="not agile_issue or not agile_card_show_fix_version"/>
+                <field name="story_points" invisible="1"/>
+                <span t-if="record.agile_issue.raw_value and record.agile_card_show_points.raw_value and record.story_points_estimated.raw_value"
+                      class="o_ag_card_points d-block mb-1"
+                      t-out="(record.story_points.raw_value % 1 === 0 ? record.story_points.raw_value : record.story_points.raw_value.toFixed(1)) + (record.story_points.raw_value === 1 ? ' pt' : ' pts')"/>
+                <span t-if="record.agile_issue.raw_value and record.agile_card_show_days.raw_value and record.agile_days_in_status.raw_value"
+                      class="o_ag_card_days d-block mb-1 text-muted small"
+                      t-out="record.agile_days_in_status.raw_value + (record.agile_days_in_status.raw_value === 1 ? ' day in this status' : ' days in this status')"/>
+                <field name="agile_vote_count" invisible="1"/>
+                <span t-if="record.agile_issue.raw_value and record.agile_vote_count.raw_value" class="o_ag_card_votes d-block mb-1 text-muted small"
+                      t-att-title="record.agile_vote_count.raw_value + (record.agile_vote_count.raw_value === 1 ? ' vote' : ' votes')">
+                    <i class="fa fa-thumbs-up" role="img" aria-label="Votes"/> <t t-out="record.agile_vote_count.raw_value"/>
+                </span>
+                <field name="agile_flagged" invisible="1"/>
+                <field name="agile_uses_resolution" invisible="1"/>
+                <field name="agile_flag_note" invisible="1"/>
+                <span t-if="record.agile_flagged.raw_value" class="o_ag_card_flagged d-block mb-1" role="status" t-att-title="record.agile_flag_note.value">
+                    <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1v12M2 2h9l-2 3 2 3H2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg> Flagged<t t-if="record.agile_flag_note.value">: <t t-out="record.agile_flag_note.value"/></t>
+                </span>
+                <field name="agile_resolution" invisible="1"/>
+                <span t-if="record.agile_resolution.raw_value" class="o_ag_card_resolution d-block mb-1" role="status">Resolution: <t t-out="record.agile_resolution.value"/></span>
+                <field name="agile_blocked" invisible="1"/>
+                <span t-if="record.agile_is_blocked.raw_value and (record.agile_blocked.raw_value or !record.agile_blocked_by_text.value)" class="o_ag_card_blocked d-block mb-1" role="status" t-att-title="record.agile_block_reason_display.value" t-att-aria-label="'Blocked: ' + record.agile_block_reason_display.value">
+                    <i class="fa fa-ban" aria-hidden="true"/> Blocked: <t t-esc="record.agile_block_reason_display.value"/>
+                </span>
+                <span t-if="record.agile_blocked_by_text.value" t-attf-class="o_ag_card_blocker d-block mb-1 #{record.agile_is_blocked.raw_value and !record.agile_blocked.raw_value ? 'o_ag_card_blocked' : ''}" t-att-title="'Waiting for ' + record.agile_blocked_by_text.value">
+                    Blocked by <t t-out="record.agile_blocked_by_text.value"/>
+                </span>
+                <span t-if="record.agile_lock_text.value" class="o_ag_card_lock d-block mb-1 small">
+                    <i class="fa fa-lock" aria-hidden="true"/> <t t-out="record.agile_lock_text.value"/>
+                </span>
+            </xpath>
+            <!-- Scrum adds its own estimate to the card; the key line already shows it once. -->
+            <xpath expr="//t[@t-name='card']//field[@name='story_points_estimated']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='sprint_id']/following-sibling::field[@name='story_points']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//footer/div[last()]/field[@name='state']" position="before">
+                <div class="o_agile_task_actions" role="group" aria-label="Issue actions">
+                    <field name="agile_step_reasons" widget="agile_step_reasons"/>
+                    <button name="action_agile_mark_ready" type="object" title="Move issue to To Do" string="To Do" class="btn btn-sm btn-primary" invisible="not can_agile_mark_ready"/>
+                    <button name="action_agile_start" type="object" title="Start work on this issue" string="Start" class="btn btn-sm btn-primary" invisible="not can_agile_start"/>
+                    <button name="action_agile_send_review" type="object" title="Send issue for review" string="Review" class="btn btn-sm btn-primary" invisible="not can_agile_send_review"/>
+                    <button name="action_agile_return" type="object" title="Return issue to work" string="Return" class="btn btn-sm btn-secondary" invisible="not can_agile_return"/>
+                    <button name="action_agile_complete" type="object" title="Complete this issue" string="Complete" class="btn btn-sm btn-primary" invisible="not can_agile_complete or agile_uses_resolution"/>
+                    <button name="action_agile_pick_resolution" type="object" context="{'agile_close': 'done'}" title="Complete this issue" string="Complete" class="btn btn-sm btn-primary" invisible="not can_agile_complete or not agile_uses_resolution"/>
+                    <button name="action_agile_reopen" type="object" title="Reopen this issue" string="Reopen" class="btn btn-sm btn-primary" invisible="not can_agile_reopen"/>
+                    <field name="agile_custom_moves" widget="agile_custom_moves"/>
+                    <a href="#" role="button" class="o_ag_move_to btn btn-sm btn-link d-md-none" aria-haspopup="dialog" invisible="not can_agile_move_to">Move to…</a>
+                </div>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//footer/div[last()]/field[@name='state']" position="attributes">
+                <attribute name="invisible">agile_issue</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/main" position="attributes">
+                <attribute name="t-att-data-agile-density">record.agile_card_density.raw_value</attribute>
+                <attribute name="t-att-data-agile-color">record.agile_card_color.raw_value or null</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='priority']" position="attributes">
+                <attribute name="invisible">agile_issue and not agile_card_show_priority</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='user_ids']" position="attributes">
+                <attribute name="invisible">agile_issue and not agile_card_show_assignee</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='tag_ids']" position="attributes">
+                <attribute name="invisible">agile_issue and not agile_card_show_tags</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']//field[@name='date_deadline']" position="attributes">
+                <attribute name="invisible">(state in ['1_done', '1_canceled']) or (agile_issue and not agile_card_show_deadline)</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- Compact form shown in the board's side drawer; the full form stays one click away. -->
+    <record id="view_project_task_form_agile_drawer" model="ir.ui.view">
+        <field name="name">project.task.form.agile.drawer</field>
+        <field name="model">project.task</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Issue" class="o_agile_drawer_form" duplicate="0" delete="0">
+                <header>
+                    <field name="can_agile_mark_ready" invisible="1"/>
+                    <field name="can_agile_start" invisible="1"/>
+                    <field name="can_agile_send_review" invisible="1"/>
+                    <field name="can_agile_return" invisible="1"/>
+                    <field name="can_agile_complete" invisible="1"/>
+                    <field name="can_agile_reopen" invisible="1"/>
+                    <field name="can_agile_cancel" invisible="1"/>
+                    <field name="can_agile_update_block" invisible="1"/>
+                    <field name="can_agile_plan_roadmap" invisible="1"/>
+                    <field name="can_agile_clone" invisible="1"/>
+                    <field name="can_agile_flag" invisible="1"/>
+                    <field name="agile_flagged" invisible="1"/>
+                    <field name="agile_uses_resolution" invisible="1"/>
+                    <field name="agile_missing_fields" invisible="1"/>
+                    <field name="agile_transition_hint" widget="agile_transition_hint" nolabel="1" class="d-block" invisible="not agile_transition_hint"/>
+                    <field name="agile_step_reasons" widget="agile_step_reasons" nolabel="1" invisible="not agile_transition_hint"/>
+                    <button name="action_agile_mark_ready" type="object" string="Move to To Do" class="oe_highlight" invisible="not can_agile_mark_ready"/>
+                    <button name="action_agile_start" type="object" string="Start" class="oe_highlight" invisible="not can_agile_start"/>
+                    <button name="action_agile_send_review" type="object" string="Send to Review" class="oe_highlight" invisible="not can_agile_send_review"/>
+                    <button name="action_agile_return" type="object" string="Return to Work" invisible="not can_agile_return"/>
+                    <button name="action_agile_complete" type="object" string="Complete" class="oe_highlight" invisible="not can_agile_complete or agile_uses_resolution"/>
+                    <button name="action_agile_pick_resolution" type="object" context="{'agile_close': 'done'}" string="Complete" class="oe_highlight" invisible="not can_agile_complete or not agile_uses_resolution"/>
+                    <button name="action_agile_reopen" type="object" string="Reopen" class="oe_highlight" invisible="not can_agile_reopen"/>
+                    <field name="agile_custom_moves" widget="agile_custom_moves" nolabel="1" invisible="not agile_custom_moves"/>
+                    <button name="action_agile_cancel" type="object" string="Cancel Issue" invisible="not can_agile_cancel or agile_uses_resolution" confirm="Cancel this issue?"/>
+                    <button name="action_agile_pick_resolution" type="object" context="{'agile_close': 'canceled'}" string="Cancel Issue" invisible="not can_agile_cancel or not agile_uses_resolution"/>
+                    <field name="agile_can_assign_me" invisible="1"/>
+                    <button name="action_agile_assign_to_me" type="object" string="Assign to me" invisible="not agile_can_assign_me"/>
+                    <button name="action_agile_open_clone" type="object" string="Clone" invisible="not can_agile_clone"/>
+                    <button name="action_agile_toggle_flag" type="object" string="Flag" invisible="not agile_issue or agile_flagged or not can_agile_flag"/>
+                    <button name="action_agile_toggle_flag" type="object" string="Remove flag" invisible="not agile_flagged or not can_agile_flag"/>
+                    <field name="stage_id" widget="statusbar" readonly="1"/>
+                </header>
+                <sheet>
+                    <field name="agile_project_enabled" invisible="1"/>
+                    <field name="agile_use_scrum" invisible="1"/>
+                    <field name="agile_issue" invisible="1"/>
+                    <field name="agile_is_epic" invisible="1"/>
+                    <field name="project_id" invisible="1"/>
+                    <field name="story_points_estimated" invisible="1"/>
+                    <field name="issue_key" class="text-primary fw-bold mb-1" readonly="1" invisible="not agile_issue"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Issue title" class="text-break"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="agile_task_type_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="user_ids" widget="many2many_avatar_user" string="Assignee"/>
+                            <field name="sprint_id" options="{'no_create': True, 'no_create_edit': True}" invisible="not agile_use_scrum"/>
+                            <field name="parent_id" string="Epic" options="{'no_create': True, 'no_create_edit': True}" invisible="agile_is_epic"/>
+                        </group>
+                        <group>
+                            <field name="story_points" string="Points" widget="agile_points" placeholder="Not estimated"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="date_deadline" string="Due date"/>
+                            <field name="agile_component_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="version_id" string="Fix Version" domain="[('project_id', '=', project_id)]" options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description" placeholder="Describe the issue" class="o_agile_drawer_description"/>
+                    <group string="Time tracking" invisible="not agile_issue or agile_is_epic">
+                        <group>
+                            <field name="allocated_hours" string="Original estimate" widget="float_time"/>
+                            <field name="agile_remaining_hours" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="agile_logged_hours" widget="float_time"/>
+                            <field name="agile_log_time_available" invisible="1"/>
+                            <button name="action_agile_log_time" type="object" string="Log work" class="btn-secondary"
+                                    invisible="not agile_log_time_available"/>
+                            <field name="agile_time_progress" widget="percentage" invisible="not allocated_hours"/>
+                        </group>
+                    </group>
+                    <group invisible="not agile_uses_resolution or not agile_resolution">
+                        <field name="agile_resolution" readonly="not can_agile_update_block"/>
+                    </group>
+                    <group invisible="not agile_flagged">
+                        <field name="agile_flag_note" string="Flagged" placeholder="Add a note: why does this need a look?" readonly="not can_agile_update_block"/>
+                    </group>
+                    <group invisible="not agile_issue">
+                        <field name="agile_blocked" readonly="not can_agile_update_block"/>
+                        <field name="agile_block_reason" invisible="not agile_blocked" required="agile_blocked" readonly="not can_agile_update_block"/>
+                    </group>
+                    <notebook>
+                        <page name="acceptance" string="Acceptance" invisible="not agile_issue">
+                            <field name="agile_acceptance_criteria" placeholder="What must be true for this issue to be accepted?"/>
+                            <field name="agile_checklist_item_ids" nolabel="1">
+                                <list editable="bottom" default_order="sequence, id">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Checklist item"/>
+                                    <field name="is_done" string="Done" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="agile_issue_links" string="Issue links" invisible="not agile_issue">
+                            <field name="agile_related_issue_ids" widget="agile_links" nolabel="1"/>
+                        </page>
+                        <page name="children" string="Child issues" invisible="not agile_issue">
+                            <field name="child_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="issue_key"/>
+                                    <field name="name"/>
+                                    <field name="stage_id"/>
+                                    <field name="story_points" string="Points" widget="agile_points" placeholder="Not estimated"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Task list view: add issue key and type columns after the name -->
+    <record id="project_task_list_agile" model="ir.ui.view">
+        <field name="name">project.task.list.agile</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_task_view_tree_base"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="issue_key" class="text-muted small" readonly="1"/>
+                <field name="agile_task_type_id" widget="badge" options="{'color_field': 'agile_task_type_color'}" optional="show"/>
+                <field name="agile_component_id" optional="show"/>
+                <field name="version_id" string="Fix Version" optional="show"/>
+                <field name="agile_task_type_color" column_invisible="True"/>
+                <field name="agile_is_blocked" string="Blocked" widget="boolean" optional="hide" decoration-danger="agile_is_blocked"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="project_task_kanban_agile_backlog_order" model="ir.ui.view">
+        <field name="name">project.task.kanban.agile.backlog.order</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_task_kanban_agile"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">sequence, id</attribute>
+                <attribute name="js_class">agile_board_kanban</attribute>
+                <attribute name="class" add="o_agile_kanban" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_task_list_agile_backlog_order" model="ir.ui.view">
+        <field name="name">project.task.list.agile.backlog.order</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_task_list_agile"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">sequence, id</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

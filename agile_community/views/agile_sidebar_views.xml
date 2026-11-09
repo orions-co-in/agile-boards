@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- N-103: a project card opens the Agile Summary for team members. -->
+    <record id="view_project_kanban_agile_landing" model="ir.ui.view">
+        <field name="name">project.project.kanban.agile.landing</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="action">agile_open_landing</attribute>
+            </xpath>
+            <!-- Agile projects wear a badge and a stripe so they stand out in the list. -->
+            <xpath expr="//kanban" position="inside">
+                <field name="agile_enabled"/>
+                <field name="agile_method"/>
+            </xpath>
+            <xpath expr="//span[@t-att-title='record.display_name.value']" position="after">
+                <span t-if="record.agile_enabled.raw_value" class="o_ag_card_badge badge rounded-pill ms-1"
+                      title="This project uses Agile">
+                    <t t-if="record.agile_method.raw_value == 'scrum'">Scrum</t>
+                    <t t-else="">Kanban</t>
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ask for Agile when the project is created, so nobody has to find the setting afterwards. -->
+    <record id="project_project_view_form_simplified_agile" model="ir.ui.view">
+        <field name="name">project.project.view.form.simplified.agile</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='alias_def']" position="before">
+                <group name="agile_create" groups="project.group_project_manager">
+                    <field name="agile_enabled" string="Use Agile"
+                           help="Sprints, a backlog, a board and reports. You can switch it on later in the project's Settings."/>
+                    <field name="agile_method" widget="radio" options="{'horizontal': true}" invisible="not agile_enabled"/>
+                    <field name="agile_key" invisible="not agile_enabled" required="agile_enabled" placeholder="e.g. ORI"
+                           help="Issue keys start with this prefix, for example ORI-12. It cannot be changed after the first issue is created."/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- A new Agile project opens on its Summary; other projects open the task list as before. -->
+    <record id="project_project_view_form_simplified_footer_agile" model="ir.ui.view">
+        <field name="name">project.project.view.form.simplified.footer.agile</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified_footer"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_tasks']" position="attributes">
+                <attribute name="name">agile_open_landing</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

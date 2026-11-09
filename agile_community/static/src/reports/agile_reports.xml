@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Reports">
+        <Layout display="display" className="'o_ag_reports'">
+            <div class="o_ag_reports_body">
+
+                <main class="o_ag_reports_main">
+                    <div class="o_ag_reports_switch">
+                        <label class="o_ag_reports_control">
+                            <span>Report</span>
+                            <select class="form-select o_ag_reports_select" aria-label="Switch report" t-on-change="onSwitch">
+                                <optgroup t-foreach="pickerGroups" t-as="group" t-key="group.name" t-att-label="group.name">
+                                    <option t-foreach="group.reports" t-as="report" t-key="report.code" t-att-value="report.code"
+                                            t-att-selected="state.report === report.code" t-out="report.label"/>
+                                </optgroup>
+                            </select>
+                        </label>
+                    </div>
+                    <AgileCfd t-if="state.report === 'cfd' and state.meta" projectId="projectId" onOpen.bind="drill"/>
+                    <AgileControlChart t-elif="state.report === 'control' and state.meta" projectId="projectId"/>
+                    <AgileDeploys t-elif="state.report === 'deploys' and state.meta" projectId="projectId"/>
+                    <AgileBurnup t-elif="state.report === 'burnup' and state.meta" t-key="state.sprintId"
+                                 projectId="projectId" sprints="state.meta.sprints.filter((s) => s.state !== 'draft')"
+                                 initialSprintId="state.sprintId"/>
+                    <AgileBurndown t-elif="(state.report === 'epic' or state.report === 'release') and state.meta"
+                                   t-key="state.report" projectId="projectId" kind="state.report" onOpen.bind="drill" initialTargetId="initialTargetId"
+                                   targets="state.report === 'epic' ? state.meta.epics : state.meta.releases"/>
+                    <t t-elif="state.error">
+                        <div class="alert alert-danger" role="alert">
+                            <p class="mb-2" t-out="state.error"/>
+                            <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                        </div>
+                    </t>
+                    <t t-elif="state.loading and !state.data">
+                        <p class="o_ag_reports_loading text-muted" role="status">Loading the report...</p>
+                    </t>
+                    <t t-elif="!state.sprintId">
+                        <p class="o_ag_reports_empty">Close a sprint to see its report. The current sprint shows its progress so far.</p>
+                    </t>
+                    <t t-else="">
+                        <header class="o_ag_reports_head">
+                            <h1 class="o_ag_reports_title" t-out="question"/>
+                            <label class="o_ag_reports_control">
+                                <span>Sprint</span>
+                                <select class="form-select" t-on-change="onSprint">
+                                    <option t-foreach="state.meta.sprints" t-as="item" t-key="item.id" t-att-value="item.id"
+                                            t-att-selected="item.id === state.sprintId">
+                                        <t t-out="item.name"/>
+                                        <t t-if="item.state === 'in_progress'"> (active)</t>
+                                        <t t-elif="item.state === 'draft'"> (planned)</t>
+                                    </option>
+                                </select>
+                            </label>
+                            <ReportExport t-if="state.data" title="exportTitle" table.bind="exportTable" png.bind="exportPng"/>
+                        </header>
+                        <t t-if="state.data">
+                            <p class="o_ag_reports_dates text-muted">
+                                <t t-out="state.data.sprint.date_start"/> to <t t-out="state.data.sprint.date_end"/>
+                                <t t-if="state.data.sprint.goal"> · <t t-out="state.data.sprint.goal"/></t>
+                            </p>
+                            <p class="o_ag_reports_delivered" t-out="delivered"/>
+                            <div t-if="!notStarted" class="o_ag_reports_bars" role="img" t-att-aria-label="delivered">
+                                <div class="o_ag_reports_bar_row"><span>Planned</span>
+                                    <i class="o_ag_reports_bar o_ag_reports_bar_planned" t-attf-style="width: {{barWidths.planned}}%"/>
+                                    <span class="o_ag_reports_bar_points"><b t-out="state.data.delivered.planned_points"/> <t t-out="unitShort(state.data.estimate_unit)"/></span></div>
+                                <div class="o_ag_reports_bar_row"><span>Delivered</span>
+                                    <i class="o_ag_reports_bar o_ag_reports_bar_done" t-attf-style="width: {{barWidths.delivered}}%"/>
+                                    <span class="o_ag_reports_bar_points"><b t-out="state.data.delivered.completed_points"/> <t t-out="unitShort(state.data.estimate_unit)"/></span></div>
+                            </div>
+                            <p t-if="state.data.no_plan" class="o_ag_reports_empty">This sprint has no plan history yet, so there is nothing to compare.</p>
+                            <section t-if="state.data.previous_actions.actions.length" class="o_ag_reports_retro o_ag_reports_previous" aria-label="Open actions from the last retrospective">
+                                <h3>Open actions from <t t-out="state.data.previous_actions.sprint.name"/></h3>
+                                <ul class="o_ag_reports_actions">
+                                    <li t-foreach="state.data.previous_actions.actions" t-as="item" t-key="item.id">
+                                        <a href="#" t-on-click.prevent="() => this.openIssue(item)"><b t-out="item.key"/> <t t-out="item.name"/></a>
+                                        <span class="text-muted" t-out="item.status"/>
+                                    </li>
+                                </ul>
+                            </section>
+                            <section t-if="state.data.sprint.state !== 'draft'" class="o_ag_reports_retro" aria-label="Retrospective notes">
+                                <h3>Retrospective notes</h3>
+                                <p t-if="state.data.sprint.retro_notes" class="o_ag_reports_retro_text" t-out="state.data.sprint.retro_notes"/>
+                                <p t-else="" class="text-muted">No retrospective notes yet. A project manager can add them on the sprint.</p>
+                                <h4>Actions</h4>
+                                <ul t-if="state.data.retro_actions.length" class="o_ag_reports_actions">
+                                    <li t-foreach="state.data.retro_actions" t-as="item" t-key="item.id">
+                                        <a href="#" t-on-click.prevent="() => this.openIssue(item)"><b t-out="item.key"/> <t t-out="item.name"/></a>
+                                        <span class="text-muted" t-out="item.status"/>
+                                    </li>
+                                </ul>
+                                <p t-else="" class="text-muted">No actions yet.</p>
+                                <form t-if="state.data.can_manage" class="o_ag_reports_action_form" t-on-submit="addRetroAction">
+                                    <input type="text" class="form-control" placeholder="What will the team do?" aria-label="New retrospective action" t-model="state.actionName"/>
+                                    <button type="submit" class="btn btn-secondary">Add action</button>
+                                </form>
+                            </section>
+                            <div class="o_ag_reports_tiles">
+                                <button t-foreach="tiles" t-as="tile" t-key="tile.code" type="button" class="o_ag_reports_tile"
+                                        t-att-data-group="tile.code"
+                                        t-att-aria-label="'Open the ' + state.data.groups[tile.code].count + ' issues: ' + tile.label"
+                                        t-on-click="() => this.openGroup(tile.code)">
+                                    <span class="o_ag_reports_tile_count" t-out="state.data.groups[tile.code].count"/>
+                                    <span class="o_ag_reports_tile_label"
+                                          t-out="(tile.code === 'carried' and state.data.so_far) ? tile.openLabel : tile.label"/>
+                                    <span class="o_ag_reports_tile_points" t-out="groupText(tile.code)"/>
+                                </button>
+                            </div>
+                            <section t-foreach="tiles" t-as="tile" t-key="tile.code" class="o_ag_reports_list" t-att-data-group="tile.code">
+                                <h3 t-out="(tile.code === 'carried' and state.data.so_far) ? tile.openLabel : tile.label"/>
+                                <p t-if="!state.data.groups[tile.code].issues.length" class="text-muted">
+                                    <t t-if="state.data.groups[tile.code].hidden">None you can see.</t>
+                                    <t t-else="">None.</t>
+                                </p>
+                                <table t-else="" class="table table-sm o_ag_reports_table">
+                                    <thead><tr><th>Key</th><th>Title</th><th>Status</th><th class="text-end">Estimate</th><th t-att-aria-hidden="tile.code === 'carried' ? null : 'true'"><t t-if="tile.code === 'carried'">Now in</t></th></tr></thead>
+                                    <tbody>
+                                        <tr t-foreach="state.data.groups[tile.code].issues" t-as="issue" t-key="issue.id">
+                                            <td><a href="#" t-on-click.prevent="() => this.openIssue(issue)" t-out="issue.key"/></td>
+                                            <td t-out="issue.name"/>
+                                            <td t-out="issue.status"/>
+                                            <td class="text-end" t-out="issue.points"/>
+                                            <td t-att-aria-hidden="tile.code === 'carried' ? null : 'true'"><t t-if="tile.code === 'carried'" t-out="issue.where"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </section>
+                        </t>
+                    </t>
+                </main>
+            </div>
+        </Layout>
+    </t>
+</templates>

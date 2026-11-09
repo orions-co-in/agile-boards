@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.CustomMoves">
+        <t t-foreach="moves" t-as="move" t-key="move.id">
+            <button type="button" class="btn btn-sm btn-primary o_ag_custom_move me-1"
+                    t-on-click.stop="() => this.take(move)" t-out="move.name"/>
+        </t>
+    </t>
+</templates>

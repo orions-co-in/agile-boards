@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.ControlChart">
+        <header class="o_ag_reports_head">
+            <h1 class="o_ag_reports_title">How long does an issue take?</h1>
+            <div class="o_ag_reports_controls">
+                <label class="o_ag_reports_control"><span>From</span>
+                    <input type="date" class="form-control" t-att-value="state.from" t-on-change="(ev) => this.onDate('from', ev)"/></label>
+                <label class="o_ag_reports_control"><span>To</span>
+                    <input type="date" class="form-control" t-att-value="state.to" t-on-change="(ev) => this.onDate('to', ev)"/></label>
+                <ReportExport t-if="state.data and state.data.issues.length" title="exportTitle" table.bind="exportTable" png.bind="exportPng"/>
+            </div>
+        </header>
+        <div t-if="state.error" class="alert alert-danger" role="alert">
+            <p class="mb-2" t-out="state.error"/>
+            <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+        </div>
+        <p t-elif="state.data and !state.data.issues.length" class="o_ag_reports_empty">
+            No issue was started and finished between these dates. Cycle time runs from the first time an issue enters In Progress to the first time it enters Done.
+        </p>
+        <t t-elif="state.data and layout">
+            <p class="o_ag_reports_delivered" t-out="summary"/>
+            <p t-if="state.data.hidden" class="text-muted">
+                <t t-out="state.data.hidden"/> more finished, but you cannot see them.
+            </p>
+            <div t-ref="chartBox" t-attf-class="o_ag_cfd {{state.loading ? 'o_ag_cfd_loading' : ''}}">
+                <svg class="o_ag_cfd_chart" t-attf-viewBox="0 0 {{layout.chart.w}} {{layout.chart.h}}" role="img"
+                     aria-label="Control chart: days each finished issue took, with the rolling average. The numbers table has the same figures."
+                     t-on-mousemove="onMove" t-on-mouseleave="onLeave">
+                    <g class="o_ag_cfd_axis">
+                        <text class="o_ag_axis_title" t-att-x="layout.chart.left + (layout.chart.w - layout.chart.left - layout.chart.right) / 2" t-att-y="layout.chart.h - 3" text-anchor="middle">Date finished</text>
+                        <text class="o_ag_axis_title" transform="rotate(-90)" t-att-x="-(layout.chart.top + (layout.chart.h - layout.chart.top - layout.chart.bottom) / 2)" y="10" text-anchor="middle" t-out="'Days to finish'"/>
+                        <line t-att-x1="layout.chart.left" t-att-x2="layout.chart.w - layout.chart.right" t-att-y1="layout.y(0)" t-att-y2="layout.y(0)"/>
+                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(layout.top) + 4" text-anchor="end" t-out="layout.top"/>
+                        <text t-att-x="layout.chart.left - 6" t-att-y="layout.y(0)" text-anchor="end">0</text>
+                        <text t-att-x="layout.chart.left" t-att-y="layout.chart.h - 20" t-out="state.data.from"/>
+                        <text t-att-x="layout.chart.w - layout.chart.right" t-att-y="layout.chart.h - 20" text-anchor="end" t-out="state.data.to"/>
+                    </g>
+                    <line class="o_ag_control_average" t-att-x1="layout.chart.left" t-att-x2="layout.chart.w - layout.chart.right"
+                          t-att-y1="layout.averageY" t-att-y2="layout.averageY"/>
+                    <polyline class="o_ag_burndown_remaining" t-att-points="layout.rollingLine" fill="none"/>
+                    <g class="o_ag_burndown_dots">
+                        <circle t-foreach="layout.dots" t-as="dot" t-key="dot_index" r="4"
+                                t-att-cx="dot.cx" t-att-cy="dot.cy" t-att-class="dot_index === state.hover ? 'o_ag_control_hot' : ''"/>
+                    </g>
+                </svg>
+                <ul class="o_ag_cfd_key">
+                    <li><i class="o_ag_cfd_swatch o_ag_burndown_swatch_remaining"/><span>Average of the last <t t-out="state.data.window"/></span></li>
+                    <li><i class="o_ag_cfd_swatch o_ag_burndown_swatch_scope"/><span>Average of all</span></li>
+                </ul>
+                <p class="o_ag_cfd_readout" aria-live="polite">
+                    <t t-if="hoverIssue"><strong t-out="hoverIssue.key"/> <t t-out="hoverIssue.name"/>: <t t-out="hoverIssue.days"/> days, finished <t t-out="hoverIssue.date"/>.</t>
+                    <t t-else="">Point at a dot for the issue and its days.</t>
+                </p>
+            </div>
+            <button type="button" class="btn btn-link o_ag_cfd_toggle" t-att-aria-expanded="state.table ? 'true' : 'false'" t-on-click="toggleTable">
+                <t t-if="state.table">Hide the numbers</t><t t-else="">Show the numbers</t>
+            </button>
+            <div t-if="state.table" class="o_ag_cfd_table_wrap">
+                <table class="table table-sm o_ag_reports_table">
+                    <thead><tr><th>Key</th><th>Title</th><th>Finished</th><th class="text-end">Days</th><th class="text-end">Average of the last <t t-out="state.data.window"/></th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="state.data.issues" t-as="issue" t-key="issue_index">
+                            <td t-out="issue.key"/>
+                            <td t-out="issue.name"/>
+                            <td t-out="issue.date"/>
+                            <td class="text-end" t-out="issue.days"/>
+                            <td class="text-end" t-out="issue.rolling"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+        <p t-else="" class="text-muted" role="status">Loading the report...</p>
+    </t>
+</templates>

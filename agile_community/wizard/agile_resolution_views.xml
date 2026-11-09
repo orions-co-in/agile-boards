@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_resolution_wizard_form" model="ir.ui.view">
+        <field name="name">agile.community.resolution.wizard.form</field>
+        <field name="model">agile_community.resolution_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resolution">
+                <field name="task_id" invisible="1"/>
+                <field name="kind" invisible="1"/>
+                <group>
+                    <field name="resolution" widget="radio"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Complete issue" class="btn-primary" invisible="kind != 'done'" data-hotkey="q"/>
+                    <button name="action_confirm" type="object" string="Cancel issue" class="btn-primary" invisible="kind != 'canceled'" data-hotkey="q"/>
+                    <button string="Keep open" special="cancel" class="btn-secondary" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

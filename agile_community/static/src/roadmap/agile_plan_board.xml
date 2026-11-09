@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.PlanBoard">
+        <section class="o_ag_pb" aria-label="Program board" t-ref="root">
+            <div t-if="state.error" class="alert alert-danger" role="alert" t-out="state.error"/>
+            <t t-elif="state.data">
+                <div class="o_ag_pb_bar">
+                    <strong t-out="state.data.name"/>
+                    <button type="button" class="btn btn-secondary o_ag_pb_prev" t-att-disabled="state.offset === 0" t-on-click="() => this.page(-1)">Earlier sprints</button>
+                    <button type="button" class="btn btn-secondary o_ag_pb_next" t-att-disabled="state.offset >= maxOffset" t-on-click="() => this.page(1)">Later sprints</button>
+                    <span class="text-muted" t-out="'Sprints ' + (state.offset + 1) + ' to ' + (state.offset + state.data.columns)"/>
+                    <label t-if="ui.isSmall and state.data.teams.length > 1" class="o_ag_pb_team_pick">Team
+                        <select class="form-select" t-on-change="(ev) => this.state.team = Number(ev.target.value)">
+                            <option t-foreach="state.data.teams" t-as="team" t-key="team.id" t-att-value="team_index" t-att-selected="state.team === team_index" t-out="team.name"/>
+                        </select></label>
+                </div>
+                <p class="text-muted o_ag_pb_hint">Moving a card changes this scenario only. Drag it to another sprint of its team, or select it and press Alt+Left or Alt+Right.</p>
+                <p t-if="state.notice" class="o_ag_pb_notice" role="status" aria-live="polite" t-out="state.notice"/>
+                <p t-if="state.data.more_teams" class="text-muted" t-out="'Showing the first 12 teams. ' + state.data.more_teams + ' more are not shown; narrow the view by project.'"/>
+                <div class="o_ag_pb_scroll">
+                    <div class="o_ag_pb_grid" role="grid" aria-label="Program board">
+                        <svg class="o_ag_pb_lines" aria-hidden="true">
+                            <defs><marker id="o_ag_pb_arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 8 4 L 0 8 z"/></marker></defs>
+                            <path t-foreach="state.lines" t-as="line" t-key="line_index" t-att-d="line.d" t-attf-class="o_ag_pb_line {{line.late ? 'late' : ''}}" marker-end="url(#o_ag_pb_arrow)"/>
+                        </svg>
+                        <t t-foreach="teams" t-as="team" t-key="team.id">
+                            <div class="o_ag_pb_team" role="row" t-att-data-team="team.id">
+                                <div class="o_ag_pb_team_name" role="rowheader" t-out="team.name"/>
+                                <p t-if="!team.sprint_count" class="o_ag_pb_nosprint text-muted">This project has no open sprints with dates.</p>
+                                <div t-else="" class="o_ag_pb_cells">
+                                    <div t-foreach="team.cells" t-as="cell" t-key="cell_index" role="gridcell"
+                                         t-attf-class="o_ag_pb_cell {{cell and cell.over ? 'over' : ''}} {{!cell ? 'empty' : ''}}"
+                                         t-attf-style="grid-column: {{cell_index + 1}}"
+                                         t-on-dragover="(ev) => this.onDragOver(team, cell, ev)" t-on-drop="(ev) => this.onDrop(team, cell, ev)">
+                                        <div class="o_ag_pb_cellhead">
+                                            <strong t-out="cell ? cell.name : ''"/>
+                                            <span t-if="cell" class="o_ag_pb_celldates text-muted" t-out="planDate(cell.start) + ' to ' + planDate(cell.end)"/>
+                                            <span class="o_ag_pb_celltext" t-out="cellText(cell)"/>
+                                        </div>
+                                    </div>
+                                    <t t-foreach="team.cards" t-as="card" t-key="card.epic_id">
+                                        <div t-attf-class="o_ag_pb_card {{card.late ? 'late' : ''}} {{card.continues ? 'continues' : ''}}" t-att-data-epic="card.epic_id"
+                                             t-attf-style="grid-column: {{card.col + 1}} / span {{card.span}}; grid-row: {{card_index + 2}}"
+                                             tabindex="0" role="gridcell" t-att-aria-label="cardLabel(card)" t-att-draggable="card.can_move ? 'true' : 'false'"
+                                             t-on-dragstart="(ev) => this.onDragStart(card, ev)" t-on-keydown="(ev) => this.onCardKeydown(team, card, ev)">
+                                            <strong t-out="card.key"/> <span t-out="card.name"/>
+                                            <span class="o_ag_pb_cardmeta text-muted" t-out="planDate(card.start) + ' to ' + planDate(card.end) + (card.points ? ', ' + card.points + ' points to plan' : '')"/>
+                                            <span t-if="card.blocked_by.length" class="o_ag_pb_blocked text-muted" t-out="'Blocked by ' + blockedText(card)"/>
+                                            <span t-if="card.late" class="badge text-bg-danger">Starts before a blocker ends</span>
+                                            <label t-if="card.can_move" class="o_ag_pb_move"><span class="visually-hidden">Move <t t-out="card.key"/> to sprint</span>
+                                                <select class="form-select form-select-sm o_ag_pb_move_select" t-on-change="(ev) => this.onMoveSelect(card, ev)">
+                                                    <option value="">Move to sprint...</option>
+                                                    <option t-foreach="sprintOptions(team)" t-as="opt" t-key="opt.ordinal" t-att-value="opt.ordinal" t-out="opt.name"/>
+                                                </select></label>
+                                        </div>
+                                    </t>
+                                </div>
+                                <p t-if="team.before or team.after" class="o_ag_pb_off text-muted"
+                                   t-out="(team.before ? team.before + ' epics end before these sprints. ' : '') + (team.after ? team.after + ' epics start after them.' : '')"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </section>
+    </t>
+</templates>

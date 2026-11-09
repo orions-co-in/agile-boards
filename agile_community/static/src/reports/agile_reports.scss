@@ -1,0 +1,456 @@
+.o_ag_reports {
+    background: var(--ag-paper);
+}
+
+.o_ag_reports_body {
+    display: block;
+    padding: var(--ag-space-4);
+    max-inline-size: 80rem;
+    margin-inline: auto; // centred on wide screens instead of hugging the left edge
+}
+
+.o_ag_reports_picker {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--ag-space-1);
+}
+
+.o_ag_reports_group {
+    margin: 0 0 var(--ag-space-1);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ag-muted);
+}
+
+.o_ag_reports_pick {
+    min-block-size: var(--ag-target);
+    padding: 0 var(--ag-space-3);
+    text-align: start;
+    background: transparent;
+    border: 0;
+    border-inline-start: 3px solid transparent;
+    color: var(--ag-ink);
+
+    &.active {
+        border-inline-start-color: var(--ag-plum);
+        font-weight: 600;
+        background: var(--ag-surface);
+    }
+}
+
+.o_ag_reports_more {
+    align-self: flex-start;
+    padding-inline: var(--ag-space-3);
+}
+
+.o_ag_reports_main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ag-space-3);
+    min-inline-size: 0;
+}
+
+.o_ag_reports_head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--ag-space-3);
+}
+
+.o_ag_reports_title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ag-ink);
+}
+
+.o_ag_reports_control {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.85rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_reports_dates {
+    margin: 0;
+}
+
+.o_ag_reports_delivered {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ag-ink);
+}
+
+.o_ag_reports_bars {
+    display: grid;
+    gap: var(--ag-space-1);
+    max-inline-size: 36rem;
+}
+
+.o_ag_reports_bar_row {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr 4.5rem;
+    align-items: center;
+    gap: var(--ag-space-2);
+    font-size: 0.85rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_reports_bar {
+    display: block;
+    block-size: 0.75rem;
+    border-radius: 2px;
+    min-inline-size: 2px;
+}
+
+.o_ag_reports_bar_planned {
+    background: var(--ag-s-backlog);
+}
+
+.o_ag_reports_bar_done {
+    background: var(--ag-s-done);
+}
+
+.o_ag_reports_tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--ag-space-3);
+}
+
+.o_ag_reports_tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: var(--ag-space-3);
+    text-align: start;
+    color: var(--ag-ink);
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+
+    &:hover {
+        border-color: var(--ag-plum);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ag-focus);
+        outline-offset: 2px;
+    }
+}
+
+.o_ag_reports_tile_count {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.o_ag_reports_tile_label {
+    font-weight: 600;
+}
+
+.o_ag_reports_tile_points {
+    font-size: 0.85rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_reports_list h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ag-ink);
+}
+
+.o_ag_reports_empty {
+    padding: var(--ag-space-3);
+    color: var(--ag-muted);
+}
+
+// Every list under a report uses the same column widths, so Key, Status and Points line up
+// from one table to the next (the "Now in" column only exists in some).
+@media (min-width: 576px) {
+    .o_ag_reports_table {
+        table-layout: fixed;
+        inline-size: 100%;
+
+        th:nth-child(1) { inline-size: 14%; }
+        th:nth-child(3) { inline-size: 16%; }
+        th:nth-child(4) { inline-size: 10%; }
+        th:nth-child(5) { inline-size: 14%; }
+    }
+}
+
+@media (max-width: 991.98px) {
+    .o_ag_reports_body {
+        grid-template-columns: 1fr;
+    }
+
+    // The report list becomes one row of tabs you swipe, so the report starts on the first screen
+    // instead of below a 340 px menu. The group names stay for screen readers.
+    .o_ag_reports_picker {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--ag-space-2);
+        overflow-x: auto;
+        padding-block-end: var(--ag-space-1);
+    }
+
+    .o_ag_reports_group {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .o_ag_reports_pick,
+    .o_ag_reports_more {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        border-inline-start: 0;
+        border-block-end: 3px solid transparent;
+
+        &.active {
+            border-block-end-color: var(--ag-plum);
+        }
+    }
+}
+
+// On a phone the table scrolls sideways rather than squeezing its columns.
+@media (max-width: 575.98px) {
+    .o_ag_reports_table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .o_ag_reports_tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.o_ag_reports_controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--ag-space-2);
+}
+
+.o_ag_cfd {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ag-space-2);
+    max-inline-size: 46rem;
+}
+
+.o_ag_cfd_loading {
+    opacity: 0.5;
+}
+
+.o_ag_cfd_chart {
+    inline-size: 100%;
+    block-size: auto;
+    cursor: crosshair;
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+}
+
+.o_ag_cfd_axis {
+    line {
+        stroke: var(--ag-line);
+    }
+
+    text {
+        font-size: 11px;
+        fill: var(--ag-muted);
+    }
+}
+
+.o_ag_cfd_cursor {
+    stroke: var(--ag-ink);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+.o_ag_cfd_band {
+    stroke: var(--ag-surface);
+    stroke-width: 1;
+}
+
+.o_ag_cfd_backlog { fill: var(--ag-s-backlog); background: var(--ag-s-backlog); }
+.o_ag_cfd_ready { fill: var(--ag-s-ready); background: var(--ag-s-ready); }
+.o_ag_cfd_progress { fill: var(--ag-s-progress); background: var(--ag-s-progress); }
+.o_ag_cfd_review { fill: var(--ag-s-review); background: var(--ag-s-review); }
+.o_ag_cfd_done { fill: var(--ag-s-done); background: var(--ag-s-done); }
+
+.o_ag_cfd_key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ag-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: var(--ag-space-1);
+    }
+}
+
+.o_ag_cfd_swatch {
+    display: inline-block;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    border-radius: 2px;
+}
+
+.o_ag_cfd_readout {
+    margin: 0;
+    min-block-size: 1.5em;
+    color: var(--ag-muted);
+}
+
+.o_ag_cfd_table_wrap {
+    overflow-x: auto;
+    max-block-size: 24rem;
+}
+
+.o_ag_burndown_area {
+    fill: var(--ag-plum);
+    fill-opacity: 0.18;
+}
+
+.o_ag_burndown_remaining {
+    stroke: var(--ag-plum);
+    stroke-width: 2;
+}
+
+.o_ag_burndown_scope {
+    stroke: var(--ag-ink);
+    stroke-width: 2;
+    stroke-dasharray: 6 3;
+}
+
+.o_ag_burndown_swatch_remaining { background: var(--ag-plum); }
+.o_ag_burndown_swatch_scope { background: var(--ag-ink); }
+
+.o_ag_burndown_dots circle {
+    fill: var(--ag-plum);
+}
+
+// "Show the numbers" sits under the chart's left edge, not in the middle of the wider page.
+.o_ag_reports .btn.o_ag_cfd_toggle {
+    align-self: flex-start;
+    padding-inline: 0;
+    text-align: start;
+}
+
+// An issue key such as SHOP-0009 stays on one line.
+.o_ag_reports_table td:first-child {
+    white-space: nowrap;
+}
+
+// Phone: squeezing the whole chart into 343 px shrank its 11 px labels to about 5 px. Keep the chart
+// near its drawn size and let it scroll sideways, so the axis text stays readable.
+@media (max-width: 575.98px) {
+    .o_ag_cfd {
+        overflow-x: auto;
+    }
+
+    .o_ag_cfd_chart {
+        inline-size: 720px;
+        max-inline-size: none;
+    }
+
+    // The legend and the hint under the chart stay in view while the chart scrolls.
+    .o_ag_cfd > :not(.o_ag_cfd_chart) {
+        position: sticky;
+        inset-inline-start: 0;
+        max-inline-size: calc(100vw - 2rem);
+    }
+}
+
+.o_ag_reports_switch { display: flex; justify-content: flex-end; }
+.o_ag_reports_select { min-inline-size: 16rem; }
+.o_ag_reports_bar_points { text-align: end; white-space: nowrap; b { color: var(--ag-ink); } }
+@media (max-width: 575.98px) {
+    .o_ag_reports_switch .o_ag_reports_control, .o_ag_reports_select { inline-size: 100%; }
+}
+
+.o_ag_reports_retro {
+    margin-block-start: 1rem;
+
+    h3 {
+        font-size: 1rem;
+        margin-block-end: .25rem;
+    }
+
+    .o_ag_reports_retro_text {
+        white-space: pre-wrap;
+        max-inline-size: 70ch;
+    }
+}
+
+.o_ag_reports_actions {
+    list-style: none;
+    padding: 0;
+    margin-block: .25rem;
+
+    li {
+        display: flex;
+        gap: .75rem;
+        align-items: baseline;
+    }
+}
+
+.o_ag_reports_action_form {
+    display: flex;
+    gap: .5rem;
+    max-inline-size: 40rem;
+}
+
+.o_ag_control_average {
+    stroke: var(--ag-ink);
+    stroke-width: 2;
+    stroke-dasharray: 6 3;
+}
+
+.o_ag_burndown_dots circle.o_ag_control_hot {
+    stroke: var(--ag-ink);
+    stroke-width: 2;
+}
+
+.o_ag_axis_title { font-size: 11px; fill: var(--ag-muted, #5d6975); }
+
+// U-1162: the two download buttons sit beside a report's other controls and print as nothing.
+.o_ag_report_export {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--ag-space-2);
+}
+
+@media print {
+    .o_ag_report_export {
+        display: none;
+    }
+}
+
+// Deployment frequency (U-1169): green for what was deployed, red for what failed; the numbers table has both counts.
+.o_ag_deploys_ok,
+.o_ag_deploys_swatch_ok {
+    fill: var(--ag-s-done);
+    background: var(--ag-s-done);
+}
+
+.o_ag_deploys_failed,
+.o_ag_deploys_swatch_failed {
+    fill: #c0392b;
+    background: repeating-linear-gradient(45deg, #c0392b 0 3px, #f2c4be 3px 6px);
+}

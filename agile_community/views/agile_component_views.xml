@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_project_component_list" model="ir.ui.view">
+        <field name="name">agile.project.component.list</field>
+        <field name="model">agile.project.component</field>
+        <field name="arch" type="xml">
+            <list default_order="sequence, name" decoration-muted="not active">
+                <field name="can_manage_component" column_invisible="True"/>
+                <field name="sequence" widget="handle" readonly="not can_manage_component"/>
+                <field name="name"/>
+                <field name="project_id" optional="hide"/>
+                <field name="owner_id" optional="show" widget="many2one_avatar_user" width="150px"/>
+                <field name="issue_count" string="Issues" width="80px"/>
+                <field name="active" widget="boolean_toggle" readonly="not can_manage_component" width="80px"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_project_component_form" model="ir.ui.view">
+        <field name="name">agile.project.component.form</field>
+        <field name="model">agile.project.component</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="can_manage_component" invisible="1"/>
+                    <field name="member_user_ids" invisible="1"/>
+                    <div class="oe_title"><label for="name"/><h1><field name="name" placeholder="e.g. Mobile App" readonly="not can_manage_component"/></h1></div>
+                    <group>
+                        <field name="project_id" readonly="id"/>
+                        <field name="owner_id" domain="[('id', 'in', member_user_ids)]" options="{'no_create': True, 'no_create_edit': True}" readonly="not can_manage_component"/>
+                        <field name="sequence" readonly="not can_manage_component"/>
+                        <field name="active" widget="boolean_toggle" readonly="not can_manage_component"/>
+                    </group>
+                    <field name="description" placeholder="What belongs to this component?" readonly="not can_manage_component"/>
+                    <group string="Issues"><field name="issue_count" readonly="1"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="agile_project_component_action" model="ir.actions.act_window">
+        <field name="name">Components</field>
+        <field name="res_model">agile.project.component</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_agile_project_component" name="Components"
+              parent="project.menu_project_config"
+              action="agile_project_component_action" sequence="45"
+              groups="project.group_project_user"/>
+</odoo>

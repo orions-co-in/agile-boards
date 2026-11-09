@@ -1,0 +1,35 @@
+// Command palette (K-1032): one input over one list, in the sidebar's quiet style.
+.o_ag_palette {
+    .modal-body { padding: 0; }
+}
+.o_ag_palette_box { display: flex; flex-direction: column; max-height: 70vh; }
+.o_ag_palette_input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1.05rem;
+    border: 0;
+    border-bottom: 1px solid var(--ag-line, #dde1e6);
+    background: transparent;
+    outline: none;
+    &:focus-visible { box-shadow: inset 0 -2px 0 var(--ag-focus, #0759b8); }
+}
+.o_ag_palette_list { margin: 0; padding: 6px 0; list-style: none; overflow-y: auto; }
+.o_ag_palette_heading {
+    padding: 8px 16px 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ag-muted, #6b7280);
+}
+.o_ag_palette_row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 16px;
+    cursor: pointer;
+    &.is-active { background: var(--ag-paper, #f0f3f7); box-shadow: inset 3px 0 0 var(--ag-focus, #0759b8); }
+}
+.o_ag_palette_key { flex: none; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ag-muted, #6b7280); }
+.o_ag_palette_title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.o_ag_palette_meta { flex: none; font-size: 0.8rem; color: var(--ag-muted, #6b7280); }
+.o_ag_palette_empty { margin: 0; padding: 16px; color: var(--ag-muted, #6b7280); }
+@media (max-width: 575px) { .o_ag_palette_meta { display: none; } }

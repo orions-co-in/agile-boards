@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_project_view_preference_form" model="ir.ui.view">
+        <field name="name">agile.project.view.preference.form</field>
+        <field name="model">agile.project.view.preference</field>
+        <field name="arch" type="xml">
+            <form string="My Board Preferences">
+                <sheet>
+                    <group>
+                        <field name="project_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="density" widget="radio"/>
+                        <field name="swimlane" widget="radio"/>
+                    </group>
+                    <group string="Issue card fields" col="4">
+                        <field name="show_assignee"/>
+                        <field name="show_issue_type"/>
+                        <field name="show_priority"/>
+                        <field name="show_points"/>
+                        <field name="show_component"/>
+                        <field name="show_fix_version"/>
+                        <field name="show_tags"/>
+                        <field name="show_deadline"/>
+                        <field name="show_days"/>
+                    </group>
+                    <div class="text-muted">Issue key and workflow status always remain visible for clarity and accessibility.</div>
+                </sheet>
+                <footer>
+                    <button string="Save" special="save" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

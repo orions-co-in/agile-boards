@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_release_notes_wizard_form" model="ir.ui.view">
+        <field name="name">agile.release.notes.wizard.form</field>
+        <field name="model">agile_community.release_notes_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Release notes">
+                <field name="release_id" invisible="1"/>
+                <p class="text-muted">Finished issues in this release, grouped by type. Use the copy button to put the text on your clipboard, then paste it into your release announcement.</p>
+                <field name="notes" nolabel="1" readonly="1" widget="CopyClipboardText" class="o_ag_release_notes"/>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

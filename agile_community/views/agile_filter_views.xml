@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Filters (S-301..S-303): a named search over the project's issues, built with the query bar. -->
+    <record id="agile_filter_view_list" model="ir.ui.view">
+        <field name="name">agile.filter.list</field>
+        <field name="model">agile.filter</field>
+        <field name="arch" type="xml">
+            <list string="Filters">
+                <field name="name"/>
+                <field name="query"/>
+                <field name="visibility"/>
+                <field name="owner_id"/>
+                <field name="match_count" string="Issues"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_filter_view_form" model="ir.ui.view">
+        <field name="name">agile.filter.form</field>
+        <field name="model">agile.filter</field>
+        <field name="arch" type="xml">
+            <form string="Filter">
+                <header>
+                    <button name="action_open_results" type="object" string="Open results" class="btn-primary"
+                            invisible="not id"/>
+                    <button name="action_export" type="object" string="Export" invisible="not id"/>
+                    <button name="action_save_copy" type="object" string="Save a copy" invisible="not id"/>
+                </header>
+                <sheet>
+                    <field name="project_id" invisible="1"/>
+                    <field name="can_edit" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Name this filter, for example My open bugs"
+                                   readonly="id and not can_edit"/></h1>
+                    </div>
+                    <group>
+                        <field name="visibility" widget="radio" options="{'horizontal': true}"
+                               readonly="id and not can_edit"/>
+                        <field name="owner_id" readonly="1"/>
+                        <field name="order_by" readonly="id and not can_edit"/>
+                        <field name="order_direction" readonly="id and not can_edit"/>
+                    </group>
+                    <field name="query" widget="agile_query" nolabel="1" readonly="id and not can_edit"/>
+                    <group string="Email">
+                        <field name="my_digest"/>
+                        <field name="my_send_empty" invisible="my_digest == 'none'"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="agile_project_filters_button" model="ir.ui.view">
+        <field name="name">project.project.form.agile.filters</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="agile_community.agile_project_settings_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='agile_tool_components']" position="after">
+                <div class="o_agile_tool" name="agile_tool_filters" colspan="2">
+                    <button name="action_open_agile_filters" type="object" string="Saved filters" class="btn-secondary"/>
+                    <span class="o_agile_tool_help">Save searches over this project's issues, share them, export the results or get them by email.</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="agile_task_type_epic" model="agile_community.task_type">
+            <field name="name">Epic</field>
+            <field name="company_id" eval="False"/>
+            <field name="color">3</field>
+            <field name="sequence">1</field>
+            <field name="is_epic" eval="True"/>
+        </record>
+        <record id="agile_task_type_story" model="agile_community.task_type">
+            <field name="name">Story</field>
+            <field name="company_id" eval="False"/>
+            <field name="color">4</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="agile_task_type_task" model="agile_community.task_type">
+            <field name="name">Task</field>
+            <field name="company_id" eval="False"/>
+            <field name="color">0</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="agile_task_type_bug" model="agile_community.task_type">
+            <field name="name">Bug</field>
+            <field name="company_id" eval="False"/>
+            <field name="color">2</field>
+            <field name="sequence">4</field>
+        </record>
+    </data>
+</odoo>

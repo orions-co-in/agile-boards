@@ -1,0 +1,193 @@
+// Project sidebar (D-801). Fixed under the navbar; the action area is padded to make room.
+$ag-side-width: 232px;
+$ag-side-icons: 56px;
+$ag-bottom-height: 56px;
+
+.o_ag_side, .o_ag_bottom { display: none; }
+
+body.o_ag_has_sidebar {
+    // Pages that are not list/kanban/form controllers (Summary, Your work, Reports) have no scroller
+    // of their own, so the action area scrolls when their content is taller than the screen.
+    .o_action_manager { padding-left: $ag-side-width; overflow-y: auto; }
+
+    // The sidebar narrows the page but Odoo sizes its control panel by the window, so buttons wrapped
+    // over three lines and the breadcrumb shrank to "B..." (NU-37).
+    .o_control_panel {
+        .o_control_panel_main_buttons .btn, .o_cp_buttons .btn { white-space: nowrap; }
+        .o_control_panel_main { flex-wrap: wrap !important; }
+        .o_control_panel_breadcrumbs { flex: 0 1 auto; min-width: 0; }
+        .o_control_panel_actions { flex: 1 1 360px; min-width: 0; }
+    }
+
+    .o_ag_side {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        position: fixed;
+        top: var(--o-navbar-height, 46px);
+        bottom: 0;
+        left: 0;
+        width: $ag-side-width;
+        padding: 12px 0;
+        overflow-y: auto;
+        background: var(--ag-surface, #fff);
+        border-right: 1px solid var(--ag-line, #dde1e6);
+        z-index: 4;
+    }
+}
+
+.o_ag_side_project {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0 12px 10px;
+    padding: 8px 10px;
+    background: var(--ag-paper, #f6f7f9);
+    border: 1px solid var(--ag-line, #dde1e6);
+    border-radius: 6px;
+}
+.o_ag_side_key {
+    flex: none;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    background: var(--ag-plum, #714B67);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+.o_ag_side_name {
+    min-width: 0;
+    b, small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    small { color: var(--ag-muted, #5d6975); font-size: 12px; }
+}
+.o_ag_side_group {
+    padding: 12px 20px 4px;
+    font-size: 12px;
+    color: var(--ag-muted, #5d6975);
+}
+.o_ag_side_item {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 20px;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: none;
+    color: inherit;
+    text-align: left;
+    &:hover { background: var(--ag-paper, #f6f7f9); }
+    &[aria-current="page"] {
+        border-left-color: var(--ag-teal, #017E84);
+        background: var(--ag-paper, #f6f7f9);
+        font-weight: 600;
+    }
+    svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: .75; }
+}
+.o_ag_side_badge {
+    margin-left: auto;
+    padding: 0 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    background: var(--ag-paper, #f6f7f9);
+    color: var(--ag-muted, #5d6975);
+    &.o_ag_side_badge_danger { background: var(--ag-red, #c62f3d); color: #fff; }
+}
+
+// Tablet: icons only.
+@media (max-width: 991.98px) {
+    body.o_ag_has_sidebar {
+        .o_action_manager { padding-left: $ag-side-icons; }
+        .o_ag_side { width: $ag-side-icons; }
+    }
+    .o_ag_side_group, .o_ag_side_label, .o_ag_side_badge, .o_ag_side_name { display: none; }
+    .o_ag_side_project { margin: 0 8px 10px; padding: 4px; justify-content: center; }
+    .o_ag_side_item { padding: 8px 0; justify-content: center; }
+}
+
+// Phone: bottom bar and a More sheet.
+@media (max-width: 575.98px) {
+    body.o_ag_has_sidebar {
+        .o_action_manager { padding-left: 0; padding-bottom: $ag-bottom-height; }
+        .o_ag_side { display: none; }
+        .o_ag_bottom {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--ag-surface, #fff);
+            border-top: 1px solid var(--ag-line, #dde1e6);
+            z-index: 1040;
+        }
+    }
+    .o_ag_bottom > button {
+        display: grid;
+        justify-items: center;
+        gap: 2px;
+        min-height: $ag-bottom-height;
+        padding: 8px 2px 10px;
+        border: 0;
+        border-top: 3px solid transparent;
+        background: none;
+        color: inherit;
+        font-size: 11px;
+        &[aria-current="page"] { border-top-color: var(--ag-teal, #017E84); font-weight: 600; }
+        svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    }
+    .o_ag_bottom_sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: $ag-bottom-height;
+        padding: 8px 0;
+        background: var(--ag-surface, #fff);
+        border-top: 1px solid var(--ag-line, #dde1e6);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, .18);
+        > button, > .o_ag_install_link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+            min-height: 48px;
+            padding: 0 20px;
+            border: 0;
+            background: none;
+            text-align: left;
+            &[aria-current="page"] { font-weight: 600; }
+            svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+        }
+    }
+}
+
+// Project cards: an Agile project shows a badge by its name and a stripe on the left edge.
+.o_ag_card_badge {
+    flex: 0 0 auto;
+    background: var(--ag-teal, #017E84);
+    color: #fff;
+    font-weight: 600;
+    font-size: .75rem;
+}
+.o_kanban_record:has(.o_ag_card_badge) {
+    border-inline-start: 4px solid var(--ag-teal, #017E84);
+}
+
+.o_ag_side_board {
+    padding-left: 2.6rem;
+    font-size: 0.9em;
+}
+
+.o_ag_side_name small.o_ag_side_access {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}

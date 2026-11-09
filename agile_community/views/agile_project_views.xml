@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Agile is configured on the existing Project form, not as another app. -->
+    <record id="agile_project_settings_inherit" model="ir.ui.view">
+        <field name="name">project.project.form.agile.settings</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='extra_settings']" position="inside">
+                <group string="Agile" groups="project.group_project_manager">
+                    <field name="agile_enabled" help="Add issue types and workflow on this existing Project. Native tasks stay native until you explicitly prepare them as Agile issues."/>
+                </group>
+                <field name="can_manage_agile_team" invisible="1" groups="project.group_project_user"/>
+            </xpath>
+            <!-- The Agile settings get the whole width of the tab (two columns), not a third column
+                 squeezed next to Odoo's own settings, where the help text became a tall narrow strip. -->
+            <xpath expr="//page[@name='settings']" position="inside">
+                <div name="agile_settings_block" invisible="not agile_enabled">
+                    <notebook>
+                        <page string="Team and setup" name="agile_settings_team">
+                            <group>
+                            <group class="o_agile_label_col" string="Agile project settings" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user">
+                                <field name="agile_key" required="agile_enabled" placeholder="WEB" help="Issue keys use this prefix. It cannot be changed after the first issue is created."/>
+                                <field name="agile_method"/>
+                                <field name="agile_key_style"/>
+                                <field name="agile_timezone"/>
+                                <field name="agile_configuration_impact" readonly="1" nolabel="1" colspan="2"/>
+                                <div class="alert alert-info" role="status" colspan="2">
+                                    <strong>Getting started:</strong> add your Agile team, review the issue types and workflow stages, then create an issue from Project → Tasks. Choose Scrum to plan sprints. Existing Project tasks appear as Agile issues only after you use <em>Prepare Existing Tasks</em> and confirm the mapping.
+                                </div>
+                            </group>
+                            <group class="o_agile_label_col o_agile_tools" string="Team and setup" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user">
+                                <div class="o_agile_tool" name="agile_tool_team" colspan="2">
+                                    <button name="action_manage_agile_team" type="object" string="Team and roles" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Who is on this project's Agile team and the role each person has: Project Manager, Contributor, Reviewer or Stakeholder. Odoo administrators and Agile Administrators are managers of every Agile project without being listed here.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_types" colspan="2">
+                                    <button name="action_manage_agile_issue_types" type="object" string="Issue types" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">The kinds of issue this project uses, such as Epic, Story, Task and Bug. Only an Odoo administrator can change the shared types.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_components" colspan="2">
+                                    <button name="action_manage_agile_components" type="object" string="Components" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Areas of the product, for example Checkout or Search. Give each an owner and group issues by it.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_permissions" colspan="2">
+                                    <button name="action_open_agile_permissions" type="object" string="Permissions" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">What each role may do: pick Standard, Open or Strict. Individual issues can be restricted from their own form.</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" name="agile_option_resolution" colspan="2">
+                                    <field name="agile_use_resolution" widget="boolean_toggle"/>
+                                    <span class="text-muted">Ask for a resolution when an issue is completed or canceled: Done, Won't do, Duplicate or Cannot reproduce.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_prepare" colspan="2">
+                                    <button name="action_view_unconverted_agile_tasks" type="object" string="Convert existing tasks" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Turn ordinary Odoo tasks of this project into Agile issues. You review each one before it changes.</span>
+                                </div>
+                            </group>
+                            </group>
+                        </page>
+                        <page string="Workflow and board" name="agile_settings_workflow">
+                            <group>
+                            <group class="o_agile_label_col" string="Workflow WIP limits" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user">
+                                <div class="text-muted" colspan="2">Limits are soft planning guides. They show live issue count versus limit on the board and never prevent work from moving. Tick Per swimlane row to count the limit inside each row when the board uses swimlanes (for example two In Progress issues per person).</div>
+                                <field name="agile_wip_limit_ids" nolabel="1" colspan="2">
+                                    <list editable="bottom" default_order="stage_id">
+                                        <field name="project_id" column_invisible="1"/>
+                                        <field name="stage_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="wip_limit" string="WIP limit"/>
+                                        <field name="per_swimlane"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group class="o_agile_label_col" string="Board cards for the whole team" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user" name="agile_card_defaults">
+                                <field name="agile_card_default_assignee"/>
+                                <field name="agile_card_default_issue_type"/>
+                                <field name="agile_card_default_priority"/>
+                                <field name="agile_card_default_points"/>
+                                <field name="agile_card_default_component"/>
+                                <field name="agile_card_default_fix_version"/>
+                                <field name="agile_card_default_tags"/>
+                                <field name="agile_card_default_deadline"/>
+                                <field name="agile_card_default_days"/>
+                                <field name="agile_card_default_density"/>
+                                <field name="agile_card_color_by"/>
+                                <field name="agile_kanban_backlog_column" invisible="agile_method != 'kanban'"/>
+                                <span class="o_form_label">Working days</span>
+                                <div name="agile_workdays" class="o_row">
+                                    <field name="agile_workday_mon"/><label for="agile_workday_mon"/>
+                                    <field name="agile_workday_tue"/><label for="agile_workday_tue"/>
+                                    <field name="agile_workday_wed"/><label for="agile_workday_wed"/>
+                                    <field name="agile_workday_thu"/><label for="agile_workday_thu"/>
+                                    <field name="agile_workday_fri"/><label for="agile_workday_fri"/>
+                                    <field name="agile_workday_sat"/><label for="agile_workday_sat"/>
+                                    <field name="agile_workday_sun"/><label for="agile_workday_sun"/>
+                                </div>
+                                <div class="text-muted" colspan="2">Working days decide how many days an issue has sat in its status and when a card counts as due soon. These are the starting choices for everyone. A person who picks their own under Board preferences keeps theirs. Issue key and status always show.</div>
+                            </group>
+                            <group class="o_agile_label_col o_agile_tools" string="Your board" invisible="not agile_enabled" groups="project.group_project_user">
+                                <div class="o_agile_tool" name="agile_tool_prefs" colspan="2">
+                                    <button name="action_agile_view_preferences" type="object" string="Board preferences" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Choose which fields your board cards show, how dense they are and how swimlanes group. Only you see these choices.</span>
+                                </div>
+                            </group>
+                            <group class="o_agile_label_col o_agile_tools" string="Shared quick filters" invisible="not agile_enabled" groups="project.group_project_user">
+                                <div class="o_agile_tool" name="agile_tool_quick" colspan="2" invisible="not can_manage_agile_team">
+                                    <button name="action_manage_agile_quick_filters" type="object" string="Shared quick filters" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Saved searches that appear as filters for everyone on this project.</span>
+                                </div>
+                                <field name="agile_quick_filter_ids" nolabel="1" colspan="2">
+                                    <list create="0" edit="0" delete="0" open_form_view="0">
+                                        <field name="sequence" column_invisible="True"/>
+                                        <field name="name"/>
+                                        <field name="filter_type"/>
+                                        <button name="action_open_issues" type="object" string="Open Issues" class="btn-secondary"/>
+                                    </list>
+                                </field>
+                            </group>
+                            </group>
+                        </page>
+                        <page string="Notifications" name="agile_settings_notify">
+                            <group>
+                            <group class="o_agile_label_col" string="Notifications" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user">
+                                <div class="text-muted" colspan="2">Who follows a new issue, and which events send an email or inbox message to followers. A person is told once per message.</div>
+                                <field name="agile_watch_creator"/>
+                                <field name="agile_watch_assignees"/>
+                                <field name="agile_watch_managers"/>
+                                <field name="agile_notify_status"/>
+                                <field name="agile_notify_comments"/>
+                                <field name="agile_notify_assignment"/>
+                            </group>
+                            <group class="o_agile_label_col" string="Email to issue" invisible="not agile_enabled or not can_manage_agile_team" groups="project.group_project_user">
+                                <div class="text-muted" colspan="2">Mail sent to this address becomes a new issue in Backlog; the subject is the title and the message is the description. The sender follows the issue, and a reply from them that names the issue key in the subject, for example "Re: WEB-12 checkout fails", is added to that issue as a comment.</div>
+                                <field name="alias_name" placeholder="web"/>
+                                <field name="alias_email" readonly="1" widget="CopyClipboardChar"/>
+                                <field name="alias_contact" string="Who can email"/>
+                            </group>
+                            </group>
+                        </page>
+                        <page string="Roadmap and import" name="agile_settings_planning">
+                            <group>
+                            <group class="o_agile_label_col o_agile_tools" string="Roadmap views" invisible="not agile_enabled" groups="project.group_project_user">
+                                <div class="o_agile_tool" name="agile_tool_roadmap" colspan="2">
+                                    <button name="action_open_agile_roadmap_page" type="object" string="Roadmap" class="btn-primary"/>
+                                    <span class="o_agile_tool_help">Epics on a timeline, with lines for what depends on what.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_timeline" colspan="2">
+                                    <button name="action_view_agile_roadmap" type="object" string="Classic timeline" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Dated issues and their dependencies as an Odoo timeline.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_unscheduled" colspan="2">
+                                    <button name="action_view_agile_unscheduled_issues" type="object" string="Unscheduled issues" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">Issues with no start or end date yet, so they are not on the roadmap.</span>
+                                </div>
+                                <div class="o_agile_tool" name="agile_tool_epics" colspan="2">
+                                    <button name="action_view_agile_roadmap_epics" type="object" string="Epic list" class="btn-secondary"/>
+                                    <span class="o_agile_tool_help">The epics as a plain list. Easier on a phone.</span>
+                                </div>
+                            </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- The Agile Summary replaces Odoo's project Dashboard button (U-3). -->
+    <record id="agile_project_hide_dashboard_button" model="ir.ui.view">
+        <field name="name">project.project.form.agile.hide.dashboard</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='project_update_all_action']" position="attributes">
+                <attribute name="invisible">is_template or agile_enabled</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="agile_project_hide_standalone_scrum_switch" model="ir.ui.view">
+        <field name="name">project.project.form.agile.hide.scrum.switch</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project_scrum.project_project_view_form_inherit_scrum_setting"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='use_scrum']" position="attributes">
+                <attribute name="invisible">agile_enabled</attribute>
+            </xpath>
+            <xpath expr="//field[@name='use_scrum']" position="after">
+                <field name="can_manage_project_sprints" invisible="1" groups="project.group_project_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="agile_project_scrum_navigation_roles" model="ir.ui.view">
+        <field name="name">project.project.form.scrum.navigation.roles</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project_scrum.project_project_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_sprints']" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">not use_scrum or not can_manage_project_sprints</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_backlog']" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">not use_scrum or not can_manage_project_sprints</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Retire the separate app created by the initial installation. Keeping
+         these XML IDs allows a normal module upgrade to hide the old menu. -->
+    <record id="agile_root_menu" model="ir.ui.menu">
+        <field name="name">Agile</field>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="agile_projects_menu" model="ir.ui.menu">
+        <field name="name">Projects</field>
+        <field name="parent_id" ref="agile_root_menu"/>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

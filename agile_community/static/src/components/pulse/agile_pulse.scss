@@ -1,0 +1,119 @@
+.o_ag_pulse {
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+    padding: var(--ag-space-3) var(--ag-space-4);
+    color: var(--ag-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.o_ag_pulse_strip {
+    display: flex;
+    gap: 3px;
+    align-items: stretch;
+    padding-block-start: var(--ag-space-1);
+}
+
+.o_ag_pulse_cell {
+    position: relative;
+    flex: 1 1 0;
+    min-inline-size: 18px;
+    block-size: 3rem;
+    display: flex;
+    align-items: flex-end;
+    background: var(--ag-paper);
+    border: 1px solid var(--ag-line);
+    border-radius: 3px;
+    cursor: default;
+
+    &:focus-visible {
+        outline: 2px solid var(--ag-focus);
+        outline-offset: 2px;
+    }
+    &.o_ag_pulse_weekend {
+        background-image: repeating-linear-gradient(90deg, var(--ag-paper) 0 2px, var(--ag-surface) 2px 4px);
+    }
+    &.o_ag_pulse_today {
+        border: 2px solid var(--ag-plum);
+    }
+    &.o_ag_pulse_estimated .o_ag_pulse_fill {
+        border-block-start: 2px dotted var(--ag-surface);
+        opacity: 0.6;
+    }
+}
+
+.o_ag_pulse_fill {
+    display: block;
+    inline-size: 100%;
+    background: var(--ag-teal);
+    opacity: 0.85;
+    border-radius: 2px 2px 0 0;
+}
+
+.o_ag_pulse_future .o_ag_pulse_fill {
+    background: repeating-linear-gradient(45deg, var(--ag-line) 0 3px, transparent 3px 6px);
+    opacity: 1;
+}
+
+// Ideal pace: a thin ink line across past days, so the gap to the fill reads at a glance.
+.o_ag_pulse_ideal {
+    position: absolute;
+    inset-inline: 0;
+    block-size: 0;
+    border-block-start: 2px solid var(--ag-ink);
+    pointer-events: none;
+}
+
+.o_ag_pulse_scope {
+    position: absolute;
+    inset-block-start: -5px;
+    inset-inline-end: 3px;
+    inline-size: 8px;
+    block-size: 8px;
+    background: var(--ag-amber);
+    transform: rotate(45deg);
+}
+
+.o_ag_pulse_tip {
+    min-block-size: 1.25rem;
+    margin: var(--ag-space-2) 0 0;
+    font-size: 0.8125rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_pulse_caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--ag-space-1) var(--ag-space-4);
+    font-size: 0.8125rem;
+    color: var(--ag-muted);
+
+    b { color: var(--ag-ink); }
+    .o_ag_pace_behind { color: var(--ag-amber-text); font-weight: 600; }
+    .o_ag_pulse_link.btn {
+        padding: 0;
+        border: 0;
+        font-size: inherit;
+        min-block-size: var(--ag-target);
+        text-align: start;
+    }
+}
+
+.o_ag_pulse_empty .o_ag_pulse_caption {
+    align-items: center;
+}
+
+@media (max-width: 767.98px) {
+    .o_ag_pulse_caption {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .o_ag_pulse_fill {
+        transition: height 200ms ease-out;
+    }
+}

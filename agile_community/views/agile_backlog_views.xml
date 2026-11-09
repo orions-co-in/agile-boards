@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_task_list_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.list.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <list class="o_agile_backlog" js_class="agile_backlog_list" default_group_by="sprint_id" default_order="sequence, id" create="0" delete="0" expand="1" groups_limit="20" limit="80">
+                <field name="sequence" widget="handle"/>
+                <field name="agile_task_type_id" widget="badge" options="{'color_field': 'agile_task_type_color'}"/>
+                <field name="agile_task_type_color" column_invisible="True"/>
+                <field name="issue_key" class="text-muted" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="agile_is_blocked" string="Blocked" widget="boolean" readonly="1" decoration-danger="agile_is_blocked"/>
+                <field name="agile_blocked_by_text" string="Blocked by" optional="show" readonly="1" class="o_ag_blocked_by"/>
+                <field name="agile_lock_text" string="Restricted" optional="show" readonly="1"/>
+                <field name="parent_id" string="Parent" widget="badge" optional="show" readonly="1"/>
+                <field name="story_points" string="Points" readonly="1" invisible="not story_points_estimated"/>
+                <field name="story_points_estimated" column_invisible="True"/>
+                <field name="user_ids" string="Assignee" widget="many2many_avatar_user" readonly="1"/>
+                <field name="agile_status" string="Status" widget="badge" class="o_ag_status_badge"
+                       decoration-success="agile_status == 'done'"
+                       decoration-info="agile_status == 'ready'"
+                       decoration-warning="agile_status == 'progress'"
+                       decoration-primary="agile_status == 'review'"
+                       decoration-muted="agile_status in ('backlog', 'canceled')"/>
+                <field name="sprint_id" column_invisible="True"/>
+                <field name="stage_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Backlog alternates (D-710): native views on the backlog action, sharing its domain, facets and search view. -->
+    <record id="project_task_kanban_agile_epics" model="ir.ui.view">
+        <field name="name">project.task.kanban.agile.epics</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <kanban string="Issues by epic" class="o_agile_kanban o_agile_epic_kanban" default_group_by="parent_id"
+                    default_order="sequence, id" group_create="0" group_edit="0" group_delete="0"
+                    records_draggable="0" quick_create="0" create="0" delete="0">
+                <field name="issue_key"/>
+                <field name="agile_task_type_color"/>
+                <field name="story_points_estimated"/>
+                <field name="agile_is_blocked"/>
+                <field name="agile_block_reason_display"/>
+                <field name="stage_id"/>
+                <progressbar field="state" colors='{"1_done": "success", "01_in_progress": "warning", "1_canceled": "muted"}' sum_field="story_points"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex gap-2 align-items-center mb-1">
+                            <field name="issue_key" class="text-muted small"/>
+                            <field name="agile_task_type_id" widget="badge" options="{'color_field': 'agile_task_type_color'}"/>
+                        </div>
+                        <field name="name" class="fw-bold"/>
+                        <span t-if="record.agile_is_blocked.raw_value" class="o_ag_card_blocked d-block mt-1" role="status">
+                            <span aria-hidden="true">⚑</span> Blocked: <t t-out="record.agile_block_reason_display.value"/>
+                        </span>
+                        <footer class="pt-2">
+                            <field name="story_points" invisible="not story_points_estimated"/>
+                            <field name="agile_status" widget="badge" class="o_ag_status_badge"
+                                   decoration-success="agile_status == 'done'"
+                                   decoration-info="agile_status == 'ready'"
+                                   decoration-warning="agile_status == 'progress'"
+                                   decoration-primary="agile_status == 'review'"
+                                   decoration-muted="agile_status in ('backlog', 'canceled')"/>
+                            <field name="user_ids" widget="many2many_avatar_user" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="project_task_calendar_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.calendar.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <calendar string="Due dates" js_class="agile_calendar" date_start="date_deadline" mode="month" color="stage_id_color"
+                      hide_time="true" event_limit="5" event_open_popup="true" quick_create="0"
+                      show_unusual_days="True" scales="month,week,day">
+                <field name="issue_key"/>
+                <field name="user_ids" widget="many2many_avatar_user" invisible="not user_ids"/>
+                <field name="parent_id" string="Epic" invisible="not parent_id"/>
+                <field name="story_points" string="Points" invisible="not story_points_estimated"/>
+                <field name="story_points_estimated" invisible="1"/>
+                <field name="stage_id_color" invisible="1"/>
+                <field name="stage_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="project_task_pivot_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.pivot.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Planning">
+                <field name="parent_id" string="Epic" type="row"/>
+                <field name="stage_id" type="col"/>
+                <field name="story_points" string="Story points" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="project_task_graph_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.graph.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <graph string="Points by status" type="bar" js_class="agile_backlog_graph">
+                <field name="stage_id"/>
+                <field name="story_points" string="Story points" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="project_task_activity_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.activity.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <activity string="Reviews and follow-ups">
+                <field name="issue_key"/>
+                <field name="user_ids"/>
+                <templates>
+                    <div t-name="activity-box" class="justify-content-between gap-2">
+                        <div class="flex-shrink-1">
+                            <field name="issue_key" class="text-muted small"/>
+                            <field name="name" class="o_text_block"/>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 flex-grow-1">
+                            <field name="user_ids" widget="many2many_avatar_user" class="o_many2many_avatar_user_no_wrap"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <record id="project_task_search_agile_backlog" model="ir.ui.view">
+        <field name="name">project.task.search.agile.backlog</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_task_search_agile"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Hide completed sprints" name="agile_hide_completed"
+                        domain="['|', ('sprint_id', '=', False), ('sprint_id.state', '!=', 'done')]"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- The address of the Agile Backlog: /odoo/<project id>/agile-backlog. Served by ir_actions_act_window.py. -->
+    <record id="action_agile_backlog_url" model="ir.actions.act_window">
+        <field name="name">Backlog</field>
+        <field name="res_model">project.task</field>
+        <field name="path">agile-backlog</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

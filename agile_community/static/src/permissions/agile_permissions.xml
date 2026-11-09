@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Permissions">
+        <Layout display="display" className="'o_ag_permissions'">
+            <div class="o_ag_perm_body">
+                <header class="o_ag_perm_head">
+                    <h1 class="o_ag_perm_title">Permissions<t t-if="state.data"> in <t t-out="state.data.project.name"/></t></h1>
+                </header>
+                <div t-if="state.error" class="alert alert-danger" role="alert">
+                    <p class="mb-2" t-out="state.error"/>
+                    <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                </div>
+                <p t-elif="state.loading and !state.data" class="text-muted" role="status">Loading the permissions...</p>
+                <t t-if="state.data">
+                    <p t-if="state.data.scheme === 'standard'" class="o_ag_perm_note text-muted">Standard is in use. Pick another scheme if your team works differently.</p>
+                    <fieldset class="o_ag_perm_schemes" t-att-disabled="state.busy">
+                        <legend>Permission scheme</legend>
+                        <div class="o_ag_perm_cards">
+                        <label t-foreach="state.data.schemes" t-as="scheme" t-key="scheme.key"
+                               t-attf-class="o_ag_perm_card {{state.viewing === scheme.key ? 'o_ag_perm_card_on' : ''}}">
+                            <input type="radio" name="scheme" t-att-value="scheme.key"
+                                   t-att-checked="state.viewing === scheme.key" t-on-change="() => this.choose(scheme)"/>
+                            <b t-out="scheme.label"/><t t-if="scheme.key === state.data.scheme"> (in use)</t>
+                            <span class="o_ag_perm_sentence" t-out="scheme.sentence"/>
+                        </label>
+                        </div>
+                    </fieldset>
+                    <table class="o_ag_perm_table">
+                        <caption class="visually-hidden">Who may do what in the selected scheme</caption>
+                        <thead t-if="editing"><tr><th scope="col">Action</th><th scope="col">Project Manager</th><th scope="col">Contributor</th><th scope="col">Reviewer</th></tr></thead>
+                        <thead t-else=""><tr><th scope="col">Action</th><th scope="col">Who may</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="rows" t-as="row" t-key="row.action">
+                                <th scope="row" t-out="row.action"/>
+                                <t t-if="editing">
+                                    <td>Always</td>
+                                    <t t-foreach="['contributor', 'reviewer']" t-as="role" t-key="role">
+                                        <td t-if="row.editable">
+                                            <input type="checkbox" t-att-checked="granted(row, role)" t-att-disabled="state.busy"
+                                                   t-att-aria-label="row.action + ': ' + role" t-on-change="() => this.toggle(row, role)"/>
+                                        </td>
+                                        <td t-else="">No</td>
+                                    </t>
+                                </t>
+                                <td t-else="" t-out="row.roles.join(', ')"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="state.viewing === 'custom' and !editing" class="o_ag_perm_note text-muted">Switch to Custom to choose who may do what. It starts as Standard.</p>
+                    <div t-if="editing" class="o_ag_perm_save">
+                        <button type="button" class="btn btn-primary" t-att-disabled="!dirty or state.busy" t-on-click="saveCustom">Save custom scheme</button>
+                        <span class="text-muted">Applies now for everyone on the project. Managers always may; stakeholders read only.</span>
+                    </div>
+                    <p class="o_ag_perm_note text-muted">Stakeholders read only. Managing the team, workflows, custom fields, automation and this scheme stays with project managers in every scheme.</p>
+                </t>
+            </div>
+        </Layout>
+    </t>
+</templates>

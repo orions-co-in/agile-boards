@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.WorkflowDiagram">
+        <div class="o_ag_flow" t-ref="root" t-att-class="{ o_ag_flow_editable: editable }">
+            <t t-set="flow" t-value="layout"/>
+            <div t-if="!flow.boxes.length" class="text-muted">Add a status to see the flow.</div>
+            <div t-else="" class="o_ag_flow_layout">
+                <div class="o_ag_flow_main">
+                    <p t-if="editable" class="o_ag_flow_hint text-muted">
+                        <b>Drag a box</b> to reorder, <b>drag its dot</b> onto another box to add a move, <b>click</b> a box or an arrow to edit it.
+                        Keyboard: Tab to a box, Alt plus Left or Right moves it, Enter opens the panel. Save the form to keep your changes.
+                    </p>
+                    <div t-if="editable" class="o_ag_flow_tools">
+                        <button type="button" class="btn btn-secondary btn-sm o_ag_add_status" t-on-click="openAdd">Add status</button>
+                    </div>
+                    <div class="o_ag_flow_scroll">
+                        <svg t-ref="svg" class="o_ag_flow_svg" role="group" aria-label="Workflow canvas. The lists below hold the same information."
+                             t-att-viewBox="'0 0 ' + flow.width + ' ' + flow.height" t-att-width="flow.width" t-att-height="flow.height"
+                             t-on-pointerdown="onPointerDown" t-on-pointermove="onPointerMove" t-on-pointerup="onPointerUp"
+                             t-on-pointercancel="() => this.state.drag = null" t-on-keydown="onSvgKey">
+                            <defs>
+                                <marker id="o_ag_flow_head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                                </marker>
+                            </defs>
+                            <g t-foreach="flow.arrows" t-as="arrow" t-key="arrow.id ?? arrow_index"
+                               t-attf-class="o_ag_flow_move {{state.sel and state.sel.type === 'move' and state.sel.key === arrow.id ? 'o_ag_selected' : ''}}"
+                               tabindex="0" role="button" t-att-data-arrow="arrow.id"
+                               t-att-aria-label="arrow.aria"
+                               t-on-click="() => !this.editable and this.clickArrow(arrow)"
+                               t-on-keydown="(ev) => !this.editable and this.onKey(ev, () => this.clickArrow(arrow))">
+                                <path t-att-d="arrow.d" fill="none" stroke="transparent" stroke-width="14" class="o_ag_flow_hit"/>
+                                <path t-att-d="arrow.d" fill="none" stroke="currentColor" stroke-width="1.6"
+                                      t-att-stroke-dasharray="arrow.dashed ? '5 4' : null" marker-end="url(#o_ag_flow_head)"/>
+                                <text t-if="arrow.showLabel" t-att-x="arrow.lx" t-att-y="arrow.ly" text-anchor="middle" class="o_ag_flow_label" t-out="arrow.shownLabel"/>
+                            </g>
+                            <g t-foreach="flow.boxes" t-as="box" t-key="box.stage_id"
+                               t-attf-class="o_ag_flow_box o_ag_cat_{{box.category}} {{box.hidden ? 'o_ag_hidden' : ''}} {{state.sel and state.sel.type === 'status' and state.sel.key === box.stage_id ? 'o_ag_selected' : ''}} {{state.drag and state.drag.over === box.stage_id ? 'o_ag_drop' : ''}}"
+                               tabindex="0" role="button" t-att-data-key="box.stage_id"
+                               t-att-aria-label="boxLabel(box)"
+                               t-on-click="() => !this.editable and this.clickBox(box)"
+                               t-on-keydown="(ev) => !this.editable and this.onKey(ev, () => this.clickBox(box))">
+                                <t t-set="bx" t-value="boxX(box)"/>
+                                <rect t-att-x="bx" t-att-y="box.y" t-att-width="box.w" t-att-height="box.h" rx="6"/>
+                                <rect t-att-x="bx" t-att-y="box.y" width="6" t-att-height="box.h" rx="3" class="o_ag_flow_band"/>
+                                <text t-att-x="bx + 16" t-att-y="box.y + 24" class="o_ag_flow_name" t-out="box.name"/>
+                                <text t-att-x="bx + 16" t-att-y="box.y + 44" class="o_ag_flow_count" t-out="countText(box)"/>
+                                <circle t-if="editable" class="o_ag_flow_port" t-att-data-port="box.stage_id" t-att-cx="bx + box.w / 2" t-att-cy="box.portY" r="7">
+                                    <title>Drag onto another status to add a move</title>
+                                </circle>
+                            </g>
+                            <g t-foreach="flow.brackets" t-as="bracket" t-key="bracket_index" class="o_ag_flow_bracket" aria-hidden="true">
+                                <path t-attf-d="M {{bracket.x1}} {{bracket.y - 6}} V {{bracket.y}} H {{bracket.x2}} V {{bracket.y - 6}}" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                                <text t-att-x="bracket.cx" t-att-y="bracket.y + 16" text-anchor="middle" class="o_ag_flow_zone" t-out="bracket.label"/>
+                            </g>
+                            <path t-if="state.drag and state.drag.line" class="o_ag_flow_ghost" fill="none"
+                                  t-attf-d="M {{state.drag.line[0]}} {{state.drag.line[1]}} L {{state.drag.line[2]}} {{state.drag.line[3]}}" marker-end="url(#o_ag_flow_head)"/>
+                        </svg>
+                    </div>
+                </div>
+                <aside t-if="editable" class="o_ag_panel" aria-live="polite">
+                    <t t-set="box" t-value="selectedBox"/>
+                    <t t-set="move" t-value="selectedMove"/>
+                    <form t-if="state.adding and !box and !move" class="o_ag_add_panel" t-on-submit.prevent="addStatus">
+                        <h3 class="o_ag_panel_title">Add a status</h3>
+                        <label class="o_ag_panel_field">
+                            <span>Name</span>
+                            <input type="text" class="form-control o_ag_add_name" t-model="state.adding.name" maxlength="64" autofocus="autofocus"/>
+                        </label>
+                        <fieldset class="o_ag_panel_field">
+                            <legend>Category</legend>
+                            <label t-foreach="categories" t-as="choice" t-key="choice.value" class="o_ag_add_choice">
+                                <input type="radio" name="o_ag_add_category" t-att-value="choice.value"
+                                       t-att-checked="state.adding.category === choice.value"
+                                       t-on-change="() => this.state.adding.category = choice.value"/>
+                                <b t-out="choice.label"/>: <span class="text-muted" t-out="choice.hint"/>
+                            </label>
+                        </fieldset>
+                        <p t-if="state.adding.error" class="text-danger o_ag_add_error" role="alert" t-out="state.adding.error"/>
+                        <div class="o_ag_panel_row">
+                            <button type="submit" class="btn btn-primary o_ag_add_confirm" t-att-disabled="state.adding.busy">Add</button>
+                            <button type="button" class="btn btn-secondary" t-on-click="cancelAdd">Cancel</button>
+                        </div>
+                    </form>
+                    <div t-if="state.adding and !box and !move and available.length" class="o_ag_use_status">
+                        <label class="o_ag_panel_field">
+                            <span>Or use a status the project already has</span>
+                            <select class="form-select">
+                                <option value="">Choose a status</option>
+                                <option t-foreach="available" t-as="entry" t-key="entry.stage_id" t-att-value="entry.stage_id">
+                                    <t t-out="entry.name"/> (<t t-out="categoryLabel(entry.category)"/><t t-if="entry.hidden">, hidden</t>)
+                                </option>
+                            </select>
+                        </label>
+                        <button type="button" class="btn btn-secondary" t-on-click="useStatus">Add to this workflow</button>
+                    </div>
+                    <div t-elif="box">
+                        <h3 class="o_ag_panel_title">Status: <t t-out="box.name"/></h3>
+                        <p class="text-muted"><t t-out="countText(box)"/></p>
+                        <label class="o_ag_panel_field">
+                            <span>Name</span>
+                            <input type="text" class="form-control o_ag_status_name" t-att-value="box.name" maxlength="64"
+                                   t-on-change="(ev) => this.renameStatus(ev, box)"/>
+                        </label>
+                        <p class="text-muted o_ag_panel_note">Category: <t t-out="categoryLabel(box.category)"/>. It is fixed once issues use the status.</p>
+                        <div class="o_ag_panel_row">
+                            <button type="button" class="btn btn-secondary" t-on-click="() => this.moveStatus(box.stage_id, flow.boxes.findIndex((b) => b.stage_id === box.stage_id) - 1)">Move left</button>
+                            <button type="button" class="btn btn-secondary" t-on-click="() => this.moveStatus(box.stage_id, flow.boxes.findIndex((b) => b.stage_id === box.stage_id) + 1)">Move right</button>
+                        </div>
+                        <div class="o_ag_panel_field o_ag_status_actions">
+                            <t t-if="box.hidden">
+                                <button type="button" class="btn btn-secondary o_ag_show_status" t-on-click="() => this.showStatus(box)">Show again</button>
+                            </t>
+                            <t t-else="">
+                                <label t-if="box.count" class="o_ag_panel_field">
+                                    <span>Move its <t t-out="countText(box)"/> to</span>
+                                    <select class="form-select o_ag_hide_target" t-model="state.moveTo">
+                                        <option value="">Choose a status</option>
+                                        <option t-foreach="moveTargets(box)" t-as="target" t-key="target.stage_id" t-att-value="stageOf(target)" t-out="target.name"/>
+                                    </select>
+                                </label>
+                                <button type="button" class="btn btn-secondary o_ag_hide_status" t-on-click="() => this.hideStatus(box)">Hide status</button>
+                            </t>
+                            <t t-if="state.ask === 'remove'">
+                                <p class="o_ag_panel_note">Take <t t-out="box.name"/> out of this workflow? Its moves here go too; the project keeps the status.</p>
+                                <button type="button" class="btn btn-danger btn-sm o_ag_confirm_remove" t-on-click="() => this.removeStatus(box)">Remove</button>
+                                <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.askFirst(null)">Cancel</button>
+                            </t>
+                            <button t-else="" type="button" class="btn btn-link text-danger o_ag_remove_status" t-on-click="() => this.askFirst('remove')">Remove from this workflow</button>
+                            <t t-if="box.canDelete">
+                                <t t-if="state.ask === 'delete'">
+                                    <p class="o_ag_panel_note">Delete <t t-out="box.name"/> for good? No issue has used it.</p>
+                                    <button type="button" class="btn btn-danger btn-sm o_ag_confirm_delete" t-on-click="() => this.deleteStatus(box)">Delete</button>
+                                    <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.askFirst(null)">Cancel</button>
+                                </t>
+                                <button t-else="" type="button" class="btn btn-link text-danger o_ag_delete_status" t-on-click="() => this.askFirst('delete')">Delete status</button>
+                            </t>
+                            <p t-else="" class="text-muted o_ag_panel_note">Issues have used this status, so hide it instead of deleting it.</p>
+                        </div>
+                        <label class="o_ag_panel_field">
+                            <span>Add a move from <t t-out="box.name"/> to</span>
+                            <select class="form-select" t-att-disabled="!targets.length">
+                                <option value="">Choose a status</option>
+                                <option t-foreach="targets" t-as="target" t-key="target.stage_id" t-att-value="target.stage_id" t-out="target.name"/>
+                            </select>
+                        </label>
+                        <button type="button" class="btn btn-secondary" t-att-disabled="!targets.length" t-on-click="(ev) => this.onAddMove(ev, box)">Add move</button>
+                    </div>
+                    <div t-elif="move">
+                        <h3 class="o_ag_panel_title">Move: <t t-out="move.name"/></h3>
+                        <p class="text-muted"><t t-out="statusName(move.from)"/> to <t t-out="statusName(move.to)"/></p>
+                        <label class="o_ag_panel_field">
+                            <span>Button name</span>
+                            <input type="text" class="form-control" t-att-value="move.name" t-on-change="(ev) => this.onName(ev, move)"/>
+                        </label>
+                        <fieldset class="o_ag_panel_field">
+                            <legend>Who may take it</legend>
+                            <label><input type="checkbox" t-att-checked="move.record.data.allow_contributor" t-on-change="(ev) => this.onRole(ev, move, 'allow_contributor')"/> Contributors</label>
+                            <label><input type="checkbox" t-att-checked="move.record.data.allow_reviewer" t-on-change="(ev) => this.onRole(ev, move, 'allow_reviewer')"/> Reviewers</label>
+                            <label><input type="checkbox" t-att-checked="move.record.data.allow_manager" t-on-change="(ev) => this.onRole(ev, move, 'allow_manager')"/> Managers</label>
+                        </fieldset>
+                        <fieldset class="o_ag_panel_field">
+                            <legend>An issue needs first</legend>
+                            <div class="o_ag_panel_chips">
+                                <button t-foreach="needs" t-as="need" t-key="need.id" type="button" class="o_ag_need"
+                                        t-att-aria-pressed="hasNeed(move, need.id) ? 'true' : 'false'"
+                                        t-on-click="() => this.toggleNeed(move, need.id)" t-out="need.name"/>
+                                <button t-foreach="customNeeds" t-as="need" t-key="'c' + need.id" type="button" class="o_ag_need o_ag_need_custom"
+                                        t-att-aria-pressed="hasCustomNeed(move, need.id) ? 'true' : 'false'"
+                                        t-on-click="() => this.toggleCustomNeed(move, need.id)" t-out="need.name"/>
+                            </div>
+                            <label class="o_ag_condition"><input type="checkbox" class="o_ag_cond_subtasks" t-att-checked="move.record.data.require_no_open_subtasks" t-on-change="(ev) => this.onCondition(ev, move, 'require_no_open_subtasks')"/> All sub-issues are Done or Canceled</label>
+                            <label class="o_ag_condition"><input type="checkbox" class="o_ag_cond_blocked" t-att-checked="move.record.data.require_not_blocked" t-on-change="(ev) => this.onCondition(ev, move, 'require_not_blocked')"/> Not blocked</label>
+                        </fieldset>
+                        <p t-if="!move.conditions.length and !(move.roles.length and move.roles.length &lt; 3)" class="text-muted o_ag_panel_note o_ag_no_rules">This move has no rules. Anyone allowed to take it can.</p>
+                        <fieldset class="o_ag_panel_field o_ag_actions">
+                            <legend>When this move happens</legend>
+                            <ul class="o_ag_action_list list-unstyled mb-2">
+                                <li t-foreach="move.actions" t-as="action" t-key="action_index" class="d-flex gap-2 align-items-center">
+                                    <span class="flex-grow-1" t-out="action.text"/>
+                                    <button type="button" class="btn btn-link btn-sm p-0 o_ag_action_remove" t-att-aria-label="'Remove: ' + action.text" t-on-click="() => this.removeAction(move, action)">Remove</button>
+                                </li>
+                                <li t-if="!move.actions.length" class="text-muted">Nothing runs after this move.</li>
+                            </ul>
+                            <label class="o_ag_panel_field">
+                                <span>Add an action</span>
+                                <select class="form-select o_ag_action_type" t-on-change="(ev) => this.state.actionType = ev.target.value">
+                                    <option value="priority">Set the priority</option>
+                                    <option value="assign">Assign to a person</option>
+                                    <option value="comment">Add a comment</option>
+                                    <option value="notify">Message the assignees</option>
+                                </select>
+                            </label>
+                            <label class="o_ag_panel_field">
+                                <span>What</span>
+                                <select t-if="state.actionType === 'priority'" class="form-select o_ag_action_value">
+                                    <option value="0">Low</option><option value="1">Medium</option><option value="2">High</option><option value="3">Urgent</option>
+                                </select>
+                                <select t-elif="state.actionType === 'assign'" class="form-select o_ag_action_value">
+                                    <option t-foreach="people" t-as="person" t-key="person.id" t-att-value="person.id" t-out="person.name"/>
+                                </select>
+                                <input t-else="" type="text" class="form-control o_ag_action_value" placeholder="You can use {key}, {name}, {status} and {assignee}"/>
+                            </label>
+                            <button type="button" class="btn btn-secondary o_ag_action_add" t-on-click="(ev) => this.addAction(ev, move)">Add action</button>
+                            <p class="text-muted o_ag_panel_note">Actions run after the move, as “Workflow rule” in the issue's history.</p>
+                        </fieldset>
+                        <button type="button" class="btn btn-link text-danger" t-on-click="() => this.deleteMove(move)">Delete move</button>
+                    </div>
+                    <p t-else="" class="text-muted">Select a status or a move to edit it.</p>
+                    <p t-if="state.message" class="o_ag_panel_message" role="status" t-out="state.message"/>
+                    <button type="button" class="btn btn-secondary" t-att-disabled="!state.undo.length" t-on-click="undo">Undo</button>
+                </aside>
+            </div>
+        </div>
+    </t>
+</templates>

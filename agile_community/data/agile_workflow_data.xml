@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="agile_workflow_field_user_ids" model="agile.workflow.field">
+        <field name="code">user_ids</field><field name="name">Assignee</field><field name="phrase">an assignee</field><field name="sequence">10</field>
+    </record>
+    <record id="agile_workflow_field_description" model="agile.workflow.field">
+        <field name="code">description</field><field name="name">Description</field><field name="phrase">a description</field><field name="sequence">20</field>
+    </record>
+    <record id="agile_workflow_field_story_points" model="agile.workflow.field">
+        <field name="code">story_points</field><field name="name">Estimate</field><field name="phrase">an estimate</field><field name="sequence">30</field>
+    </record>
+    <record id="agile_workflow_field_date_deadline" model="agile.workflow.field">
+        <field name="code">date_deadline</field><field name="name">Due date</field><field name="phrase">a due date</field><field name="sequence">40</field>
+    </record>
+    <record id="agile_workflow_field_parent_id" model="agile.workflow.field">
+        <field name="code">parent_id</field><field name="name">Epic</field><field name="phrase">an epic</field><field name="sequence">50</field>
+    </record>
+    <record id="agile_workflow_field_sprint_id" model="agile.workflow.field">
+        <field name="code">sprint_id</field><field name="name">Sprint</field><field name="phrase">a sprint</field><field name="sequence">60</field>
+    </record>
+</odoo>

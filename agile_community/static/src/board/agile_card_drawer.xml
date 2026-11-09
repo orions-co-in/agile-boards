@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.CardDrawer">
+        <aside class="o_ag_drawer" role="dialog" aria-label="Issue details" tabindex="-1" t-ref="root"
+               t-on-keydown="onKeydown">
+            <header class="o_ag_drawer_bar">
+                <button type="button" class="btn btn-link o_ag_drawer_expand" t-on-click="expand">Open full page</button>
+                <button type="button" class="btn btn-primary o_ag_drawer_close" t-on-click="close">Done</button>
+            </header>
+            <div class="o_ag_drawer_body">
+                <View t-props="viewProps"/>
+            </div>
+        </aside>
+    </t>
+</templates>

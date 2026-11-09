@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_workflow_template_wizard_form" model="ir.ui.view">
+        <field name="name">agile.workflow.template.wizard.form</field>
+        <field name="model">agile_community.workflow_template_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Share a workflow">
+                <field name="workflow_id" invisible="1"/>
+                <field name="new_workflow_id" invisible="1"/>
+                <div class="text-muted mb-3" invisible="new_workflow_id">
+                    Copy this workflow to another project, download it as a file, or create a new workflow from a file. Nothing in an existing workflow changes: a copy or an import always creates a new workflow.
+                </div>
+                <group invisible="new_workflow_id">
+                    <field name="project_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="file" filename="filename" string="Workflow file"/>
+                    <field name="filename" invisible="1"/>
+                </group>
+                <field name="report" invisible="not new_workflow_id" readonly="1"/>
+                <footer>
+                    <button name="action_copy" type="object" string="Copy to project" class="btn-primary" invisible="new_workflow_id or not workflow_id or not project_id"/>
+                    <button name="action_import" type="object" string="Import file" class="btn-primary" invisible="new_workflow_id or not file or not project_id"/>
+                    <button name="action_download" type="object" string="Download file" class="btn-secondary" invisible="new_workflow_id or not workflow_id"/>
+                    <button name="action_open_workflow" type="object" string="Open the new workflow" class="btn-primary" invisible="not new_workflow_id"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

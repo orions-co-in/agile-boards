@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_roadmap_page_action" model="ir.actions.client">
+        <field name="name">Roadmap</field>
+        <field name="tag">agile_community.roadmap</field>
+    </record>
+    <menuitem id="menu_agile_roadmap_page" name="Roadmap" parent="project.menu_project_management"
+              action="agile_roadmap_page_action" sequence="1" groups="project.group_project_user"/>
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_release_correction_wizard_form" model="ir.ui.view">
+        <field name="name">agile.release.correction.wizard.form</field>
+        <field name="model">agile_community.release_correction_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Correct Released Record">
+                <group>
+                    <field name="release_id"/>
+                    <field name="project_id"/>
+                    <field name="correction_type" widget="radio"/>
+                    <field name="reason" placeholder="Explain why this correction is needed."/>
+                </group>
+                <group string="Release details" invisible="correction_type != 'details'">
+                    <field name="name" placeholder="Leave blank to keep the current name."/>
+                    <field name="release_date"/>
+                    <field name="clear_target_date"/>
+                    <field name="description" placeholder="Leave blank to keep the current description."/>
+                    <field name="clear_description"/>
+                    <field name="milestone_id" domain="[('project_id', '=', project_id)]" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <field name="clear_milestone"/>
+                </group>
+                <group string="Issue membership" invisible="correction_type != 'issue'">
+                    <field name="membership_action"/>
+                    <field name="issue_id" domain="[('project_id', '=', project_id), ('agile_issue', '=', True)]" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <field name="target_version_id" invisible="membership_action != 'move'" required="correction_type == 'issue' and membership_action == 'move'" options="{'no_create': True, 'no_create_edit': True}"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply Correction" class="oe_highlight" confirm="This correction will be added to the release history. Continue?"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

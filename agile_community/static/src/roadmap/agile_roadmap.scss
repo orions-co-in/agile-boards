@@ -1,0 +1,665 @@
+.o_ag_roadmap {
+    background: var(--ag-paper);
+}
+
+.o_ag_rm_body {
+    padding: var(--ag-space-4);
+}
+
+.o_ag_rm_head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--ag-space-3);
+    margin-block-end: var(--ag-space-4);
+}
+
+.o_ag_rm_title {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.o_ag_rm_controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ag-space-3);
+}
+
+.o_ag_rm_control {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_empty {
+    padding: var(--ag-space-5);
+    text-align: center;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_scroll {
+    overflow-x: auto;
+    border: 1px solid var(--ag-line);
+    border-radius: var(--ag-radius-card);
+    background: var(--ag-surface);
+}
+
+.o_ag_rm_grid {
+    display: flex;
+    min-width: 100%;
+}
+
+.o_ag_rm_labels {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 3;
+    flex: 0 0 16rem;
+    background: var(--ag-surface);
+    border-inline-end: 1px solid var(--ag-line);
+}
+
+.o_ag_rm_label_head,
+.o_ag_rm_head_rail {
+    block-size: 3.4rem;
+    border-block-end: 1px solid var(--ag-line);
+}
+
+.o_ag_rm_label_head {
+    padding: 2.1rem var(--ag-space-3) 0;
+    font-size: 0.8rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_label {
+    display: flex;
+    align-items: center;
+    gap: var(--ag-space-1);
+    block-size: 48px;
+    padding-inline: var(--ag-space-2);
+    overflow: hidden;
+    white-space: nowrap;
+
+    &.issue {
+        padding-inline-start: var(--ag-space-5);
+        font-size: 0.9rem;
+    }
+}
+
+.o_ag_rm_label_project {
+    font-weight: 600;
+    background: var(--ag-paper);
+}
+
+.o_ag_rm_label_name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.o_ag_rm_chevron {
+    inline-size: 1.6rem;
+    min-block-size: 1.6rem;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: var(--ag-ink);
+}
+
+.o_ag_rm_chevron_gap {
+    display: inline-block;
+    inline-size: 1.6rem;
+}
+
+.o_ag_rm_canvas {
+    position: relative;
+    // When the timeline is shorter than the screen, stretch the row lines to the right edge
+    // instead of stopping short of the frame. Bars keep their pixel positions.
+    flex: 1 0 auto;
+}
+
+.o_ag_rm_head_rail {
+    position: relative;
+}
+
+.o_ag_rm_sprint {
+    position: absolute;
+    inset-block-start: 2px;
+    block-size: 1rem;
+    overflow: hidden;
+    padding-inline: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    background: var(--ag-paper);
+    border: 1px solid var(--ag-line);
+    border-radius: 3px;
+}
+
+.o_ag_rm_release {
+    position: absolute;
+    inset-block-start: 1.15rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--ag-plum);
+}
+
+.o_ag_rm_today {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 2px;
+    background: var(--ag-plum);
+    opacity: 0.6;
+    z-index: 1;
+}
+
+.o_ag_rm_rows {
+    position: relative;
+}
+
+.o_ag_rm_row {
+    position: relative;
+    block-size: 48px;
+    border-block-end: 1px solid var(--ag-line);
+}
+
+.o_ag_rm_row_project {
+    background: var(--ag-paper);
+}
+
+.o_ag_rm_bar {
+    position: absolute;
+    inset-block: 10px;
+    overflow: hidden;
+    padding: 0 6px;
+    text-align: start;
+    white-space: nowrap;
+    color: var(--ag-ink);
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-plum);
+    border-radius: 4px;
+    z-index: 2;
+
+    &.issue {
+        border-color: var(--ag-s-progress);
+    }
+
+    &.done {
+        border-color: var(--ag-s-done);
+    }
+
+    // A late bar is red and also outlined with dashes, so it reads without colour (O-1072).
+    &.late {
+        border-color: #c0392b;
+        border-width: 2px;
+        outline: 2px dashed var(--ag-ink, #1d2733);
+        outline-offset: 2px;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ag-focus);
+        outline-offset: 2px;
+    }
+}
+
+.o_ag_rm_fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--ag-plum);
+    opacity: 0.25;
+}
+
+.o_ag_rm_bar_text {
+    position: relative;
+    font-size: 0.8rem;
+}
+
+.o_ag_rm_row .o_ag_rm_tag_blocked,
+.o_ag_rm_row .o_ag_rm_tag_circular {
+    position: absolute;
+    inset-block-start: 12px;
+    z-index: 2;
+}
+
+.o_ag_rm_lines {
+    position: absolute;
+    inset-block-start: 3.4rem;
+    inset-inline-start: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.o_ag_rm_line {
+    stroke: var(--ag-muted);
+    stroke-width: 1.5;
+
+    &.late {
+        stroke: #c0392b;
+        stroke-width: 2;
+    }
+
+    &.stub {
+        stroke-dasharray: 3 3;
+    }
+
+    &.faded {
+        opacity: 0.15;
+    }
+}
+
+.o_ag_rm_list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.o_ag_rm_list_project {
+    padding: var(--ag-space-3) 0 var(--ag-space-1);
+    font-weight: 600;
+}
+
+.o_ag_rm_list_item > .o_ag_rm_chevron,
+.o_ag_rm_list_item > .o_ag_rm_chevron_gap {
+    flex: 0 0 1.6rem;
+    // As tall as the title line beside it, so the arrow sits level with the title.
+    min-block-size: 2.25rem;
+}
+
+.o_ag_rm_list_item {
+    // The arrow (or an empty gap of the same width) in the first column keeps every title aligned.
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ag-space-2);
+    min-block-size: var(--ag-target);
+    padding-block: var(--ag-space-2);
+    border-block-end: 1px solid var(--ag-line);
+
+    &.issue {
+        padding-inline-start: var(--ag-space-5);
+    }
+
+    progress {
+        inline-size: 6rem;
+    }
+}
+
+.o_ag_rm_list_body {
+    display: flex;
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ag-space-1) var(--ag-space-2);
+    min-inline-size: 0;
+
+    // The title takes its own line; dates, progress and tags follow beneath it.
+    > .o_ag_rm_open.btn {
+        flex: 0 0 100%;
+        padding-inline: 0;
+        text-align: start;
+    }
+}
+
+.o_ag_rm_dates,
+.o_ag_rm_progress_text {
+    font-size: 0.85rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_blockers {
+    margin-inline-start: auto;
+    padding-block: 0;
+    font-size: 0.75rem;
+}
+
+// The Blockers panel: a sheet on the right that leaves the timeline readable beside it.
+.o_ag_rm_panel {
+    position: fixed;
+    inset-block: 3rem 0;
+    inset-inline-end: 0;
+    z-index: 20;
+    inline-size: 26rem;
+    max-inline-size: 100vw;
+    padding: var(--ag-space-3, 1rem);
+    overflow-y: auto;
+    background: var(--ag-surface, var(--o-view-background-color, #fff));
+    border-inline-start: 1px solid var(--ag-line, #d6d9de);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
+}
+
+.o_ag_rm_panel_head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ag-space-2, 0.5rem);
+}
+
+.o_ag_rm_panel_title {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.o_ag_rm_panel_sub {
+    margin-block: var(--ag-space-3, 1rem) var(--ag-space-1, 0.25rem);
+    font-size: 0.9rem;
+}
+
+.o_ag_rm_blocker {
+    padding-block: var(--ag-space-2, 0.5rem);
+    border-block-end: 1px solid var(--ag-line, #d6d9de);
+
+    &.late .o_ag_rm_blocker_text {
+        color: var(--ag-red, #c62f3d);
+        font-weight: 600;
+    }
+}
+
+.o_ag_rm_blocker_text {
+    margin: 0;
+}
+
+.o_ag_rm_blocker_meta {
+    font-size: 0.85rem;
+}
+
+.o_ag_rm_blocker_actions {
+    display: flex;
+    gap: var(--ag-space-2, 0.5rem);
+}
+
+.o_ag_rm_add {
+    margin-block-start: var(--ag-space-3, 1rem);
+}
+
+.o_ag_rm_result {
+    display: block;
+    inline-size: 100%;
+    text-align: start;
+}
+
+.o_ag_rm_panel_notice {
+    min-block-size: 1.5rem;
+    margin-block-start: var(--ag-space-2, 0.5rem);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 767px) {
+    .o_ag_rm_panel {
+        inset-block-start: auto;
+        max-block-size: 80vh;
+        inline-size: 100vw;
+        border-inline-start: 0;
+        border-block-start: 1px solid var(--ag-line, #d6d9de);
+    }
+}
+
+// A project's heading in the cross-project view: its progress in words and a link to its own roadmap.
+.o_ag_rm_row_project {
+    display: flex;
+    align-items: center;
+    gap: var(--ag-space-2, 0.5rem);
+    padding-inline-start: var(--ag-space-2, 0.5rem);
+}
+
+.o_ag_rm_rollup {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_list_project {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--ag-space-1, 0.25rem) var(--ag-space-2, 0.5rem);
+}
+
+// The Blocked tag is a button that opens the Blockers panel.
+button.o_ag_rm_tag_blocked {
+    border: 0;
+    cursor: pointer;
+}
+
+// O-1073: the collision block at the top of the Blockers panel, and the list row's "Blocked by" disclosure.
+.o_ag_rm_collision {
+    margin-block: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--bs-danger, #dc3545);
+    border-inline-start-width: 4px;
+    border-radius: 4px;
+
+    p {
+        margin-block-end: 0.5rem;
+    }
+}
+
+.o_ag_rm_blocked_by {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+
+    summary {
+        cursor: pointer;
+    }
+
+    p {
+        margin-block: 0.25rem 0;
+    }
+}
+
+// O-1074: the print layout is the list form on a landscape page without the controls or the panel.
+@page {
+    size: landscape;
+}
+
+@media print {
+    .o_main_navbar,
+    .o_control_panel,
+    .o_ag_rm_controls,
+    .o_ag_rm_export_notice,
+    .o_ag_rm_panel,
+    .o_ag_rm_chevron,
+    .o_ag_rm_chevron_gap,
+    .o_ag_rm_blockers,
+    .o_ag_rm_open_project {
+        display: none !important;
+    }
+
+    .o_ag_rm_list_item {
+        break-inside: avoid;
+    }
+}
+
+// The date ruler (a label at each Monday, or each month when zoomed out) and the faint lines under it.
+.o_ag_rm_tick {
+    position: absolute;
+    inset-block-end: 2px;
+    padding-inline-start: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--ag-muted);
+    border-inline-start: 1px solid var(--ag-line);
+
+    &.month {
+        color: var(--ag-ink);
+        font-weight: 600;
+    }
+}
+
+.o_ag_rm_gridlines {
+    position: absolute;
+    inset-block: 3.4rem 0;
+    inset-inline: 0;
+    pointer-events: none;
+
+    span {
+        position: absolute;
+        inset-block: 0;
+        inline-size: 1px;
+        background: var(--ag-line);
+        opacity: 0.6;
+    }
+}
+
+.o_ag_rm_label_text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    flex: 1 1 auto;
+    line-height: 1.15;
+}
+
+.o_ag_rm_label_dates {
+    font-size: 0.7rem;
+    color: var(--ag-muted);
+}
+
+// The "starts too early" popover under the bar it explains (D-1071).
+.o_ag_rm_warning {
+    position: fixed;
+    z-index: 25;
+    inline-size: 24rem;
+    max-inline-size: 90vw;
+    padding: var(--ag-space-3, 1rem);
+    background: var(--ag-surface, var(--o-view-background-color, #fff));
+    border: 1px solid var(--ag-line, #d6d9de);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    white-space: normal;
+
+    p {
+        margin-block: 0 0.6rem;
+    }
+}
+
+.o_ag_rm_warning_title {
+    margin-block-end: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.o_ag_rm_warning_lead {
+    font-weight: 600;
+}
+
+.o_ag_rm_warning_detail,
+.o_ag_rm_warning_earliest,
+.o_ag_rm_warning_note {
+    font-size: 0.85rem;
+    color: var(--ag-muted);
+}
+
+.o_ag_rm_warning_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-end: 0.6rem;
+}
+
+.o_ag_rm_export {
+    position: relative;
+
+    summary { list-style: none; cursor: pointer; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: " \25BE"; }
+
+    .o_ag_rm_export_items {
+        position: absolute;
+        z-index: 5;
+        inset-inline-end: 0;
+        display: grid;
+        min-inline-size: 11rem;
+        padding: 0.25rem;
+        border: 1px solid var(--ag-line, #dde1e6);
+        border-radius: var(--ag-radius-card, 8px);
+        background: var(--ag-surface, #fff);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+        .btn { text-align: start; }
+    }
+}
+
+.o_ag_rm_legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--ag-muted, #5d6975);
+
+    li { display: flex; align-items: center; gap: 0.4rem; }
+
+    .o_ag_rm_legend_bar {
+        inline-size: 1.5rem;
+        block-size: 0.7rem;
+        border: 1px solid var(--ag-muted, #5d6975);
+        border-radius: 3px;
+
+        &.late { border: 1px dashed #c0392b; background: rgba(192, 57, 43, 0.15); }
+    }
+
+    .o_ag_rm_legend_arrow { color: var(--ag-muted, #5d6975); }
+}
+
+// Colour by status or release (U-1163): the bar keeps its outline and gains a tint of its colour.
+.o_ag_rm_bar.o_ag_rm_coloured {
+    border-color: var(--rm-colour);
+    background: color-mix(in srgb, var(--rm-colour) 20%, var(--ag-surface));
+
+    .o_ag_rm_fill {
+        background: var(--rm-colour);
+        opacity: 0.35;
+    }
+
+    &.late {
+        border-color: #c0392b;
+    }
+}
+
+.o_ag_rm_colour_legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ag-space-3, 1rem);
+    margin: 0 0 var(--ag-space-2, 0.5rem);
+    font-size: 0.85rem;
+}
+
+.o_ag_rm_swatch {
+    display: inline-block;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    border: 1px solid var(--ag-ink, #1d2733);
+    border-radius: 3px;
+    vertical-align: -2px;
+}
+
+.o_ag_rm_share {
+    max-inline-size: 38rem;
+    margin-block: var(--ag-space-3, 1rem);
+    padding: var(--ag-space-3, 1rem);
+    background: var(--ag-surface);
+    border: 1px solid var(--ag-line, #dde1e6);
+    border-radius: 6px;
+
+    .o_ag_rm_share_head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .o_ag_rm_share_people {
+        display: grid;
+        gap: 0.25rem;
+        margin-block: var(--ag-space-2, 0.5rem);
+    }
+
+    .o_ag_rm_share_item {
+        padding-block: 0.4rem;
+        border-block-start: 1px solid var(--ag-line, #dde1e6);
+    }
+}
+
+@media print {
+    .o_ag_rm_share,
+    .o_ag_rm_share_button {
+        display: none;
+    }
+}

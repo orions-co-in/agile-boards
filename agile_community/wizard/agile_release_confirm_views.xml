@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_release_confirm_form" model="ir.ui.view">
+        <field name="name">agile.release.confirm.form</field>
+        <field name="model">agile.release.confirm</field>
+        <field name="arch" type="xml">
+            <form string="Mark as Released">
+                <field name="release_id" invisible="1"/>
+                <field name="project_id" invisible="1"/>
+                <field name="open_count" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not open_count">
+                    <strong><field name="open_count" class="oe_inline"/> issue(s) in this release are not done yet.</strong>
+                    <field name="open_list" readonly="1" nolabel="1"/>
+                </div>
+                <p invisible="open_count">Every issue in this release is done or canceled. Release it?</p>
+                <group invisible="not open_count">
+                    <field name="handling" widget="radio"/>
+                    <field name="target_version_id" invisible="handling != 'move'" required="handling == 'move'" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button string="Mark as Released" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

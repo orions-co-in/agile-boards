@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.BacklogGraphRenderer" t-inherit="web.GraphRenderer" t-inherit-mode="primary">
+        <xpath expr="//div[@t-ref='container']" position="after">
+            <details t-if="model.hasData()" class="o_ag_graph_numbers px-3 pb-3 flex-shrink-0">
+                <summary>Show the numbers</summary>
+                <table class="table table-sm w-auto mb-0">
+                    <caption class="visually-hidden"><t t-out="measureLabel"/> by group</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Group</th>
+                            <th scope="col" class="text-end" t-out="measureLabel"/>
+                            <th scope="col" class="text-end">Issues</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="numberRows" t-as="row" t-key="row_index">
+                            <th scope="row" class="fw-normal" t-out="row.label"/>
+                            <td class="text-end" t-out="row.value"/>
+                            <td class="text-end" t-out="row.count"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </details>
+        </xpath>
+    </t>
+</templates>

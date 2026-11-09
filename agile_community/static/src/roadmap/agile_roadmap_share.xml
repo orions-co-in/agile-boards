@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.RoadmapShare">
+        <section class="o_ag_rm_share" role="dialog" aria-label="Share this roadmap">
+            <header class="o_ag_rm_share_head">
+                <h2>Share this roadmap</h2>
+                <button type="button" class="btn btn-link o_ag_rm_share_close" t-on-click="props.onClose">Close</button>
+            </header>
+            <p class="text-muted">Named people open it read only. They see only the projects and items their own access allows.</p>
+            <p t-if="state.error" class="alert alert-danger" role="alert" t-out="state.error"/>
+            <p t-if="state.notice" class="o_ag_rm_share_notice" role="status" t-out="state.notice"/>
+            <p t-if="state.loading" class="text-muted" role="status">Loading...</p>
+            <t t-else="">
+                <form class="o_ag_rm_share_form" t-on-submit="create">
+                    <label class="o_ag_rm_control"><span>Name</span>
+                        <input type="text" class="form-control o_ag_rm_share_name" maxlength="60" t-model="state.name" placeholder="Q1 plan"/></label>
+                    <fieldset class="o_ag_rm_share_people">
+                        <legend>Share with</legend>
+                        <p t-if="!state.people.length" class="text-muted">No one else is on your projects yet.</p>
+                        <label t-foreach="state.people" t-as="person" t-key="person.id" class="o_ag_rm_check">
+                            <input type="checkbox" t-att-checked="state.chosen.includes(person.id)" t-on-change="() => this.toggle(state.chosen, person.id)"/>
+                            <t t-out="person.name"/>
+                        </label>
+                    </fieldset>
+                    <p class="text-muted">Saves the <t t-out="props.projects.length"/> project(s) in view, the Hide done and Epics only choices and the colours.</p>
+                    <button type="submit" class="btn btn-primary o_ag_rm_share_create">Share</button>
+                </form>
+                <h3 t-if="state.mine.length">Shared by you</h3>
+                <ul t-if="state.mine.length" class="o_ag_rm_share_list list-unstyled">
+                    <li t-foreach="state.mine" t-as="share" t-key="share.id" class="o_ag_rm_share_item">
+                        <b t-out="share.name"/> <span class="text-muted">with <t t-out="share.people"/></span>
+                        <div t-if="state.editing and state.editing.id === share.id" class="o_ag_rm_share_edit">
+                            <label t-foreach="state.people" t-as="person" t-key="person.id" class="o_ag_rm_check">
+                                <input type="checkbox" t-att-checked="state.editing.chosen.includes(person.id)" t-on-change="() => this.toggle(state.editing.chosen, person.id)"/>
+                                <t t-out="person.name"/>
+                            </label>
+                            <button type="button" class="btn btn-primary btn-sm" t-on-click="saveEdit">Save people</button>
+                        </div>
+                        <span class="o_ag_rm_share_actions">
+                            <button type="button" class="btn btn-link btn-sm o_ag_rm_share_copy" t-on-click="() => this.copyLink(share)">Copy link</button>
+                            <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.startEdit(share)">Change people</button>
+                            <button type="button" class="btn btn-link btn-sm text-danger" t-on-click="() => this.remove(share)">Stop sharing</button>
+                        </span>
+                    </li>
+                </ul>
+                <h3 t-if="state.shared.length">Shared with you</h3>
+                <ul t-if="state.shared.length" class="o_ag_rm_share_list list-unstyled">
+                    <li t-foreach="state.shared" t-as="share" t-key="share.id" class="o_ag_rm_share_item">
+                        <b t-out="share.name"/> <span class="text-muted">from <t t-out="share.owner"/></span>
+                        <button type="button" class="btn btn-link btn-sm o_ag_rm_share_open" t-on-click="() => this.open(share)">Open</button>
+                    </li>
+                </ul>
+            </t>
+        </section>
+    </t>
+</templates>

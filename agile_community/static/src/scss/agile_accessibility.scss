@@ -1,0 +1,155 @@
+.o_kanban_renderer.o_agile_kanban {
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: 1rem;
+
+    .o_agile_task_actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+        max-width: 100%;
+
+        .btn {
+            min-block-size: 2.75rem;
+            min-inline-size: 2.75rem;
+            white-space: normal;
+        }
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--ag-focus, #0759b8);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px var(--body-bg, #fff);
+    }
+}
+
+.o_form_view {
+    .o_agile_issue_fields,
+    .o_agile_issue_links {
+        min-inline-size: 0;
+
+        :focus-visible {
+            outline: 3px solid var(--ag-focus, #0759b8);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px var(--body-bg, #fff);
+        }
+    }
+
+    .o_agile_transition_action {
+        min-block-size: 2.75rem;
+        min-inline-size: 2.75rem;
+        white-space: normal;
+    }
+
+    .o_agile_transition_action:focus-visible {
+        outline: 3px solid var(--ag-focus, #0759b8);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px var(--body-bg, #fff);
+    }
+
+    .o_agile_acceptance .o_field_boolean_toggle {
+        min-block-size: 2.75rem;
+        min-inline-size: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.o_agile_bulk_update_preview {
+    max-block-size: 40vh;
+    overflow: auto;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 767.98px) {
+    .o_kanban_renderer.o_agile_kanban {
+        .o_agile_task_actions {
+            align-items: stretch;
+        }
+
+        .o_agile_task_actions .btn {
+            flex: 1 1 6.5rem;
+        }
+    }
+
+    .o_form_view .o_agile_transition_action {
+        max-inline-size: 100%;
+    }
+}
+
+// Form: one label column width for every group, so values line up down the page instead of
+// starting where each group's longest label happens to end. The !important beats Odoo's grid rule.
+@media (min-width: 576px) {
+    .o_form_view:has(.o_agile_issue_fields) .o_form_sheet .o_inner_group {
+        grid-template-columns: 9.5rem minmax(0, 1fr) !important;
+    }
+}
+
+// Groups that opt in with o_agile_label_col share one label width, so values start at the same x.
+@media (min-width: 576px) {
+    .o_form_view .o_inner_group.o_agile_label_col {
+        grid-template-columns: 13rem minmax(0, 1fr) !important;
+    }
+}
+
+// Phone: titles in the release's included-issues list wrap instead of being cut to a few letters.
+@media (max-width: 767.98px) {
+    // Odoo fixes every column at the same width and keeps text on one line; give the title the room
+    // and let it wrap. The issue type column is dropped here (the key and stage still say enough).
+    .o_form_view .o_field_widget[name="agile_issue_ids"] {
+        td[name="name"] {
+            white-space: normal !important;
+        }
+
+        th[data-name="name"] {
+            inline-size: 50% !important;
+        }
+
+        th[data-name="agile_task_type_id"],
+        td[name="agile_task_type_id"] {
+            display: none !important;
+        }
+    }
+
+    // Odoo's chatter toolbar (Send message, Attach files, Followers) wraps instead of running
+    // past the right edge of the screen.
+    .o-mail-Chatter-topbar {
+        flex-wrap: wrap;
+        row-gap: 0.25rem;
+        max-width: 100%;
+    }
+
+    .o-mail-Chatter-topbar .o-mail-Followers {
+        margin-inline-start: auto;
+    }
+}
+
+// Agile settings tools: each button says in one line what it opens (U-2).
+.o_agile_tools .o_agile_tool {
+    display: grid;
+    // The button sits above its help line: beside it the help wrapped one word per line next to the chatter (NU-39).
+    grid-template-columns: minmax(0, 1fr);
+    gap: .25rem;
+    align-items: start;
+    padding: .5rem 0;
+    > .btn { justify-self: start; }
+}
+.o_agile_tool_help {
+    color: var(--ag-muted, #5d6975);
+    font-size: .875rem;
+}
+@media (max-width: 575.98px) {
+    .o_agile_tools .o_agile_tool { grid-template-columns: 1fr; gap: .25rem; }
+}
+
+// The release notes keep their line breaks so the headings and bullets read as written.
+.o_ag_release_notes {
+    white-space: pre-line;
+}
+
+// E2E-011: Odoo's info badge is white on cyan (3.0:1). Agile's status badges use dark text so To Do reads at AA (4.5:1).
+.o_ag_status_badge .badge.text-bg-info {
+    color: #1b1f24 !important;
+}

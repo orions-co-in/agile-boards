@@ -1,0 +1,32 @@
+.o_agile_roadmap_view {
+    .oe_timeline_buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .o_agile_timeline_item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.2rem;
+        line-height: 1.35;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_agile_roadmap_view {
+        .oe_timeline_buttons .btn-group {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .oe_timeline_widget {
+            min-height: 22rem;
+            overflow-x: auto;
+            touch-action: pan-x pan-y;
+        }
+    }
+}

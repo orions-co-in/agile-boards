@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_sprint_user,project.sprint.user,model_project_sprint,project.group_project_user,1,0,0,0
+access_project_sprint_admin,project.sprint.admin,model_project_sprint,project.group_project_manager,1,1,1,1
+access_project_sprint_close_manager,project.sprint.close.manager,model_project_sprint_close,project.group_project_manager,1,1,1,1
+access_project_sprint_scope_change_wizard_manager,project.sprint.scope.change.wizard.manager,model_project_sprint_scope_change_wizard,project.group_project_manager,1,1,1,1
+access_project_sprint_scope_change_read,project.sprint.scope.change.read,model_project_sprint_scope_change,project.group_project_user,1,0,0,0
+access_project_sprint_commitment_read,project.sprint.commitment.read,model_project_sprint_commitment,project.group_project_user,1,0,0,0
+access_project_sprint_commitment_line_read,project.sprint.commitment.line.read,model_project_sprint_commitment_line,project.group_project_user,1,0,0,0
+access_project_sprint_capacity_user,project.sprint.capacity.user,model_project_sprint_capacity,project.group_project_user,1,0,0,0
+access_project_sprint_capacity_manager,project.sprint.capacity.manager,model_project_sprint_capacity,project.group_project_manager,1,1,1,1
+access_project_sprint_commitment_capacity_read,project.sprint.commitment.capacity.read,model_project_sprint_commitment_capacity,project.group_project_user,1,0,0,0
+access_project_sprint_correction_read,project.sprint.correction.read,model_project_sprint_correction,project.group_project_user,1,0,0,0
+access_project_sprint_correction_wizard_manager,project.sprint.correction.wizard.manager,model_project_sprint_correction_wizard,project.group_project_manager,1,1,1,1

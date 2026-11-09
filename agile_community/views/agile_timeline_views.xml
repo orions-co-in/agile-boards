@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_roadmap_item_timeline" model="ir.ui.view">
+        <field name="name">agile.roadmap.item.timeline</field>
+        <field name="model">agile.roadmap.item</field>
+        <field name="type">timeline</field>
+        <field name="arch" type="xml">
+            <timeline
+                string="Project Roadmap"
+                date_start="date_start"
+                date_stop="date_end"
+                default_group_by="item_type"
+                dependency_arrow="dependency_item_ids"
+                mode="month"
+                class="o_agile_roadmap_view"
+                stack="true"
+                create="false"
+                edit="false"
+                delete="false"
+                event_open_popup="true"
+                zoomKey="ctrlKey"
+            >
+                <field name="item_type"/>
+                <field name="issue_key" readonly="1"/>
+                <field name="agile_status"/>
+                <field name="agile_is_epic"/>
+                <field name="is_derived"/>
+                <field name="child_issue_count"/>
+                <field name="child_done_count"/>
+                <field name="dependency_item_ids"/>
+                <templates>
+                    <t t-name="timeline-item">
+                        <div class="o_agile_timeline_item">
+                            <small><t t-esc="record.item_type"/> · </small>
+                            <strong t-if="record.issue_key">
+                                <t t-esc="record.issue_key"/> —
+                            </strong>
+                            <span><t t-esc="record.display_name"/></span>
+                            <small t-if="record.is_derived" title="Dates come from the child issues and sprints">(from child issues)</small>
+                            <small t-if="record.agile_is_epic">
+                                <t t-esc="record.child_done_count"/>/
+                                <t t-esc="record.child_issue_count"/> complete
+                            </small>
+                        </div>
+                    </t>
+                </templates>
+            </timeline>
+        </field>
+    </record>
+
+    <record id="agile_roadmap_item_list" model="ir.ui.view">
+        <field name="name">agile.roadmap.item.list</field>
+        <field name="model">agile.roadmap.item</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0" default_order="date_start, item_type, name">
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="item_type" widget="badge"/>
+                <field name="issue_key" optional="show" readonly="1"/>
+                <field name="name"/>
+                <field name="agile_status" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="project_task_epic_roadmap_list" model="ir.ui.view">
+        <field name="name">project.task.epic.roadmap.list</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <list default_order="agile_planned_start, sequence, name">
+                <field name="issue_key" readonly="1"/>
+                <field name="name"/>
+                <field name="agile_planned_start" optional="show"/>
+                <field name="agile_planned_end" optional="show"/>
+                <field name="agile_child_done_count" string="Done"/>
+                <field name="agile_child_issue_count" string="Children"/>
+                <field name="agile_status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="agile_roadmap_item_form" model="ir.ui.view">
+        <field name="name">agile.roadmap.item.form</field>
+        <field name="model">agile.roadmap.item</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_source" type="object" string="Open issue" class="oe_highlight" invisible="item_type != 'issue'"/>
+                    <button name="action_open_source" type="object" string="Open sprint" class="oe_highlight" invisible="item_type != 'sprint'"/>
+                    <button name="action_open_source" type="object" string="Open release" class="oe_highlight" invisible="item_type != 'release'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="item_type"/>
+                        <field name="project_id"/>
+                        <field name="date_start"/>
+                        <field name="date_end"/>
+                        <field name="issue_key" invisible="not issue_key" readonly="1"/>
+                        <field name="agile_status" invisible="item_type != 'issue'"/>
+                    </group>
+                    <group string="Epic progress" invisible="not agile_is_epic">
+                        <field name="child_done_count"/>
+                        <field name="child_issue_count"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="project_task_list_agile_roadmap" model="ir.ui.view">
+        <field name="name">project.task.list.agile.roadmap</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="agile_community.project_task_list_agile_backlog_order"/>
+        <field name="arch" type="xml">
+            <field name="issue_key" position="after">
+                <field name="agile_planned_start" optional="hide"/>
+                <field name="agile_planned_end" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,60 @@
+// Agile design tokens (D-700). Text colours keep 4.5:1 on both surfaces in light and dark (checked in H-602). Namespaced --ag-* so they never collide with Odoo's own variables.
+// Status and type colours are always paired with an icon or label by the components that use them.
+:root {
+    --ag-plum: #714B67;
+    --ag-teal: #017E84;
+    --ag-ink: #1d2733;
+    --ag-paper: #f6f7f9;
+    --ag-surface: #fff;
+    --ag-line: #dde1e6;
+    --ag-muted: #5d6975;
+    --ag-amber: #b87503;
+    --ag-amber-text: #8a5700;
+    --ag-red: #c62f3d;
+    --ag-focus: #0759b8;
+
+    --ag-s-backlog: #5d6975;
+    --ag-s-ready: #0b5ed7;
+    --ag-s-progress: #96620a;
+    --ag-s-review: #7a46c9;
+    --ag-s-done: #157347;
+    --ag-s-canceled: #5d6975;
+
+    --ag-t-epic: #7d48c4;
+    --ag-t-story: #157347;
+    --ag-t-task: #0b5ed7;
+    --ag-t-bug: #c62f3d;
+
+    --ag-space-1: 4px;
+    --ag-space-2: 8px;
+    --ag-space-3: 12px;
+    --ag-space-4: 16px;
+    --ag-space-5: 24px;
+    --ag-radius-control: 4px;
+    --ag-radius-card: 8px;
+    --ag-target: 2.5rem;
+}
+
+// Odoo 19 switches its dark theme through the o_web_client dark colour scheme.
+.o_web_client.o_dark, [data-bs-theme="dark"] {
+    --ag-ink: #e8ecf0;
+    --ag-paper: #14181c;
+    --ag-surface: #1c2126;
+    --ag-line: #38414a;
+    --ag-muted: #9aa6b2;
+    --ag-plum: #a77c9d;
+    --ag-s-progress: #e0a53a;
+    --ag-s-review: #a98be0;
+    --ag-s-done: #4cb782;
+    --ag-s-ready: #6ea8fe;
+    --ag-red: #ef6b78;
+    --ag-amber-text: #e0a53a;
+    --ag-focus: #6ea8fe;
+    --ag-teal: #4dc0c6;
+    --ag-s-backlog: #9aa6b2;
+    --ag-s-canceled: #9aa6b2;
+    --ag-t-epic: #b794f4;
+    --ag-t-story: #4cb782;
+    --ag-t-task: #6ea8fe;
+    --ag-t-bug: #ef6b78;
+}

@@ -1,0 +1,10 @@
+// Sprint and release spans of the Calendar: a dashed outline marks them as plan, not as issues.
+.o_calendar_renderer .fc-event.o_ag_cal_span {
+    cursor: pointer;
+    border-style: dashed;
+    font-weight: 600;
+
+    &.o_ag_cal_release .o_event_title::before {
+        content: "\2691\00a0"; // flag
+    }
+}

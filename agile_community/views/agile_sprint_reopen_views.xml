@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="agile_sprint_reopen_form" model="ir.ui.view">
+        <field name="name">agile.sprint.reopen.form</field>
+        <field name="model">agile.sprint.reopen</field>
+        <field name="arch" type="xml">
+            <form string="Reopen sprint">
+                <sheet>
+                    <h2>Reopen <field name="name" class="d-inline"/>?</h2>
+                    <ul class="text-muted">
+                        <li>The sprint becomes active again with the same dates.</li>
+                        <li>The committed plan stays as it was. No new plan revision is made.</li>
+                        <li>The closing numbers are cleared and counted again when you complete it.</li>
+                        <li>Issues that moved out when it closed stay where they are. Move them back by hand if you want them.</li>
+                    </ul>
+                    <group>
+                        <field name="sprint_id" invisible="1"/>
+                        <field name="reason" placeholder="Why are you reopening it? At least 5 characters."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Reopen sprint" name="action_reopen" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_sprint_form_agile_roles" model="ir.ui.view">
+        <field name="name">project.sprint.form.agile.roles</field>
+        <field name="model">project.sprint</field>
+        <field name="inherit_id" ref="project_scrum.project_sprint_view_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <field name="can_manage_project_sprint" invisible="1"/>
+            </header>
+            <button name="action_start" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">state != 'draft' or not can_manage_project_sprint</attribute>
+            </button>
+            <button name="%(project_scrum.action_project_sprint_close)d" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">state != 'in_progress' or not can_manage_project_sprint</attribute>
+            </button>
+            <header position="inside">
+                <field name="can_reopen_sprint" invisible="1"/>
+                <button name="action_agile_open_reopen" type="object" string="Reopen sprint" groups="project.group_project_user"
+                        invisible="state != 'done' or not can_reopen_sprint"/>
+            </header>
+            <button name="action_open_correction" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">state != 'done' or not can_manage_project_sprint</attribute>
+            </button>
+            <button name="action_confirm_plan" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">state != 'draft' or planning_confirmed or not can_manage_project_sprint</attribute>
+            </button>
+            <xpath expr="//sheet/div[@role='alert'][@invisible='not planning_stale']" position="attributes">
+                <attribute name="invisible">not planning_stale or state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//sheet/div[@role='alert'][@invisible='not over_capacity']" position="attributes">
+                <attribute name="invisible">not over_capacity or state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//sheet/div[@role='alert'][@invisible='not unestimated_issue_count']" position="attributes">
+                <attribute name="invisible">not unestimated_issue_count or state == 'done'</attribute>
+            </xpath>
+            <xpath expr="//sheet/div[@role='status']" position="after">
+                <div class="text-muted mb-2" role="status" invisible="not reopen_count">
+                    Reopened <field name="reopen_count" class="d-inline"/> time(s). The closing totals are counted again when it is completed.
+                </div>
+                <div class="text-muted mb-2" role="note" invisible="state != 'draft'">
+                    Confirming records the exact issues, estimates, and member capacity in this plan. To change a confirmed plan before starting, use <em>Update Plan</em> and give a reason; the earlier snapshot stays in history.
+                </div>
+            </xpath>
+            <xpath expr="//sheet/group[field[@name='close_summary']]" position="before">
+                <div class="text-muted mb-2" role="note" invisible="state != 'in_progress'">
+                    Before completing a sprint, review unfinished issues and return them to the backlog or move them to another planned sprint. Completion saves the sprint summary and commitment totals.
+                </div>
+            </xpath>
+            <field name="name" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="user_ids" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="project_id" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="date_start" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="date_option" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="date_end" position="attributes">
+                <attribute name="readonly">date_option != 'custom' or state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <field name="description" position="attributes">
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+            </field>
+            <!-- A field is located by its name alone, so each of the two capacity lists is picked by its groups (E2E-005). -->
+            <xpath expr="//field[@name='capacity_ids'][@groups='project.group_project_manager']" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="readonly">state != 'draft' or not can_manage_project_sprint</attribute>
+                <attribute name="invisible">not can_manage_project_sprint</attribute>
+            </xpath>
+            <xpath expr="//field[@name='capacity_ids'][@groups='project.group_project_user,!project.group_project_manager']" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">can_manage_project_sprint</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='capacity']" position="before">
+                <page string="Retrospective" name="retrospective" invisible="state == 'draft'">
+                    <field name="retro_notes" nolabel="1" readonly="not can_manage_project_sprint"
+                           placeholder="What went well? What should change? What will we try next sprint?"/>
+                </page>
+            </xpath>
+            <button name="action_open_scope_change" position="attributes">
+                <attribute name="groups">project.group_project_user</attribute>
+                <attribute name="invisible">state != 'draft' or not can_manage_project_sprint</attribute>
+            </button>
+        </field>
+    </record>
+
+    <record id="project_scrum.project_sprint_menu" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('project.group_project_user')])]"/>
+    </record>
+</odoo>

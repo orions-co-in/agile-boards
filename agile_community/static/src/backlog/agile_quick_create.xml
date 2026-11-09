@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.QuickCreate">
+        <div class="o_ag_quick">
+          <div class="o_ag_quick_line d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm o_ag_quick_type" t-att-aria-label="'Issue type for ' + props.label"
+                    t-on-change="onTypeChange">
+                <option t-foreach="props.types" t-as="type" t-key="type.id" t-att-value="type.id"
+                        t-att-selected="type.id === typeId" t-out="type.name"/>
+            </select>
+            <input type="text" class="form-control form-control-sm o_ag_quick_input flex-grow-1" t-ref="input"
+                   t-att-data-group-key="props.groupKey" t-att-aria-label="'Add an issue to ' + props.label"
+                   placeholder="Add an issue: type a title, press Enter" t-model="state.title"
+                   t-att-disabled="state.saving" t-on-keydown="onKeydown"/>
+            <select class="form-select form-select-sm o_ag_quick_assignee" t-att-aria-label="'Assignee for ' + props.label"
+                    t-on-change="onAssigneeChange" t-on-keydown="onKeydown">
+                <option value="">Unassigned</option>
+                <option t-foreach="props.members || []" t-as="member" t-key="member.id" t-att-value="member.id"
+                        t-att-selected="member.id === state.userId" t-out="member.name"/>
+            </select>
+          </div>
+            <div t-if="state.error" class="o_ag_inline_error text-danger small mt-1" role="alert" t-out="state.error"/>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,103 @@
+.o_ag_flow {
+    overflow-x: auto;
+    padding: 0.5rem 0 1rem;
+
+    .o_ag_flow_svg { max-width: none; color: #4a5560; }
+
+    .o_ag_flow_box rect:first-child {
+        fill: var(--o-view-background-color, #fff);
+        stroke: #8d97a1;
+        stroke-width: 1.2;
+    }
+    .o_ag_flow_band { fill: #8d97a1; stroke: none; }
+    .o_ag_cat_backlog .o_ag_flow_band { fill: #8d97a1; }
+    .o_ag_cat_ready .o_ag_flow_band { fill: #017e84; }
+    .o_ag_cat_progress .o_ag_flow_band { fill: #b87503; }
+    .o_ag_cat_review .o_ag_flow_band { fill: #714b67; }
+    .o_ag_cat_done .o_ag_flow_band { fill: #2f7d4f; }
+    .o_ag_cat_canceled .o_ag_flow_band { fill: #c62f3d; }
+
+    .o_ag_flow_name { font-size: 14px; font-weight: 600; fill: currentColor; }
+    .o_ag_flow_count { font-size: 12px; fill: currentColor; }
+    .o_ag_flow_label { font-size: 14px; fill: currentColor; }
+    // A halo in the page colour keeps a label readable where another arrow passes behind it.
+    .o_ag_flow_label {
+        paint-order: stroke;
+        stroke: var(--o-view-background-color, #fff);
+        stroke-width: 4px;
+        stroke-linejoin: round;
+    }
+
+    .o_ag_flow_box, .o_ag_flow_move {
+        cursor: pointer;
+        &:focus-visible { outline: 2px solid var(--ag-focus, #0759b8); outline-offset: 3px; }
+    }
+}
+
+tr.o_data_row.o_ag_flash td { background: rgba(1, 126, 132, 0.18); }
+
+.o_ag_flow_bracket { color: var(--ag-muted, #5d6975); }
+.o_ag_flow_zone { fill: var(--ag-muted, #5d6975); font-size: 12px; }
+
+// Workflow canvas (D-806): the picture, then the side panel; stacked on narrow screens.
+.o_ag_flow_layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.o_ag_flow_editable .o_ag_flow_layout { grid-template-columns: minmax(0, 1fr) 19rem; }
+.o_ag_flow_scroll { overflow-x: auto; }
+// Fit the picture to the space it has; below 800px it keeps that width and scrolls sideways.
+.o_ag_flow_editable .o_ag_flow_svg { width: 100%; height: auto; min-width: 800px; }
+.o_ag_flow_hint { font-size: .8125rem; margin-bottom: .5rem; }
+.o_ag_flow_editable .o_ag_flow_svg { user-select: none; }
+// Touch drags a box or a dot; a touch on the empty canvas still scrolls it sideways.
+.o_ag_flow_editable .o_ag_flow_box, .o_ag_flow_editable .o_ag_flow_port { touch-action: none; }
+.o_ag_flow_port { fill: var(--ag-teal, #017E84); cursor: crosshair; &:hover { r: 9; } }
+.o_ag_flow_ghost { stroke: var(--ag-teal, #017E84); stroke-width: 2; stroke-dasharray: 6 4; pointer-events: none; }
+.o_ag_flow_box.o_ag_selected rect:first-of-type { stroke: var(--ag-teal, #017E84); stroke-width: 2.5; }
+.o_ag_flow_box.o_ag_drop rect:first-of-type { stroke: var(--ag-teal, #017E84); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.o_ag_flow_move.o_ag_selected path:nth-of-type(2) { stroke: var(--ag-teal, #017E84); stroke-width: 3; }
+.o_ag_flow_hit { cursor: pointer; }
+.o_ag_panel {
+    padding: .75rem 1rem;
+    border: 1px solid var(--ag-line, #dde1e6);
+    border-radius: 8px;
+    background: var(--ag-surface, #fff);
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+.o_ag_panel_title { font-size: .9375rem; margin: 0; }
+.o_ag_panel_row { display: flex; gap: .5rem; flex-wrap: wrap; }
+// Section headings in the move panel: a caption with a rule line after it.
+.o_ag_panel fieldset.o_ag_panel_field > legend {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    inline-size: 100%;
+    &::after { content: ""; flex: 1; border-block-start: 1px solid var(--ag-line, #dde1e6); }
+}
+.o_ag_panel_field { display: grid; gap: .25rem; margin: 0; padding: 0; border: 0; legend { font-size: .8125rem; color: var(--ag-muted, #5d6975); margin: 0; float: none; } label { display: flex; gap: .5rem; align-items: center; } }
+.o_ag_panel_chips { display: flex; gap: .375rem; flex-wrap: wrap; }
+.o_ag_need {
+    border: 1px solid var(--ag-line, #dde1e6);
+    border-radius: 14px;
+    padding: .125rem .625rem;
+    min-block-size: 28px;
+    background: var(--ag-surface, #fff);
+    &[aria-pressed="true"] { background: var(--ag-teal, #017E84); border-color: var(--ag-teal, #017E84); color: #fff; &::before { content: "\2713\00a0"; } }
+}
+.o_ag_panel_message { margin: 0; font-size: .8125rem; color: var(--ag-ink, #1d2733); }
+.o_ag_panel_note { font-size: .8125rem; margin: 0; }
+@media (max-width: 991.98px) {
+    .o_ag_flow_editable .o_ag_flow_layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.o_ag_flow_tools { margin-bottom: .5rem; }
+.o_ag_add_choice {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+    margin: 0 0 .25rem;
+}
+
+.o_ag_flow_box.o_ag_hidden { opacity: .5; }
+.o_ag_status_actions { display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; }

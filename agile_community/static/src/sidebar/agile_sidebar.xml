@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.SidebarIcon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path t-att-d="path"/></svg>
+    </t>
+
+    <t t-name="agile_community.Sidebar">
+        <t t-if="state.data">
+            <nav class="o_ag_side" aria-label="Project">
+                <div class="o_ag_side_project">
+                    <span class="o_ag_side_key" t-out="state.data.key or state.data.name.slice(0, 4)"/>
+                    <span class="o_ag_side_name">
+                        <b t-out="state.data.name"/>
+                        <small>
+                            <t t-out="state.data.method === 'scrum' ? 'Scrum' : 'Kanban'"/>
+                            <t t-if="state.data.sprint"> · <t t-out="state.data.sprint"/></t>
+                        </small>
+                        <small t-if="state.data.access_label" class="o_ag_side_access" t-out="state.data.access_label"/>
+                    </span>
+                </div>
+                <t t-foreach="groups" t-as="group" t-key="group.name">
+                    <div class="o_ag_side_group" t-out="group.name"/>
+                    <t t-foreach="group.entries" t-as="entry" t-key="entry.key">
+                        <button type="button"
+                                class="o_ag_side_item" t-att-aria-current="state.entry === entry.key ? 'page' : false"
+                                t-att-title="entry.label" t-on-click="() => this.open(entry.key)">
+                            <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="entry.icon"/></t>
+                            <span class="o_ag_side_label" t-out="entry.label"/>
+                            <t t-set="badge" t-value="badgeFor(entry.key)"/>
+                            <span t-if="badge" class="o_ag_side_badge" t-att-class="{ 'o_ag_side_badge_danger': badge.danger }" t-att-title="badge.tip" t-att-aria-label="badge.tip + ': ' + badge.text" t-out="badge.text"/>
+                        </button>
+                        <t t-if="entry.key === 'board'">
+                            <button t-foreach="state.data.boards || []" t-as="board" t-key="board.id" type="button"
+                                    class="o_ag_side_item o_ag_side_board" t-att-title="board.name"
+                                    t-att-aria-current="state.entry === 'board' and state.data.board_id === board.id ? 'page' : false"
+                                    t-on-click="() => this.openBoard(board.id)">
+                                <span class="o_ag_side_label" t-out="board.name"/>
+                            </button>
+                        </t>
+                    </t>
+                </t>
+                <button type="button" class="o_ag_side_item o_ag_side_shortcuts" aria-keyshortcuts="?" t-on-click="showShortcuts">
+                    <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="'M4 7h16v10H4z M7 10h.01M10 10h.01M13 10h.01M16 10h.01M8 14h8'"/></t>
+                    <span class="o_ag_side_label">Shortcuts</span>
+                </button>
+                <a t-if="canInstall" class="o_ag_side_item o_ag_side_install" t-att-href="installUrl" target="_blank" rel="noopener">
+                    <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="'M12 4v10M8 10l4 4 4-4M5 19h14'"/></t>
+                    <span class="o_ag_side_label">Install app</span>
+                </a>
+            </nav>
+            <nav class="o_ag_bottom" aria-label="Project">
+                <button t-foreach="bottomEntries" t-as="entry" t-key="entry.key" type="button"
+                        t-att-aria-current="state.entry === entry.key ? 'page' : false" t-on-click="() => this.open(entry.key)">
+                    <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="entry.icon"/></t>
+                    <span t-out="entry.label"/>
+                </button>
+                <button type="button" aria-haspopup="true" t-att-aria-expanded="state.more ? 'true' : 'false'" t-on-click="toggleMore">
+                    <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="'M5 12h.01M12 12h.01M19 12h.01'"/></t>
+                    <span>More</span>
+                </button>
+                <div t-if="state.more" class="o_ag_bottom_sheet">
+                    <button t-foreach="moreEntries" t-as="entry" t-key="entry.key" type="button"
+                            t-att-aria-current="state.entry === entry.key ? 'page' : false" t-on-click="() => this.open(entry.key)">
+                        <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="entry.icon"/></t>
+                        <span t-out="entry.label"/>
+                    </button>
+                    <a t-if="canInstall" class="o_ag_install_link" t-att-href="installUrl" target="_blank" rel="noopener">
+                        <t t-call="agile_community.SidebarIcon"><t t-set="path" t-value="'M12 4v10M8 10l4 4 4-4M5 19h14'"/></t>
+                        <span>Install app</span>
+                    </a>
+                </div>
+            </nav>
+        </t>
+    </t>
+</templates>

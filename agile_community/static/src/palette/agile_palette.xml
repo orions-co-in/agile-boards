@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.PaletteHost"><span class="d-none" aria-hidden="true"/></t>
+    <t t-name="agile_community.Palette">
+        <Dialog header="false" footer="false" size="'md'" contentClass="'o_ag_palette'" bodyClass="'p-0'">
+            <div class="o_ag_palette_box" t-on-keydown="onKeydown">
+                <input type="text" class="o_ag_palette_input" t-ref="input" autocomplete="off" spellcheck="false"
+                       role="combobox" aria-label="Go to an issue or a screen" aria-haspopup="listbox"
+                       aria-controls="o_ag_palette_list" t-att-aria-expanded="flat.length ? 'true' : 'false'"
+                       t-att-aria-activedescendant="activeId or false"
+                       placeholder="Type an issue key, a title or a screen name"
+                       t-att-value="state.term" t-on-input="onInput"/>
+                <ul class="o_ag_palette_list" id="o_ag_palette_list" role="listbox" aria-label="Results">
+                    <t t-foreach="sections" t-as="section" t-key="section.title">
+                        <li role="presentation" class="o_ag_palette_heading" t-out="section.title"/>
+                        <li t-foreach="section.items" t-as="row" t-key="rowId(row)" role="option"
+                            t-att-id="rowId(row)" class="o_ag_palette_row"
+                            t-att-class="{ 'is-active': row.index === state.index }"
+                            t-att-aria-selected="row.index === state.index ? 'true' : 'false'"
+                            t-on-click="() => this.choose(row)"
+                            t-on-mousemove="() => { state.index = row.index }">
+                            <t t-if="row.type === 'issue'">
+                                <span class="o_ag_palette_key" t-out="row.issue.key"/>
+                                <span class="o_ag_palette_title" t-out="row.issue.name"/>
+                                <span class="o_ag_palette_meta">
+                                    <t t-out="row.issue.status"/>
+                                    <t t-if="row.issue.project !== ''"> in <t t-out="row.issue.project"/></t>
+                                </span>
+                            </t>
+                            <t t-elif="row.type === 'screen'"><span class="o_ag_palette_title" t-out="row.screen.label"/></t>
+                            <t t-else=""><span class="o_ag_palette_title" t-out="row.action.label"/></t>
+                        </li>
+                    </t>
+                </ul>
+                <p t-if="state.loaded and !flat.length" class="o_ag_palette_empty" role="status">
+                    <t t-if="state.term.trim()">Nothing matches "<t t-out="state.term.trim()"/>".</t>
+                    <t t-else="">No issues opened yet. Type an issue key or a title.</t>
+                </p>
+            </div>
+        </Dialog>
+    </t>
+</templates>

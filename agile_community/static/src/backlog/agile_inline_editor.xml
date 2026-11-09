@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.InlineEditor">
+        <div class="o_ag_inline p-2" t-on-keydown="onKeydown">
+            <label class="o_ag_inline_label d-block mb-1" t-att-for="'o_ag_inline_input'" t-out="props.label"/>
+            <input t-if="props.kind === 'number'" id="o_ag_inline_input" t-ref="input" type="text" inputmode="decimal"
+                   class="form-control form-control-sm" t-model="state.value" t-att-disabled="state.saving"
+                   t-att-aria-invalid="state.error ? 'true' : 'false'" placeholder="Not estimated"/>
+            <select t-else="" id="o_ag_inline_input" t-ref="input" class="form-select form-select-sm"
+                    t-model="state.value" t-att-disabled="state.saving" t-on-change="save">
+                <option t-foreach="props.options" t-as="option" t-key="option.id" t-att-value="option.id" t-out="option.label"/>
+            </select>
+            <p t-if="state.error" class="o_ag_inline_error text-danger small mt-1 mb-0" role="alert" t-out="state.error"/>
+            <p class="text-muted small mt-1 mb-0">Enter saves, Esc cancels.</p>
+        </div>
+    </t>
+</templates>

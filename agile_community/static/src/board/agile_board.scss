@@ -1,0 +1,705 @@
+.o_ag_board_head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ag-space-3, 1rem);
+    padding: 0.5rem 1rem 0;
+
+    .o_ag_pulse {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .o_ag_complete_sprint {
+        flex: 0 0 auto;
+        margin-top: 0.25rem;
+    }
+
+    @media (max-width: 767.98px) {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem 0;
+
+        .o_ag_complete_sprint {
+            align-self: stretch;
+            margin-top: 0;
+        }
+    }
+}
+
+// A column title carries the WIP text ("Review · WIP 3/2 — over by 1"); let it wrap instead of cutting it off.
+.o_agile_kanban .o_kanban_header .o_column_title .text-truncate {
+    white-space: normal;
+    text-overflow: clip;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+// ---- Filter chips and swimlane choice ----
+.o_ag_board_bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.5rem 1rem;
+
+    .o_ag_chips,
+    .o_ag_lanes_switch {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .o_ag_chip {
+        min-height: 2rem;
+        padding: 0 0.85rem;
+        border: 1px solid var(--ag-line, #c9ccd4);
+        border-radius: 999px;
+        background: transparent;
+        color: inherit;
+        font-size: 0.9rem;
+
+        &[aria-pressed="true"] {
+            border-color: var(--ag-plum, #714b67);
+            background: var(--ag-plum, #714b67);
+            color: #fff;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--ag-plum, #714b67);
+            outline-offset: 2px;
+        }
+    }
+
+    .o_ag_pick {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin: 0;
+    }
+
+    .o_ag_pick_label {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        color: var(--ag-muted, #6b7280);
+    }
+
+    .o_ag_select {
+        min-height: 2rem;
+        max-width: 14rem;
+        padding: 0 0.5rem;
+        border: 1px solid var(--ag-line, #c9ccd4);
+        border-radius: 0.5rem;
+        background: transparent;
+        color: inherit;
+    }
+
+    @media (max-width: 767.98px) {
+        padding: 0.5rem 0.75rem;
+
+        .o_ag_chip {
+            min-height: 2.5rem;
+        }
+
+        .o_ag_select {
+            min-height: 2.5rem;
+        }
+    }
+}
+
+// ---- Swimlanes ----
+.o_ag_swimlanes {
+    min-width: 0;
+    padding: 0 1rem 1rem;
+    overflow-x: auto;
+
+    .o_ag_lane_head,
+    .o_ag_lane_row {
+        display: grid;
+        gap: 0.75rem;
+        min-width: min-content;
+    }
+
+    .o_ag_lane_head {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 0.5rem 0;
+        background: var(--o-view-background-color, #fff);
+    }
+
+    .o_ag_lane_col {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+
+    .o_ag_lane_col_count {
+        color: var(--ag-muted, #6b7280);
+    }
+
+    .o_ag_lane {
+        margin-bottom: 0.75rem;
+        border-top: 1px solid var(--ag-line, #c9ccd4);
+    }
+
+    .o_ag_lane_title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 0;
+        border: 0;
+        background: transparent;
+        text-align: left;
+        color: inherit;
+
+        &:focus-visible {
+            outline: 2px solid var(--ag-plum, #714b67);
+            outline-offset: 2px;
+        }
+    }
+
+    .o_ag_lane_meta {
+        color: var(--ag-muted, #6b7280);
+        font-size: 0.85rem;
+    }
+
+    .o_ag_lane_cell {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .o_ag_lane_more {
+        margin: 0.5rem 0 0;
+    }
+}
+
+// ---- Card drawer ----
+.o_ag_drawer {
+    position: fixed;
+    top: var(--o-navbar-height, 46px);
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    width: clamp(26rem, 40vw, 46rem);
+    background: var(--o-view-background-color, #fff);
+    border-left: 1px solid var(--ag-line, #c9ccd4);
+    box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.12);
+    outline: none;
+
+    .o_ag_drawer_bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--ag-line, #c9ccd4);
+    }
+
+    .o_ag_drawer_body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+
+        .o_form_view {
+            height: auto;
+        }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        animation: o_ag_drawer_in 0.16s ease-out;
+    }
+
+    // On a phone the drawer is the whole screen under the navigation bar.
+    @media (max-width: 767.98px) {
+        left: 0;
+        width: auto;
+        border-left: 0;
+        box-shadow: none;
+    }
+}
+
+// Slide only: a fade would leave the drawer invisible while an animation is paused.
+@keyframes o_ag_drawer_in {
+    from {
+        transform: translateX(1.5rem);
+    }
+}
+
+// ---- Column header: blocked count and WIP badge ----
+.o_ag_colinfo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.85rem;
+    // Always one line tall, so the first card of every column starts at the same height.
+    min-height: 1.75rem;
+
+    &:not(:has(*)) {
+        @media (max-width: 991.98px) {
+            display: none;
+        }
+    }
+}
+
+.o_ag_blocked_count {
+    color: var(--ag-red, #c62f3d);
+    font-weight: 600;
+}
+
+.o_ag_wip {
+    padding: 0 0.5rem;
+    border: 1px solid var(--ag-line, #c9ccd4);
+    border-radius: 999px;
+    white-space: nowrap;
+
+    &.o_ag_wip_at {
+        border-color: var(--ag-amber, #b87503);
+        background: rgba(224, 161, 43, 0.18);
+    }
+
+    &.o_ag_wip_over {
+        border: 2px solid var(--ag-red, #c62f3d);
+        color: var(--ag-red, #c62f3d);
+        font-weight: 700;
+    }
+}
+
+.o_ag_swimlanes .o_ag_lane_col {
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+// Blocked card: red outline, flag and reason on the card (never colour alone).
+.o_agile_kanban .o_kanban_record:has(.o_ag_card_blocked) {
+    box-shadow: inset 0 0 0 1px var(--ag-red, #c62f3d);
+}
+
+.o_ag_card_blocked {
+    color: var(--ag-red, #c62f3d);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+// Dependency tag: a quiet chip, so the red flag stays for issues someone marked as blocked.
+.o_ag_card_flagged {
+    color: var(--ag-amber-text, #8a5700);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.o_ag_card_resolution {
+    color: var(--ag-muted-text, #5f6b76);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.o_ag_card_blocker {
+    color: var(--ag-amber, #8a5a00);
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    // Blocked only by its dependencies: one red line instead of a red line plus an amber one.
+    &.o_ag_card_blocked {
+        color: var(--ag-red, #c62f3d);
+        font-size: 0.85rem;
+    }
+}
+
+// ---- Phone: a one-line sprint header that opens to the pulse and Complete sprint ----
+.o_ag_board_head_phone {
+    display: block;
+    padding: 0.25rem 0.75rem 0;
+
+    .o_ag_head_toggle {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem 0.5rem;
+        width: 100%;
+        min-height: 2.75rem;
+        padding: 0.25rem 0;
+        border: 0;
+        border-bottom: 1px solid var(--ag-line, #c9ccd4);
+        background: transparent;
+        color: inherit;
+        text-align: left;
+
+        &:focus-visible {
+            outline: 2px solid var(--ag-plum, #714b67);
+            outline-offset: 2px;
+        }
+    }
+
+    .o_ag_head_pace_behind {
+        color: var(--ag-red, #c62f3d);
+        font-weight: 600;
+    }
+
+    .o_ag_head_pace_ahead {
+        color: var(--ag-teal, #017e84);
+        font-weight: 600;
+    }
+
+    .o_ag_head_chevron {
+        margin-left: auto;
+    }
+
+    .o_ag_complete_sprint {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+
+.o_ag_board_bar .o_ag_chips {
+    @media (max-width: 767.98px) {
+        flex-wrap: wrap;
+        max-width: 100%;
+        padding-bottom: 0.25rem;
+    }
+}
+
+// ---- Required-field hint (B-114) ----
+// The line and the marked fields carry words; the amber is only a second cue.
+.o_ag_hint {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid #b87503;
+    background: rgba(184, 117, 3, 0.1);
+    font-size: 0.9rem;
+}
+
+.o_field_widget.o_ag_needed {
+    outline: 2px solid #b87503;
+    outline-offset: 2px;
+    border-radius: 3px;
+
+    &::after {
+        content: attr(data-needed);
+        display: block;
+        color: #8a5700;
+        font-size: 0.8rem;
+    }
+}
+
+// ---- Phone: column tabs and the Move-to sheet (B-115) ----
+// The renderer is a row; with tabs it wraps so the tabs take the full first line.
+.o_kanban_renderer:has(> .o_ag_tabs) {
+    flex-wrap: wrap;
+    // Without this the spare height is shared between the wrapped lines and opens a gap under the tabs.
+    // Odoo's renderer carries Bootstrap's align-content-stretch (an !important utility), so this must too.
+    align-content: flex-start !important;
+
+    // Columns come from the workflow, so the "add column" strip is only noise on a phone.
+    > .o_column_quick_create {
+        display: none;
+    }
+
+    // One column at a time: let it use the whole width, not Odoo's fixed column width.
+    > .o_kanban_group {
+        flex: 1 1 100%;
+        max-width: none;
+        width: auto;
+    }
+}
+
+.o_ag_tabs {
+    flex: 0 0 100%;
+    align-self: flex-start;
+    align-items: flex-start;
+    height: auto;
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.75rem 0.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--o-view-background-color, #fff);
+
+    .o_ag_tab {
+        flex: 0 0 auto;
+        min-height: 44px;
+        padding: 0.25rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background: transparent;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.2;
+
+        &[aria-selected="true"] {
+            border-color: #017e84;
+            background: rgba(1, 126, 132, 0.12);
+            font-weight: 600;
+        }
+    }
+
+    .o_ag_tab_count {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_ag_tab_wip {
+        font-size: 0.75rem;
+    }
+}
+
+.o_ag_sheet_backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1040;
+}
+
+.o_ag_sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1041;
+    max-height: 70vh;
+    overflow: auto;
+    padding: 1rem 1rem 1.25rem;
+    background: var(--o-view-background-color, #fff);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .o_ag_sheet_title {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .o_ag_sheet_move {
+        min-height: 44px;
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        background: transparent;
+    }
+
+    .o_ag_sheet_close {
+        min-height: 44px;
+    }
+}
+
+// ---- Phone drawer: the workflow buttons and the hint line stay at the bottom (B-116) ----
+.o_ag_drawer {
+    .o_form_statusbar {
+        flex-wrap: wrap;
+    }
+
+    // The hint field is the first line of the button bar, above the buttons.
+    .o_form_statusbar > .o_field_widget[name="agile_transition_hint"] {
+        flex: 0 0 100%;
+        order: -1;
+    }
+
+    .o_ag_hint {
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .o_form_statusbar {
+            position: fixed;
+            inset-inline: 0;
+            bottom: 0;
+            z-index: 3;
+            padding: 0.5rem 0.75rem;
+            background: var(--o-view-background-color, #fff);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+
+            .btn {
+                min-height: 44px;
+            }
+        }
+
+        .o_ag_drawer_body {
+            padding-bottom: 8rem;
+        }
+
+        // The "open record" arrows make some fields narrower than others, so the underlines end at
+        // different places. Full page opens the issue; related records are one tap away there.
+        .o_external_button {
+            display: none;
+        }
+    }
+}
+
+// Desktop and tablet (the phone has tabs instead): Odoo gives every column a 332 px minimum, so a six-column workflow needs
+// sideways scrolling on a 1280 px screen and Review's buttons are cut off. 210 px still holds a
+// card and its buttons, and lets all six columns share the screen.
+@media (min-width: 768px) {
+    .o_agile_kanban .o_kanban_renderer.o_kanban_grouped > .o_kanban_group {
+        min-width: 210px;
+        max-width: 360px;
+    }
+}
+
+// Card footer: on a narrow column the stars, avatar and action buttons wrap onto a second line
+// inside the card instead of spilling over its edge.
+.o_agile_kanban .o_kanban_record footer {
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+
+    > .d-flex.ms-auto {
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.25rem;
+        max-width: 100%;
+    }
+
+    .o_agile_task_actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.25rem;
+    }
+}
+
+// Wide screens (1534 px and up): Odoo puts a form's chatter beside the form, which inside this
+// 512 px drawer left the form about 160 px wide and broke every label letter by letter. The drawer
+// always stacks the form and the chatter.
+.o_ag_drawer .o_form_renderer {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    height: auto !important;
+
+    > .o_form_sheet_bg,
+    > .o-mail-Form-chatter {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        overflow: visible !important;
+    }
+}
+
+// Points on a card read "3 pts", not a bare number (UX-5).
+.o_ag_card_points {
+    color: var(--ag-muted);
+    font-size: .8125rem;
+}
+
+// Card drawer (UI-3): time inputs show "00:00" and the assignee name is not cut to "Dev ...".
+.o_ag_drawer {
+    .o_field_widget[name="allocated_hours"],
+    .o_field_widget[name="agile_remaining_hours"] {
+        min-inline-size: 5.5rem;
+        input { min-inline-size: 5.5rem; }
+    }
+    // Two columns of fields do not fit a 512 px drawer; stack them so names are not cut.
+    .o_group > .o_inner_group {
+        flex: 0 0 100%;
+        max-inline-size: 100%;
+    }
+}
+
+// The pulse strip stops growing on very wide screens (UI-17).
+.o_agile_kanban .o_ag_pulse { max-inline-size: 80rem; }
+
+// The filter bar stays put and only the columns scroll beneath it, so the column headers
+// (name, blocked count, progress, total) stay in view at the top of the scrolling area.
+.o_agile_board_kanban_view > .o_content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    > .o_ag_board_bar { flex: 0 0 auto; }
+    > .o_kanban_renderer {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        align-content: flex-start;
+    }
+}
+
+// A step the workflow would refuse right now: muted, the tooltip says why; it still answers a click.
+.o_ag_step_unmet {
+    opacity: .6;
+    border-style: dashed;
+}
+
+.o_ag_views { display: flex; align-items: center; gap: var(--ag-space-2); flex-wrap: wrap; }
+.o_ag_view_row { display: flex; align-items: center; }
+.o_ag_view_form { display: flex; align-items: center; gap: var(--ag-space-1); flex-wrap: wrap; }
+
+.o_ag_cell_wip {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.8rem;
+}
+
+// R-1109: the board's insights panel under the filter bar.
+.o_ag_board_bar .o_ag_insights {
+    flex: 1 0 100%; // its own row below the filters, whatever the bar's other items do
+    order: 99;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.75rem;
+    padding: 0.5rem 0 0.25rem;
+
+    .o_ag_insight {
+        border: 1px solid var(--agile-border, #d8dadd);
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        min-width: 0;
+    }
+    .o_ag_insight_title { font-size: 0.875rem; font-weight: 600; margin: 0 0 0.25rem; }
+    .o_ag_insight_value { margin: 0 0 0.25rem; }
+    .o_ag_insight_list { margin: 0; padding-left: 1.25rem; font-size: 0.875rem; }
+    .o_ag_insight_key { color: var(--agile-muted, #6c757d); }
+    .o_ag_insight_bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 2.5rem;
+    }
+    .o_ag_insight_bar {
+        flex: 1 1 0;
+        min-height: 2px;
+        background: var(--agile-accent, #714b67);
+        border-radius: 2px 2px 0 0;
+    }
+}
+
+// R-1111: merged columns show the card's own status and each status's own count in the heading.
+.o_ag_status_chip {
+    display: inline-block;
+    padding: 0 0.5rem;
+    margin: 0 0 0.25rem;
+    border: 1px solid var(--agile-border, #d8dadd);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    color: var(--agile-muted, #6c757d);
+}
+.o_ag_member_head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--agile-muted, #6c757d);
+}
+
+// Phone: the chip rows are folded behind one button, so the first column shows without scrolling (NU-38).
+.o_ag_bar_toggle { display: none; }
+@media (max-width: 575.98px) {
+    .o_ag_bar_toggle { display: inline-flex; align-items: center; gap: 6px; margin: 4px 8px; }
+    .o_ag_board_bar:not(.o_ag_bar_open) > :not(.o_ag_bar_toggle) { display: none !important; }
+}

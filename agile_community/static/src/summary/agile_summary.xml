@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Summary">
+        <Layout display="display" className="'o_ag_summary'">
+            <div class="o_ag_summary_body">
+                <t t-if="state.loading">
+                    <div class="o_ag_skeleton" role="status" aria-label="Loading the summary">
+                        <div class="o_ag_skeleton_strip"><span t-foreach="[1,2,3,4,5,6,7,8,9,10]" t-as="n" t-key="n"/></div>
+                    </div>
+                </t>
+                <t t-elif="state.error">
+                    <div class="o_ag_overview_error alert alert-danger" role="alert">
+                        <p class="mb-2" t-out="state.error"/>
+                        <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                    </div>
+                </t>
+                <t t-else="">
+                    <header class="o_ag_overview_head">
+                        <h1 class="o_ag_overview_title" t-out="state.data.project.name"/>
+                        <label t-if="(state.data.active_sprints || []).length > 1" class="o_ag_sum_sprint_pick">
+                            <span class="visually-hidden">Sprint</span>
+                            <select class="form-select form-select-sm" t-on-change="onSprintChange">
+                                <option value="0" t-att-selected="!state.sprintId">All active sprints</option>
+                                <option t-foreach="state.data.active_sprints" t-as="sprint" t-key="sprint.id"
+                                        t-att-value="sprint.id" t-att-selected="state.sprintId === sprint.id" t-out="sprint.name"/>
+                            </select>
+                        </label>
+                        <button type="button" class="btn btn-link" t-on-click="openReports">Reports</button>
+                        <button type="button" t-attf-class="btn btn-sm {{state.editing ? 'btn-primary' : 'btn-secondary'}} o_ag_sum_customize"
+                                t-att-aria-pressed="state.editing ? 'true' : 'false'" t-on-click="toggleEdit">
+                            <t t-if="state.editing">Done</t><t t-else="">Customize</t>
+                        </button>
+                    </header>
+                    <div t-if="state.editing" class="o_ag_sum_editbar" role="group" aria-label="Customize the Summary">
+                        <p class="o_ag_sum_edithint">Arrange your Summary. Each change is saved as you make it.</p>
+                        <div t-if="hiddenTiles.length" class="o_ag_sum_hiddenrow">
+                            <span>Hidden tiles</span>
+                            <button t-foreach="hiddenTiles" t-as="tile" t-key="tile.id" type="button" class="btn btn-secondary btn-sm o_ag_sum_show"
+                                    t-att-data-tile="tile.id" t-on-click="() => this.showTile(tile.id)">Show <t t-out="tileName(tile.id)"/></button>
+                        </div>
+                        <div class="o_ag_sum_editactions">
+                            <t t-if="state.confirmReset">
+                                <span>Reset your Summary?</span>
+                                <button type="button" class="btn btn-danger btn-sm o_ag_sum_reset_yes" t-on-click="resetLayout">Reset</button>
+                                <button type="button" class="btn btn-link btn-sm" t-on-click="() => this.state.confirmReset = false">Keep</button>
+                            </t>
+                            <button t-else="" type="button" class="btn btn-link btn-sm o_ag_sum_reset" t-on-click="() => this.state.confirmReset = true">Reset to default</button>
+                        </div>
+                        <p t-if="state.notice" class="o_ag_sum_notice" role="status" t-out="state.notice"/>
+                        <p t-if="state.saveError" class="text-danger o_ag_sum_saveerror" role="alert">
+                            <t t-out="state.saveError"/> <button type="button" class="btn btn-link btn-sm" t-on-click="retrySave">Retry</button>
+                        </p>
+                    </div>
+                    <div class="visually-hidden" role="status" aria-live="polite" t-out="state.announce"/>
+                    <div class="o_ag_sum_grid" t-att-class="{ o_ag_sum_editing: state.editing }">
+                        <t t-foreach="shownTiles" t-as="tile" t-key="tile.id">
+                        <t t-if="tile.id === 'pulse'">
+<section class="o_ag_sum_card o_ag_sum_hero o_ag_sum_wide" aria-label="Sprint progress" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+<AgilePulse pulse="state.data" onOpenSprint.bind="openSprint" onPlanSprint.bind="planSprint"/>
+</div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'counts'">
+<section class="o_ag_sum_card o_ag_sum_hero o_ag_sum_wide" aria-label="Counts" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+<div class="o_ag_sum_kpis">
+                            <button t-foreach="tiles" t-as="tile" t-key="tile.metric" type="button"
+                                    t-attf-class="o_ag_sum_kpi {{tile.tone ? 'o_ag_sum_kpi_' + tile.tone : ''}}"
+                                    t-att-data-metric="tile.metric" t-on-click="() => this.openTile(tile.metric)">
+                                <span class="o_ag_sum_kpi_count" t-out="state.data.counts[tile.metric]"/>
+                                <span class="o_ag_sum_kpi_label" t-out="tile.label"/>
+                            </button>
+                        </div>
+</div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'status'">
+<section class="o_ag_sum_card o_ag_sum_status" aria-labelledby="sum_status_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_status_h" class="o_ag_sum_h">Status <button type="button" class="btn btn-link" t-on-click="openBoard">View board</button></h2>
+                            <div class="o_ag_sum_bars">
+                                <button t-foreach="state.data.status" t-as="row" t-key="row.status" type="button"
+                                        class="o_ag_sum_bar" t-on-click="openBoard">
+                                    <span class="o_ag_sum_bar_name" t-out="statusLabels[row.status]"/>
+                                    <span class="o_ag_sum_bar_track"><i t-attf-class="o_ag_sum_fill o_ag_sum_fill_{{row.status}}" t-attf-style="width: {{width(row.count, maxStatus)}}%"/></span>
+                                    <b t-out="row.count"/>
+                                </button>
+                            </div>
+                            <p t-if="state.data.in_backlog" class="o_ag_sum_backlog_note text-muted mb-0">
+                                <t t-out="state.data.in_backlog"/> <t t-if="state.data.in_backlog === 1">issue is</t><t t-else="">issues are</t> still in the Backlog and not counted here.
+                            </p>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'flow'">
+<section class="o_ag_sum_card o_ag_sum_flow" aria-labelledby="sum_flow_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_flow_h" class="o_ag_sum_h">Created and resolved <span class="o_ag_sum_note">last 30 days</span></h2>
+                            <t t-set="chart" t-value="flowChart"/>
+                            <svg class="o_ag_sum_chart" t-att-viewBox="'0 0 ' + chart.width + ' ' + chart.height" role="img" tabindex="0"
+                                 t-att-aria-label="'Created ' + chart.createdTotal + ', resolved ' + chart.resolvedTotal + ' in the last 30 days. Use the left and right arrow keys to read one day at a time.'"
+                                 t-on-keydown="onFlowKey" t-on-mouseleave="() => this.state.flowDay = null" t-on-blur="() => this.state.flowDay = null">
+                                <g class="o_ag_sum_grid" aria-hidden="true">
+                                    <t t-foreach="chart.yTicks" t-as="tick" t-key="tick.label">
+                                        <line t-att-x1="chart.left" t-att-x2="chart.right" t-att-y1="tick.y" t-att-y2="tick.y"/>
+                                        <text class="o_ag_sum_axis_num" t-att-x="chart.left - 5" t-att-y="tick.y + 3" text-anchor="end" t-out="tick.label"/>
+                                    </t>
+                                    <line class="o_ag_sum_axis" t-att-x1="chart.left" t-att-x2="chart.left" t-att-y1="chart.top" t-att-y2="chart.bottom"/>
+                                    <line class="o_ag_sum_axis" t-att-x1="chart.left" t-att-x2="chart.right" t-att-y1="chart.bottom" t-att-y2="chart.bottom"/>
+                                    <text t-foreach="chart.xTicks" t-as="tick" t-key="tick.label" class="o_ag_sum_axis_num"
+                                          t-att-x="tick.x" t-att-y="chart.bottom + 12" t-att-text-anchor="tick.anchor" t-out="tick.label"/>
+                                    <text class="o_ag_sum_axis_title" t-att-x="(chart.left + chart.right) / 2" t-att-y="chart.height - 3" text-anchor="middle">Day</text>
+                                    <text class="o_ag_sum_axis_title" transform="rotate(-90)" t-att-x="-(chart.top + chart.bottom) / 2" y="9" text-anchor="middle">Issues (running total)</text>
+                                </g>
+                                <polyline class="o_ag_sum_line_created" fill="none" t-att-points="chart.created"/>
+                                <polyline class="o_ag_sum_line_resolved" fill="none" t-att-points="chart.resolved"/>
+                                <g t-if="state.flowDay !== null and chart.days[state.flowDay]" class="o_ag_sum_cursor" aria-hidden="true">
+                                    <line t-att-x1="chart.days[state.flowDay].x" t-att-x2="chart.days[state.flowDay].x" t-att-y1="chart.top" t-att-y2="chart.bottom"/>
+                                    <circle class="o_ag_sum_dot_created" r="3.5" t-att-cx="chart.days[state.flowDay].x" t-att-cy="chart.days[state.flowDay].createdY"/>
+                                    <circle class="o_ag_sum_dot_resolved" r="3.5" t-att-cx="chart.days[state.flowDay].x" t-att-cy="chart.days[state.flowDay].resolvedY"/>
+                                </g>
+                                <rect t-foreach="chart.days" t-as="day" t-key="day_index" class="o_ag_sum_hit" aria-hidden="true"
+                                      t-att-x="day.x - day.band / 2" t-att-y="chart.top" t-att-width="day.band" t-att-height="chart.bottom - chart.top"
+                                      t-on-mouseenter="() => this.state.flowDay = day_index" t-on-click="() => this.state.flowDay = day_index"/>
+                            </svg>
+                            <p class="o_ag_sum_hover" role="status" aria-live="polite">
+                                <t t-if="state.flowDay !== null and chart.days[state.flowDay]">
+                                    <b t-out="chart.days[state.flowDay].label"/>:
+                                    created <b t-out="chart.days[state.flowDay].created"/>,
+                                    resolved <b t-out="chart.days[state.flowDay].resolved"/>
+                                    <span class="o_ag_sum_note">(running totals)</span>
+                                </t>
+                                <t t-else="">Point at the chart, or use the arrow keys, to read a day. Lines show running totals; the gap is the work still open.</t>
+                            </p>
+                            <div class="o_ag_sum_legend">
+                                <span><i class="o_ag_sum_swatch o_ag_sum_swatch_created"/>Created <b t-out="chart.createdTotal"/></span>
+                                <span><i class="o_ag_sum_swatch o_ag_sum_swatch_resolved"/>Resolved <b t-out="chart.resolvedTotal"/></span>
+                            </div>
+                            <details class="o_ag_sum_numbers">
+                                <summary>Show the numbers</summary>
+                                <table class="table table-sm">
+                                    <thead><tr><th>Day</th><th>Created</th><th>Resolved</th></tr></thead>
+                                    <tbody>
+                                        <tr t-foreach="state.data.flow.days" t-as="day" t-key="day">
+                                            <t t-if="state.data.flow.created[day_index] or state.data.flow.resolved[day_index]">
+                                                <td t-out="day"/><td t-out="state.data.flow.created[day_index]"/><td t-out="state.data.flow.resolved[day_index]"/>
+                                            </t>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </details>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'load'">
+<section class="o_ag_sum_card" aria-labelledby="sum_load_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_load_h" class="o_ag_sum_h">Workload <span class="o_ag_sum_note">open issues<t t-if="state.data.estimate_unit !== 'issues'"> and <t t-out="unitWord(state.data.estimate_unit)"/></t></span></h2>
+                            <div class="o_ag_sum_rows">
+                                <div t-foreach="state.data.workload.people" t-as="person" t-key="person.id" class="o_ag_sum_row">
+                                    <AgileAvatar name="person.name"/>
+                                    <span class="o_ag_sum_row_name" t-out="person.name"/>
+                                    <span class="o_ag_sum_bar_track o_ag_sum_row_bar"><i class="o_ag_sum_fill o_ag_sum_fill_load" t-attf-style="width: {{width(person.issues, maxLoad)}}%"/></span>
+                                    <span class="o_ag_sum_note"><t t-out="person.issues"/> · <t t-out="person.points"/> <t t-out="unitShort(state.data.estimate_unit)"/></span>
+                                </div>
+                                <button type="button" class="o_ag_sum_row o_ag_sum_row_link" t-on-click="() => this.openTile('unassigned')">
+                                    <AgileAvatar name="''"/>
+                                    <span class="o_ag_sum_row_name">Unassigned</span>
+                                    <span class="o_ag_sum_bar_track o_ag_sum_row_bar"><i class="o_ag_sum_fill o_ag_sum_fill_warn" t-attf-style="width: {{width(state.data.workload.unassigned.issues, maxLoad)}}%"/></span>
+                                    <span class="o_ag_sum_note"><t t-out="state.data.workload.unassigned.issues"/> · <t t-out="state.data.workload.unassigned.points"/> <t t-out="unitShort(state.data.estimate_unit)"/></span>
+                                </button>
+                            </div>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'types'">
+<section class="o_ag_sum_card" aria-labelledby="sum_types_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_types_h" class="o_ag_sum_h">Types <button type="button" class="btn btn-link" t-on-click="openBacklog">Backlog</button></h2>
+                            <div class="o_ag_sum_bars">
+                                <div t-foreach="state.data.types" t-as="row" t-key="row_index" class="o_ag_sum_bar">
+                                    <span class="o_ag_sum_bar_name" t-out="row.name"/>
+                                    <span class="o_ag_sum_bar_track"><i class="o_ag_sum_fill o_ag_sum_fill_type" t-attf-style="width: {{width(row.count, maxType)}}%"/></span>
+                                    <b t-out="row.count"/>
+                                </div>
+                                <p t-if="!state.data.types.length" class="o_ag_sum_empty">No issues in scope yet.</p>
+                            </div>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'epics'">
+<section class="o_ag_sum_card" aria-labelledby="sum_epics_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_epics_h" class="o_ag_sum_h">Epics <button type="button" class="btn btn-link" t-on-click="openRoadmap">Roadmap</button></h2>
+                            <div class="o_ag_sum_rows">
+                                <div t-foreach="state.data.epics" t-as="epic" t-key="epic.id" class="o_ag_sum_row o_ag_sum_row_epic">
+                                    <span class="o_ag_sum_row_name"><span class="o_ag_sum_note" t-out="epic.issue_key"/> <t t-out="epic.name"/></span>
+                                    <span class="o_ag_sum_bar_track o_ag_sum_row_bar"><i class="o_ag_sum_fill o_ag_sum_fill_load" t-attf-style="width: {{epic.children ? Math.round(100 * epic.done_children / epic.children) : 0}}%"/></span>
+                                    <span class="o_ag_sum_note"><t t-out="epic.done_children"/> of <t t-out="epic.children"/> done</span>
+                                </div>
+                                <p t-if="!state.data.epics.length" class="o_ag_sum_empty">No epics yet. Create an issue of type Epic to group work.</p>
+                            </div>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'release'">
+<section class="o_ag_sum_card" aria-labelledby="sum_rel_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_rel_h" class="o_ag_sum_h">Next release</h2>
+                            <t t-if="state.data.release">
+                                <button type="button" class="o_ag_sum_release" t-on-click="() => this.openRecord('project.version', state.data.release.id)">
+                                    <b t-out="state.data.release.name"/>
+                                    <span class="o_ag_sum_note"><t t-if="state.data.release.target_date">target <t t-out="state.data.release.target_date"/></t><t t-else="">no target date</t></span>
+                                    <span class="o_ag_sum_bar_track"><i class="o_ag_sum_fill o_ag_sum_fill_load" t-attf-style="width: {{state.data.release.issue_count ? Math.round(100 * state.data.release.done_issue_count / state.data.release.issue_count) : 0}}%"/></span>
+                                    <span class="o_ag_sum_note">
+                                        <t t-out="state.data.release.done_issue_count"/> of <t t-out="state.data.release.issue_count"/> done<t t-if="state.data.release.blocked_count">, <t t-out="state.data.release.blocked_count"/> blocked</t>
+                                    </span>
+                                </button>
+                            </t>
+                            <p t-else="" class="o_ag_sum_empty">No planned release. Add one under Releases in the sidebar.</p>
+                        </div>
+</section>
+                        </t>
+                        <t t-if="tile.id === 'activity'">
+<section class="o_ag_sum_card o_ag_sum_wide" aria-labelledby="sum_act_h" t-att-data-tile="tile.id">
+<t t-call="agile_community.SummaryTileBar"/>
+<div class="o_ag_sum_inner" t-att-inert="state.editing">
+                            <h2 id="sum_act_h" class="o_ag_sum_h">Recent activity</h2>
+                            <div class="o_ag_sum_rows">
+                                <button t-foreach="state.data.activity" t-as="item" t-key="item.id" type="button" class="o_ag_sum_row o_ag_sum_row_link"
+                                        t-att-disabled="!item.task_id" t-on-click="() => this.openRecord('project.task', item.task_id)">
+                                    <AgileAvatar name="item.author"/>
+                                    <span class="o_ag_sum_row_name"><b t-out="item.author"/> on <span class="o_ag_sum_note" t-out="item.issue_key"/> <t t-out="item.issue_name"/><t t-if="item.text">: <span class="o_ag_sum_note" t-out="item.text"/></t></span>
+                                    <span class="o_ag_sum_note" t-out="when(item.date)"/>
+                                </button>
+                                <p t-if="!state.data.activity.length" class="o_ag_sum_empty">Nothing has happened on this project's issues yet.</p>
+                            </div>
+                        </div>
+</section>
+                        </t>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </Layout>
+    </t>
+
+    <t t-name="agile_community.SummaryTileBar">
+        <div t-if="state.editing" class="o_ag_sum_tilebar" tabindex="0" role="group" draggable="true"
+             t-att-aria-label="tileName(tile.id) + ', tile ' + (tile_index + 1) + ' of ' + shownTiles.length + '. Alt plus the arrow keys moves it.'"
+             t-on-keydown="(ev) => this.onBarKey(ev, tile.id)"
+             t-on-dragstart="(ev) => this.onDragStart(ev, tile.id)" t-on-dragover.prevent="" t-on-drop.prevent="() => this.dropOn(tile.id)">
+            <i class="fa fa-arrows d-none d-md-inline" aria-hidden="true"/>
+            <b class="o_ag_sum_tilename" t-out="tileName(tile.id)"/>
+            <span class="o_ag_sum_tilebtns">
+                <button type="button" class="btn btn-link btn-sm o_ag_sum_earlier" t-att-disabled="tile_index === 0" t-on-click="() => this.moveTile(tile.id, -1)">Move earlier</button>
+                <button type="button" class="btn btn-link btn-sm o_ag_sum_later" t-att-disabled="tile_index === shownTiles.length - 1" t-on-click="() => this.moveTile(tile.id, 1)">Move later</button>
+                <button type="button" class="btn btn-link btn-sm o_ag_sum_hide" t-on-click="() => this.hideTile(tile.id)">Hide</button>
+            </span>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,111 @@
+.o_ag_links {
+    inline-size: 100%;
+
+    .o_ag_links_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .o_ag_links_heading {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+    }
+
+    .o_ag_links_actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .o_ag_links_group {
+        margin: 1rem 0 0.25rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .o_ag_links_row {
+        display: grid;
+        grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 0.5rem;
+        min-block-size: var(--ag-target, 2.5rem);
+        border-block-end: 1px solid var(--ag-line, #dde1e6);
+    }
+
+    .o_ag_links_key,
+    .o_ag_links_remove,
+    .o_ag_links_result {
+        min-block-size: var(--ag-target, 2.5rem);
+        min-inline-size: var(--ag-target, 2.5rem);
+    }
+
+    .o_ag_links_title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .o_ag_links_status {
+        padding: 0 0.5rem;
+        border: 1px solid var(--ag-line, #dde1e6);
+        border-radius: 999px;
+        font-size: 0.8rem;
+    }
+
+    .o_ag_links_dot {
+        inline-size: 0.6rem;
+        block-size: 0.6rem;
+        border-radius: 2px;
+        background: var(--ag-muted, #5d6975);
+    }
+    .o_ag_links_dot_backlog { background: var(--ag-s-backlog, #5d6975); }
+    .o_ag_links_dot_canceled { background: var(--ag-s-canceled, #8a929b); }
+    .o_ag_links_dot_ready { background: var(--ag-s-ready, #0b5ed7); }
+    .o_ag_links_dot_progress { background: var(--ag-s-progress, #96620a); }
+    .o_ag_links_dot_review { background: var(--ag-s-review, #7a46c9); }
+    .o_ag_links_dot_done { background: var(--ag-s-done, #157347); }
+
+    .o_ag_links_note {
+        margin: 0.5rem 0;
+        color: var(--ag-muted, #5d6975);
+    }
+
+    .o_ag_links_problem { color: var(--ag-red, #c62f3d); }
+
+    .o_ag_links_add { margin-block-start: 0.75rem; }
+
+    .o_ag_links_box {
+        display: grid;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid var(--ag-line, #dde1e6);
+        border-radius: var(--ag-radius-card, 8px);
+    }
+
+    .o_ag_links_label { display: grid; gap: 0.25rem; }
+
+    .o_ag_links_result {
+        inline-size: 100%;
+        text-align: start;
+    }
+}
+
+// Phone: key and title on one line, status under them.
+@media (max-width: 575.98px) {
+    .o_ag_links .o_ag_links_row {
+        grid-template-columns: auto auto minmax(0, 1fr) auto;
+
+        .o_ag_links_status {
+            grid-column: 3 / 4;
+            justify-self: start;
+        }
+    }
+}
+
+// The field wrapper is inline-block by default, which shrinks the panel to its content.
+.o_field_widget.o_field_agile_links {
+    display: block;
+    inline-size: 100%;
+}

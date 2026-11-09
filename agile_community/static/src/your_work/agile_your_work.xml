@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.YourWork">
+        <Layout display="display" className="'o_ag_your_work'">
+            <div class="o_ag_yw_body">
+                <t t-if="state.loading">
+                    <p class="text-muted" role="status">Loading your work...</p>
+                </t>
+                <t t-elif="state.error">
+                    <div class="alert alert-danger" role="alert">
+                        <p class="mb-2" t-out="state.error"/>
+                        <button type="button" class="btn btn-secondary" t-on-click="load">Retry</button>
+                    </div>
+                </t>
+                <t t-else="">
+                    <header class="o_ag_overview_head">
+                        <h1 class="o_ag_overview_title">Your work <span class="o_ag_yw_scope" t-out="state.data.project.name"/></h1>
+                        <button type="button" class="btn btn-link" t-on-click="openAllProjects">All projects</button>
+                    </header>
+                    <div class="o_ag_yw_tabs" role="tablist" aria-label="Your work" t-on-keydown="onTabKey">
+                        <button t-foreach="tabs" t-as="tab" t-key="tab.key" type="button" role="tab" t-att-data-tab="tab.key"
+                                class="o_ag_yw_tab" t-att-aria-selected="state.tab === tab.key ? 'true' : 'false'"
+                                t-att-tabindex="state.tab === tab.key ? 0 : -1" t-on-click="() => this.pickTab(tab.key)">
+                            <span t-out="tab.label"/>
+                            <span class="o_ag_yw_count" t-out="state.data.tabs[tab.key].count"/>
+                        </button>
+                    </div>
+                    <div class="o_ag_yw_list" role="tabpanel">
+                        <button t-foreach="current.rows" t-as="row" t-key="row.id" type="button" class="o_ag_yw_row"
+                                t-on-click="() => this.openIssue(row.id)">
+                            <span class="o_ag_yw_key" t-out="row.issue_key"/>
+                            <span class="o_ag_yw_name">
+                                <t t-out="row.name"/>
+                                <span t-if="row.blocked" class="o_ag_yw_blocked">Blocked</span>
+                            </span>
+                            <span class="o_ag_yw_meta" t-if="row.sprint" t-out="row.sprint"/>
+                            <AgileLozenge label="statusLabel(row.status)" category="row.status"/>
+                            <span class="o_ag_yw_points"><t t-if="row.points !== false"><t t-out="row.points"/> pts</t><t t-else="">-</t></span>
+                        </button>
+                        <p t-if="!current.rows.length" class="o_ag_yw_empty" t-out="emptyText"/>
+                        <p t-elif="current.count > current.rows.length" class="o_ag_yw_empty">
+                            Showing <t t-out="current.rows.length"/> of <t t-out="current.count"/>. Narrow it down on the board or backlog.
+                        </p>
+                    </div>
+                </t>
+            </div>
+        </Layout>
+    </t>
+</templates>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="agile_community.Links">
+        <section class="o_ag_links" aria-label="Issue links">
+            <header class="o_ag_links_header">
+                <h3 class="o_ag_links_heading">Links</h3>
+                <button t-if="canAdd and !state.adding" type="button" class="btn btn-secondary" t-ref="addButton"
+                        aria-haspopup="true" t-on-click="openAdd">Add link</button>
+            </header>
+            <div t-if="!resId" class="o_ag_links_note">Save the issue to add links.</div>
+            <div t-elif="state.loading" class="o_ag_links_note" role="status">Loading links…</div>
+            <div t-elif="state.error" class="o_ag_links_note text-danger" role="alert">
+                <t t-out="state.error"/>
+                <button type="button" class="btn btn-link" t-on-click="retry">Try again</button>
+            </div>
+            <t t-else="">
+                <p t-if="isEmpty" class="o_ag_links_note">No links yet. Add one to show what blocks, clones or relates to this issue.</p>
+                <t t-foreach="state.data.groups" t-as="group" t-key="group.kind">
+                    <h4 class="o_ag_links_group" t-out="group.label"/>
+                    <ul class="o_ag_links_list list-unstyled">
+                        <li t-foreach="group.items" t-as="item" t-key="item.kind + item.id" class="o_ag_links_row">
+                            <span t-attf-class="o_ag_links_dot o_ag_links_dot_{{ item.status }}" aria-hidden="true"/>
+                            <button type="button" class="btn btn-link o_ag_links_key" t-on-click="() => this.open(item)"
+                                    t-att-aria-label="'Open ' + item.key + ', ' + item.name">
+                                <t t-out="item.key"/>
+                            </button>
+                            <span class="o_ag_links_title" t-out="item.name"/>
+                            <span class="o_ag_links_status" t-out="item.status_label"/>
+                            <button t-if="state.data.can_edit" type="button" class="btn o_ag_links_remove"
+                                    t-att-disabled="state.busy"
+                                    t-att-aria-label="'Remove link to ' + item.key" t-on-click="() => this.remove(item)">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </li>
+                    </ul>
+                </t>
+                <p t-if="state.data.hidden" class="o_ag_links_note o_ag_links_hidden" t-out="hiddenText"/>
+                <p t-if="!state.data.can_edit" class="o_ag_links_note">
+                    You can read links but not change them.
+                </p>
+                <div t-elif="state.adding" class="o_ag_links_add">
+                    <div class="o_ag_links_box" role="group" aria-label="Add link" t-on-keydown="onBoxKeydown">
+                        <label class="o_ag_links_label">
+                            <span>Type</span>
+                            <select class="form-select" t-model="state.kind">
+                                <option t-foreach="kinds" t-as="kind" t-key="kind.key" t-att-value="kind.key" t-out="kind.label"/>
+                            </select>
+                        </label>
+                        <label class="o_ag_links_label">
+                            <span>Issue</span>
+                            <input type="text" class="form-control" t-ref="search" autocomplete="off"
+                                   placeholder="Key or title" t-att-value="state.query"
+                                   t-on-input="onInput" t-on-keydown="onSearchKeydown"/>
+                        </label>
+                        <ul t-if="state.results.length" class="o_ag_links_results list-unstyled">
+                            <li t-foreach="state.results" t-as="found" t-key="found.id">
+                                <button type="button" class="btn o_ag_links_result" t-on-click="() => this.add(found)"
+                                        t-on-keydown="onResultKeydown">
+                                    <strong t-out="found.issue_key"/> <span t-out="found.name"/>
+                                </button>
+                            </li>
+                        </ul>
+                        <p t-elif="state.query.trim()" class="o_ag_links_note">No issue <t t-out="state.query.trim().toUpperCase()"/> found that you can link.</p>
+                        <p t-if="state.problem" class="o_ag_links_problem" role="alert" t-out="state.problem"/>
+                        <div class="o_ag_links_actions">
+                            <button type="button" class="btn btn-primary" t-att-disabled="state.busy" t-on-click="submit">Add link</button>
+                            <button type="button" class="btn btn-secondary" t-on-click="cancelAdd">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </t>
+            <div class="visually-hidden" role="status" aria-live="polite" t-out="state.notice"/>
+        </section>
+    </t>
+</templates>
