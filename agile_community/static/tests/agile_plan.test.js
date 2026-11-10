@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { planDates, planRows } from "@agile_community/roadmap/agile_plan";
 import { compareBars, compareSummary } from "@agile_community/roadmap/agile_plan_scenario";
 import { cellText, connectorPath, neighbourOrdinal } from "@agile_community/roadmap/agile_plan_board";
@@ -52,14 +52,14 @@ test("compareBars puts live and scenario bars on one scale and flags a later end
 });
 
 test("compareSummary says how many epics move and how many are late", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(compareSummary({ moves: 0, late: 0 })).toBe("Nothing differs from the live plan.");
     expect(compareSummary({ moves: 1, late: 0 })).toBe("1 epic moves");
     expect(compareSummary({ moves: 12, late: 3 })).toBe("12 epics move, 3 later than 30 days");
 });
 
 test("cellText says planned against capacity and by how much a sprint is over", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(cellText(null)).toBe("No sprint");
     expect(cellText({ planned: 0, capacity: 0, over: 0 })).toBe("No capacity set");
     expect(cellText({ planned: 7, capacity: 0, over: 0 })).toBe("7 points planned, no capacity set");

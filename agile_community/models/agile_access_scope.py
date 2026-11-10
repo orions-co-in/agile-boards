@@ -22,11 +22,12 @@ class ProjectProject(models.Model):
         hidden = {}
         if not projects:
             return hidden
-        blocked = projects.filtered(
-            lambda project: project._agile_role_for_user(user) == "none"
-            or not project.with_user(user).has_access("read")
-        )
-        open_projects = projects - blocked
+        # One query for the team rows and one access check for the whole set, not one pair of queries per project.
+        roles = projects._agile_access_by_project(user)
+        with_role = projects.filtered(lambda project: roles[project.id][0] != "none")
+        readable = with_role.with_user(user)._filtered_access("read")
+        open_projects = projects.browse(readable.ids)
+        blocked = projects - open_projects
         for model_name in AGILE_SCOPED_MODELS:
             if model_name not in self.env:
                 continue

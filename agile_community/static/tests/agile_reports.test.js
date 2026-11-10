@@ -3,7 +3,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { click, queryAllTexts, waitFor } from "@odoo/hoot-dom";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
-import { defineModels, getService, makeMockEnv, models, contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
+import { defineModels, getService, makeTestApp, models, contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { niceMax, stackLayout } from "@agile_community/reports/agile_cfd";
 import { burndownLayout, leftText } from "@agile_community/reports/agile_burndown";
 import { deliveredText, groupText, withMarkedHelp } from "@agile_community/reports/agile_reports";
@@ -27,12 +27,12 @@ const STATUSES = [
 ];
 
 test("the axis tops out at 1, 2, 5 or 10 times a power of ten", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect([0, 1, 3, 7, 12, 34, 101].map(niceMax)).toEqual([1, 1, 5, 10, 20, 50, 200]);
 });
 
 test("bands stack from the first status upward and add up to the day's total", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const days = [
         { date: "2026-10-01", counts: { done: 1, backlog: 3 }, total: 4 },
         { date: "2026-10-02", counts: { done: 2, backlog: 2 }, total: 4 },
@@ -52,7 +52,7 @@ test("bands stack from the first status upward and add up to the day's total", a
 });
 
 test("the sprint report sentences say what was delivered and what is hidden", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(deliveredText({ planned_points: 24, completed_points: 21, percent: 88 }, false)).toBe(
         "Delivered 21 of 24 planned points, 88%"
     );
@@ -67,7 +67,7 @@ test("the sprint report sentences say what was delivered and what is hidden", as
 });
 
 test("the burndown draws points left as an area and the scope as a stepped line", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const days = [
         { date: "2026-10-01", remaining: 8, scope: 8, done: 0, issues: 2 },
         { date: "2026-10-02", remaining: 5, scope: 10, done: 5, issues: 3 },
@@ -149,7 +149,7 @@ test("a manager adds a retrospective action and the previous sprint's open ones 
 });
 
 test("burnup draws done as a rising line and the scope as steps, and words the scope change", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const days = [
         { date: "2026-10-05", done: 0, scope: 10 },
         { date: "2026-10-06", done: 4, scope: 10 },
@@ -166,7 +166,7 @@ test("burnup draws done as a rising line and the scope as steps, and words the s
 });
 
 test("control chart places a dot per issue by finish date and words the average", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const data = {
         from: "2026-10-01", to: "2026-10-31", window: 5, average: 4, longest: 6, hidden: 0,
         issues: [
@@ -226,7 +226,7 @@ test("deployment columns stand on a nice top and stack failures above successes"
 });
 
 test("the deployment summary says what happened, or what to do when nothing was recorded", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(deploySummary({ any: false })).toMatch(/No deployments have been recorded/);
     expect(deploySummary({ any: true, total: 0, environment: "production" })).toMatch(/No deploys to production/);
     const text = deploySummary({ any: true, total: 12, environment: "production", per_week: 1.2, days_since: 3, failed: 2 });

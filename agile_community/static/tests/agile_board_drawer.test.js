@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { click, queryOne } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { contains, defineModels, fields, makeMockEnv, models, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
+import { contains, defineModels, fields, makeTestApp, models, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { AgileCardDrawer } from "@agile_community/board/agile_card_drawer";
 import { AgileBoardKanbanController } from "@agile_community/board/agile_board_kanban";
 
@@ -22,7 +22,7 @@ defineModels([ProjectTask]);
 
 async function mountDrawer(overrides = {}) {
     const calls = { closed: 0, expanded: [], leave: null };
-    await makeMockEnv();
+    await makeTestApp();
     await mountWithCleanup(AgileCardDrawer, {
         props: {
             resId: 5,

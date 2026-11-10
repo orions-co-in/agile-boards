@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
     <t t-name="agile_community.Lozenge">
         <span t-attf-class="o_ag_lozenge o_ag_s_{{this.category}}">
-            <i t-attf-class="oi {{this.icon}}" aria-hidden="true"/>
+            <i class="oi oi-fw" t-att-data-icon="this.icon" aria-hidden="true"/>
             <span t-out="this.props.label"/>
         </span>
     </t>

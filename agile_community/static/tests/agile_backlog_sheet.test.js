@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { AgileBacklogRenderer } from "@agile_community/backlog/agile_backlog_list";
 import { AgileRowSheet } from "@agile_community/backlog/agile_row_sheet";
 
@@ -27,7 +27,7 @@ function fakeList({ isSmall = true, completed = false, canEdit = true, locked = 
 }
 
 test("a row's menu offers move, assign and rank, and each does what it says", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, row, record, calls } = fakeList();
     renderer.openRowSheet(row);
     const { component, props } = calls.dialogs[0];
@@ -44,7 +44,7 @@ test("a row's menu offers move, assign and rank, and each does what it says", as
 });
 
 test("without edit rights the menu has no Assign, and completed sprints say so instead", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const noEdit = fakeList({ canEdit: false });
     noEdit.renderer.openRowSheet(noEdit.row);
     expect(noEdit.calls.dialogs[0].props.actions.map((action) => action.id)).toEqual(["move", "up", "down"]);
@@ -55,7 +55,7 @@ test("without edit rights the menu has no Assign, and completed sprints say so i
 });
 
 test("on a phone the handle cell opens the menu; on a wide screen it is left to drag", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const phone = fakeList();
     const cell = { closest: () => phone.row };
     const ev = { target: { closest: () => cell }, button: 0, preventDefault() {}, stopPropagation() {} };

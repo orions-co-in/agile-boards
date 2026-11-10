@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { animationFrame, queryAllTexts } from "@odoo/hoot-dom";
-import { contains, defineModels, fields, makeMockEnv, mountView, onRpc } from "@web/../tests/web_test_helpers";
+import { contains, defineModels, fields, makeTestApp, mountView, onRpc } from "@web/../tests/web_test_helpers";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { projectModels } from "@project/../tests/project_models";
 import { AgileBoardKanbanRenderer } from "@agile_community/board/agile_board_renderer";
@@ -30,7 +30,7 @@ defineModels({ ...projectModels, ProjectTask: AgileProjectTask });
 // ---- the words ----
 
 test("move messages name the card and say what to do", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(movedMessage("WALK-3", "Review")).toBe("WALK-3 moved to Review.");
     expect(refusedMessage("WALK-3", "Add an assignee.")).toBe("WALK-3 was not moved. Add an assignee.");
     expect(refusedMessage("WALK-3", "")).toBe("WALK-3 was not moved.");
@@ -77,7 +77,7 @@ function fakeBoard({ moveFails = null, swimlane = "assignee" } = {}) {
                 context: { default_project_id: 7 },
                 groups: stages,
                 records: [record],
-                moveRecord: async (...args) => {
+                moveRecords: async (...args) => {
                     if (moveFails) {
                         throw moveFails;
                     }
@@ -99,15 +99,15 @@ function fakeBoard({ moveFails = null, swimlane = "assignee" } = {}) {
 const cell = (id, lane) => ({ dataset: { id, lane } });
 
 test("a sideways drop inside the row moves the card", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard();
     await renderer.dropOnLane("r1", "g1", cell("g2", "AK"), cell("g1", "AK"));
-    expect(calls.moves).toEqual([["r1", "g1", null, "g2"]]);
+    expect(calls.moves).toEqual([[["r1"], null, "g2"]]);
     expect(calls.notes).toEqual([]);
 });
 
 test("a drop on another row is refused with a message and nothing moves", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard();
     await renderer.dropOnLane("r1", "g1", cell("g2", "RM"), cell("g1", "AK"));
     expect(calls.moves).toEqual([]);
@@ -119,7 +119,7 @@ test("a drop on another row is refused with a message and nothing moves", async 
 });
 
 test("a drop back into the same cell does nothing", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard();
     await renderer.dropOnLane("r1", "g1", cell("g1", "AK"), cell("g1", "AK"));
     expect(calls.moves).toEqual([]);
@@ -127,7 +127,7 @@ test("a drop back into the same cell does nothing", async () => {
 });
 
 test("a move the server refuses is worded with its reason and reports failure", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const error = { data: { message: "Before moving this issue to In Progress, add an assignee." } };
     const { renderer, record, calls } = fakeBoard({ moveFails: error });
     const moved = await renderer.moveCard(record, "g1", "g2");
@@ -151,17 +151,17 @@ function key(ev) {
 }
 
 test("Alt+Right moves the focused card one column and announces it", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard();
     const ev = key({ key: "ArrowRight" });
     await renderer.onCardKeydown(ev);
     expect(ev.prevented).toBe(true);
-    expect(calls.moves).toEqual([["r1", "g1", null, "g2"]]);
+    expect(calls.moves).toEqual([[["r1"], null, "g2"]]);
     expect(calls.notes).toEqual([["WALK-3 moved to Ready.", "info"]]);
 });
 
 test("Alt+Left at the first column says so; keys without Alt are left alone", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard();
     await renderer.onCardKeydown(key({ key: "ArrowLeft" }));
     expect(calls.moves).toEqual([]);
@@ -173,7 +173,7 @@ test("Alt+Left at the first column says so; keys without Alt are left alone", as
 });
 
 test("a refused keyboard move stays put and says why", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = fakeBoard({ moveFails: { data: { message: "No." } } });
     await renderer.onCardKeydown(key({ key: "ArrowRight" }));
     expect(calls.notes).toEqual([["WALK-3 was not moved. No.", "danger"]]);
@@ -241,9 +241,10 @@ function phoneBoard({ moves = [], isSmall = true } = {}) {
     board.stages.forEach((stage, index) => (stage.value = index + 1));
     Object.assign(board.renderer, {
         env: { isSmall },
+        uiService: { isSmall },
         tabState: { id: null },
         sheet: { recordId: null, title: "", moves: [], loading: false, groupId: null },
-        sheetRef: { el: null },
+        sheetRef: () => null,
         getGroupUnloadedCount: () => 0,
         columnFacts: () => ({ wip: null }),
         orm: { call: async (model, method) => (method === "agile_allowed_moves" ? moves : { stages: [] }) },
@@ -252,7 +253,7 @@ function phoneBoard({ moves = [], isSmall = true } = {}) {
 }
 
 test("on a phone each column is a tab with its count, and the first one is open", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer } = phoneBoard();
     expect(renderer.phoneTabs.map((tab) => [tab.name, tab.count, tab.active])).toEqual([
         ["Backlog", 1, true],
@@ -267,12 +268,12 @@ test("on a phone each column is a tab with its count, and the first one is open"
 });
 
 test("a wide screen has no tabs", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(phoneBoard({ isSmall: false }).renderer.phoneTabs).toBe(null);
 });
 
 test("Move to opens a sheet of the moves the server allows and a choice moves the card", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, record, calls } = phoneBoard({
         moves: [{ name: "Mark ready", stage_id: 2, stage: "Ready" }],
     });
@@ -284,13 +285,13 @@ test("Move to opens a sheet of the moves the server allows and a choice moves th
     expect(renderer.sheet.moves).toEqual([{ name: "Mark ready", stage_id: 2, stage: "Ready" }]);
     expect(renderer.sheet.loading).toBe(false);
     await renderer.chooseMove(renderer.sheet.moves[0]);
-    expect(calls.moves).toEqual([["r1", "g1", null, "g2"]]);
+    expect(calls.moves).toEqual([[["r1"], null, "g2"]]);
     expect(calls.notes).toEqual([["WALK-3 moved to Ready.", "info"]]);
     expect(renderer.sheet.recordId).toBe(null);
 });
 
 test("a click elsewhere on the board does not open the sheet, and Close leaves the card alone", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, calls } = phoneBoard();
     await renderer.onMoveToClick({ target: { closest: () => null }, preventDefault() {} });
     expect(renderer.sheet.recordId).toBe(null);
@@ -301,7 +302,7 @@ test("a click elsewhere on the board does not open the sheet, and Close leaves t
 });
 
 test("closing the sheet gives focus back to the Move to button that opened it", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, record } = phoneBoard({ moves: [] });
     record.resId = 11;
     let focused = 0;

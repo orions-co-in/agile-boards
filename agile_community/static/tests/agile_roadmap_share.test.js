@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import {
     RELEASE_COLOURS,
     barColour,
@@ -43,7 +43,7 @@ test("a bar takes its colour from the status or the release, or keeps the standa
 });
 
 test("the legend lists each status, or each release and 'No release' when some bars have none", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const releases = releaseColours(data);
     expect(colourLegend("status", releases, data).map((e) => e.key)).toEqual(["backlog", "ready", "progress", "review", "done", "canceled"]);
     expect(colourLegend("release", releases, data).map((e) => e.label)).toEqual(["R1", "R2", "No release"]);

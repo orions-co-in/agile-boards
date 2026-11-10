@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { click, edit, press, queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame, advanceTime } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { defineModels, fields, getService, makeMockEnv, mountWithCleanup, models, onRpc } from "@web/../tests/web_test_helpers";
+import { defineModels, fields, getService, makeTestApp, mountWithCleanup, models, onRpc } from "@web/../tests/web_test_helpers";
 import { MainComponentsContainer } from "@web/core/main_components_container";
 import { AgilePalette } from "@agile_community/palette/agile_palette";
 import { buildSections, isPaletteKey, matchTargets, moveIndex } from "@agile_community/palette/palette_helpers";
@@ -19,7 +19,7 @@ defineModels([ProjectTask]);
 const press_ = (key, extra = {}) => ({ key, defaultPrevented: false, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...extra });
 
 test("Ctrl+K and Cmd+K open the palette, nothing else does", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(isPaletteKey(press_("k", { ctrlKey: true }))).toBe(true);
     expect(isPaletteKey(press_("K", { metaKey: true }))).toBe(true);
     expect(isPaletteKey(press_("k"))).toBe(false);
@@ -29,7 +29,7 @@ test("Ctrl+K and Cmd+K open the palette, nothing else does", async () => {
 });
 
 test("sections keep only what has rows and the arrow keys wrap", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { sections, flat } = buildSections({
         issues: [{ id: 1, key: "A-1", name: "One" }],
         issuesTitle: "Issues",
@@ -47,7 +47,7 @@ test("sections keep only what has rows and the arrow keys wrap", async () => {
 });
 
 test("issues of other projects get their own group after the open project's", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const issue = (id, project_id) => ({ id, key: `K-${id}`, name: `Issue ${id}`, project: `P${project_id}`, project_id });
     const { sections, flat } = buildSections({
         issues: [issue(1, 7), issue(2, 8), issue(3, 7)],
@@ -63,7 +63,7 @@ test("issues of other projects get their own group after the open project's", as
 });
 
 async function mountPalette(onClose = () => {}) {
-    await makeMockEnv();
+    await makeTestApp();
     await mountWithCleanup(MainComponentsContainer);
     // A Dialog needs the dialog service's environment, so open the palette the way the app does.
     getService("dialog").add(AgilePalette, { projectId: 7, entries: ["backlog", "board"] }, { onClose });

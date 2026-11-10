@@ -7,7 +7,7 @@ import {
     contains,
     defineModels,
     fields,
-    makeMockEnv,
+    makeTestApp,
     models,
     mountView,
     onRpc,
@@ -111,13 +111,13 @@ const keys = () =>
     queryAllTexts(".o_data_row td[name=issue_key]").filter((key) => !["WALK-10", "WALK-11"].includes(key));
 
 test("an epic counted by issues does not repeat itself on a second line", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(epicProgress(EPICS[0], "issues").points).toBe("");
     expect(txt(epicProgress(EPICS[0], "hours").points)).toBe("11 of 24 hours");
 });
 
 test("progress words and bar follow points when an epic has them, issues when it does not", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const withPoints = epicProgress(EPICS[0]);
     expect(withPoints.percent).toBe(46); // 11 of 24 points
     expect(txt(withPoints.issues)).toBe("3 of 8 issues done");

@@ -30,7 +30,7 @@
                             <summary class="btn btn-secondary">Export</summary>
                             <div class="o_ag_rm_export_items" role="group" aria-label="Export">
                                 <button type="button" class="btn btn-link o_ag_rm_download_csv" t-on-click="this.downloadCsv">Download CSV</button>
-                                <button t-if="!this.ui.isSmall" type="button" class="btn btn-link o_ag_rm_print" t-on-click="this.printLayout">Print layout</button>
+                                <button t-if="!this.ui.isSmall()" type="button" class="btn btn-link o_ag_rm_print" t-on-click="this.printLayout">Print layout</button>
                             </div>
                         </details>
                         <label t-if="!this.isPlan and !this.isShared" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_epics_only" t-att-checked="this.state.epicsOnly" t-on-change="(ev) => this.setOption('epicsOnly', ev)"/> Epics only</label>
@@ -43,7 +43,7 @@
                             </select></label>
                         <button t-if="!this.isShared and !this.isPlan" type="button" class="btn btn-secondary o_ag_rm_share_button"
                                 t-att-aria-expanded="this.state.sharing ? 'true' : 'false'" t-on-click="this.toggleSharing">Share</button>
-                        <label t-if="!this.ui.isSmall and !this.isPlan" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_as_list" t-model="this.agileModel(this.state, 'asList')"/> Show as list</label>
+                        <label t-if="!this.ui.isSmall() and !this.isPlan" class="o_ag_rm_check"><input type="checkbox" class="o_ag_rm_as_list" t-model="this.agileModel(this.state, 'asList')"/> Show as list</label>
                     </div>
                 </header>
                 <p t-if="this.isShared and this.state.share" class="o_ag_rm_shared_note text-muted" role="status">

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import {
     ARROW_GAP,
     ROW_H,
@@ -41,7 +41,7 @@ function data(overrides = {}) {
 }
 
 test("the range holds every date and today with air on both sides", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const range = timeRange(data());
     const day = (iso) => Math.round(Date.parse(`${iso}T00:00:00Z`) / 86400000);
     expect(range.start).toBe(day("2026-10-01") - 7);
@@ -49,14 +49,14 @@ test("the range holds every date and today with air on both sides", async () => 
 });
 
 test("a bar starts at its first day and spans both end days", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const range = { start: Math.round(Date.parse("2026-10-01T00:00:00Z") / 86400000), end: 0 };
     expect(barBox(range, "week", "2026-10-03", "2026-10-05")).toEqual({ left: 48, width: 72 });
     expect(barBox(range, "quarter", "2026-10-03", "2026-10-03").width).toBe(6); // never thinner than 6px
 });
 
 test("children show only for expanded epics and projects get a heading when several are shown", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const d = data();
     expect(visibleRows(d, new Set()).map((r) => r.type)).toEqual(["epic", "epic"]);
     const open = visibleRows(d, new Set(["epic:10"]));
@@ -67,7 +67,7 @@ test("children show only for expanded epics and projects get a heading when seve
 });
 
 test("an arrow runs from the blocker's end to the blocked bar's start, on the epic row when collapsed", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const d = data({ dependencies: [{ from: 11, to: 1, late: true, hidden: false }] });
     const range = timeRange(d);
     const collapsed = visibleRows(d, new Set());
@@ -84,7 +84,7 @@ test("an arrow runs from the blocker's end to the blocked bar's start, on the ep
 });
 
 test("an arrow within one row and a missing target draw nothing, a hidden blocker draws a stub", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const d = data({
         dependencies: [
             { from: 1, to: 2, late: false, hidden: false }, // both inside collapsed epic 10
@@ -98,7 +98,7 @@ test("an arrow within one row and a missing target draw nothing, a hidden blocke
 });
 
 test("text for progress and for a bar names its dates and problems", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(progressText(epic(1, "a", "b"))).toBe("1 of 2 done");
     expect(progressText(issue(1, "a", "b"))).toBe("");
     const text = describeItem(epic(1, "2026-10-05", "2026-10-20", [], { late: true }));
@@ -106,7 +106,7 @@ test("text for progress and for a bar names its dates and problems", async () =>
 });
 
 test("arrow keys, Home and End pick the next bar and stop at both ends", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(nextBarIndex(4, 1, "ArrowDown")).toBe(2);
     expect(nextBarIndex(4, 1, "ArrowRight")).toBe(2);
     expect(nextBarIndex(4, 1, "ArrowUp")).toBe(0);
@@ -119,7 +119,7 @@ test("arrow keys, Home and End pick the next bar and stop at both ends", async (
 });
 
 test("a project heading carries its id and progress, and the rollup reads as words", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const rollup = { epics_done: 3, epics_total: 5, issues_done: 18, issues_total: 40 };
     const d = data({ multi: true, projects: [{ id: 7, name: "Shop", rollup, rows: [] }] });
     const [heading] = visibleRows(d, new Set());
@@ -129,7 +129,7 @@ test("a project heading carries its id and progress, and the rollup reads as wor
 });
 
 test("the dependencies switch is on until this browser stored off, and unreadable storage means on", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const memory = new Map();
     const storage = { getItem: (k) => memory.get(k) ?? null, setItem: (k, v) => memory.set(k, v) };
     expect(readShowDependencies(storage)).toBe(true);
@@ -150,7 +150,7 @@ test("the dependencies switch is on until this browser stored off, and unreadabl
 });
 
 test("a late bar reads out how many days early it starts and its earliest valid start", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const collision = { blocker_key: "I-9", blocker_end: "2026-10-12", days: 7, earliest_start: "2026-10-13", new_end: "2026-10-17" };
     expect(collisionText(collision)).toBe("Starts 7 days before I-9 ends. Earliest valid start 2026-10-13.");
     expect(collisionText({ ...collision, days: 1 })).toBe("Starts 1 day before I-9 ends. Earliest valid start 2026-10-13.");
@@ -159,7 +159,7 @@ test("a late bar reads out how many days early it starts and its earliest valid 
 });
 
 test("the ruler marks every Monday, or the first of each month when zoomed out", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const day = (iso) => Math.round(Date.parse(`${iso}T00:00:00Z`) / 86400000);
     const range = { start: day("2026-10-26"), end: day("2026-11-30") }; // a Monday up to a Monday
     const weeks = rulerTicks(range, "month");
@@ -174,7 +174,7 @@ test("the ruler marks every Monday, or the first of each month when zoomed out",
 });
 
 test("an arrow to a bar that starts before the blocker ends runs along the row edge, not across the bar", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const d = data({
         dependencies: [{ from: 11, to: 2, late: true, hidden: false }],
     });
@@ -191,7 +191,7 @@ test("an arrow to a bar that starts before the blocker ends runs along the row e
 });
 
 test("the warning popover words follow the design: title, days, dates, earliest start and where the end goes", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const collision = { blocker_id: 9, blocker_key: "I-9", blocker_end: "2026-10-12", days: 7, earliest_start: "2026-10-13", new_end: "2026-10-17" };
     const words = warningText(issue(3, "2026-10-05", "2026-10-09", { late: true, collision }));
     expect(words.title).toBe("I-3 starts too early");

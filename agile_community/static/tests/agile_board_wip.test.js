@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv, patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { makeTestApp, patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { browser } from "@web/core/browser/browser";
 import {
     blockedCount,
@@ -16,13 +16,13 @@ import { AgileBoardKanbanRenderer } from "@agile_community/board/agile_board_ren
 describe.current.tags("desktop");
 
 test("a stage without a limit has no badge", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(wipState(0, 5)).toBe(null);
     expect(wipState(undefined, 5)).toBe(null);
 });
 
 test("the badge says in words whether the stage is under, at or over its limit", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(wipState(2, 1)).toEqual({ kind: "ok", icon: "", text: "WIP 1 of 2" });
     expect(wipState(2, 2)).toEqual({ kind: "at", icon: "●", text: "WIP 2 of 2, at the limit" });
     expect(wipState(2, 3)).toEqual({ kind: "over", icon: "▲", text: "WIP 3 of 2, over by 1" });
@@ -36,7 +36,7 @@ test("blocked cards are counted among the loaded records", () => {
 });
 
 test("column facts join the stage's counts with the column's blocked cards", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const group = { value: [25, "Review"], list: { records: [{ data: { agile_is_blocked: true } }] } };
     const facts = columnFacts(group, { 25: { limit: 1, current: 2 } });
     expect(facts.blocked).toBe(1);
@@ -47,7 +47,7 @@ test("column facts join the stage's counts with the column's blocked cards", asy
 });
 
 test("sample cards on an empty board do not count as blocked (NU-30)", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const group = {
         value: [25, "Review"],
         model: { useSampleModel: true },
@@ -57,7 +57,7 @@ test("sample cards on an empty board do not count as blocked (NU-30)", async () 
 });
 
 test("the over-limit message names the card, the column and that it is only a warning", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const message = overLimitMessage("WALK-3", "Review", wipState(2, 3));
     expect(message).toBe("WALK-3 moved to Review. WIP 3 of 2, over by 1. This is a warning, not a limit.");
 });
@@ -70,7 +70,7 @@ function fakeRenderer({ stages, fail = false }) {
             list: {
                 context: { default_project_id: 7 },
                 groups: [{ id: "g-review", displayName: "Review", list: { records: [] } }],
-                moveRecord: async (...args) => moves.push(args),
+                moveRecords: async (...args) => moves.push(args),
             },
         },
         orm: {
@@ -89,18 +89,18 @@ function fakeRenderer({ stages, fail = false }) {
 }
 
 test("a drop that leaves the column over its limit warns and offers Undo", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const { renderer, record, added, moves } = fakeRenderer({ stages: [{ stage_id: 40, limit: 2, current: 3 }] });
     await renderer.warnWhenOverLimit(record, "g-progress");
     expect(added).toHaveLength(1);
     expect(added[0].message).toBe("WALK-3 moved to Review. WIP 3 of 2, over by 1. This is a warning, not a limit.");
     expect(added[0].options.type).toBe("warning");
     added[0].options.buttons[0].onClick();
-    expect(moves).toEqual([["r1", "g-review", null, "g-progress"]]);
+    expect(moves).toEqual([[["r1"], null, "g-progress"]]);
 });
 
 test("a drop under or at the limit, or a failed count request, says nothing", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     for (const setup of [
         { stages: [{ stage_id: 40, limit: 2, current: 2 }] },
         { stages: [{ stage_id: 99, limit: 1, current: 5 }] },
@@ -168,7 +168,7 @@ function patchStorage(storage, run) {
 }
 
 test("the renderer starts each kind of swimlane with its own folded rows and saves a fold", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const storage = fakeStorage({ [lanesKey(7, "assignee")]: '["AK"]' });
     const renderer = Object.assign(Object.create(AgileBoardKanbanRenderer.prototype), {
         props: { swimlane: "assignee", list: { context: { default_project_id: 7 } } },
@@ -189,7 +189,7 @@ test("the renderer starts each kind of swimlane with its own folded rows and sav
 });
 
 test("a per-row limit is counted in each swimlane cell, not across the column", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const group = { value: [4, "In Progress"], list: { records: [{ data: {} }, { data: {} }, { data: {} }] } };
     const wip = { 4: { limit: 2, current: 3, per_swimlane: true } };
     expect(columnFacts(group, wip, false).wip.text).toBe("WIP 3 of 2, over by 1");

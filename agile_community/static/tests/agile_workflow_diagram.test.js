@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { queryAll, queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { defineModels, fields, makeMockEnv, models, mountView } from "@web/../tests/web_test_helpers";
+import { defineModels, fields, makeTestApp, models, mountView } from "@web/../tests/web_test_helpers";
 import { flowLayout, rolesText } from "@agile_community/workflow/agile_workflow_diagram";
 
 describe.current.tags("desktop");
@@ -32,7 +32,7 @@ defineMailModels();
 defineModels([AgileWorkflow]);
 
 test("statuses sit left to right, forward moves arc above and backward moves below", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const flow = flowLayout(DIAGRAM);
     expect(flow.boxes.map((box) => box.name)).toEqual(["Backlog", "Ready", "Canceled"]);
     expect(flow.boxes[0].x < flow.boxes[1].x && flow.boxes[1].x < flow.boxes[2].x).toBe(true);
@@ -51,7 +51,7 @@ test("statuses sit left to right, forward moves arc above and backward moves bel
 });
 
 test("an empty workflow lays out without boxes and roles read in words", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(flowLayout(null).boxes).toEqual([]);
     expect(rolesText([])).toBe("nobody");
     expect(rolesText(["Contributors", "Managers"])).toBe("contributors, managers");
@@ -99,7 +99,7 @@ test("brackets say the backlog is outside the sprint and To Do to Done is the sp
 });
 
 test("moves with one name into one status share a single label", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const diagram = {
         statuses: [1, 2, 3, 4].map((id) => ({ stage_id: id, name: `S${id}`, category: "ready", count: 0 })),
         moves: [1, 2, 3].map((from) => ({ id: from, name: "Cancel Issue", from, to: 4, roles: [], conditions: [], actions: [] })),

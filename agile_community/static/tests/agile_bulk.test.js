@@ -1,11 +1,11 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { resultText } from "@agile_community/bulk/agile_bulk_bar";
 
 describe.current.tags("desktop");
 
 test("the result line says how many changed, what happened and how many were refused", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(resultText("sprint", "Sprint 3", 5, 5, 0)).toBe("5 of 5 issues moved to Sprint 3.");
     expect(resultText("sprint", "Sprint 3", 4, 5, 1)).toBe("4 of 5 issues moved to Sprint 3. 1 was refused.");
     expect(resultText("status", "Done", 1, 4, 3)).toBe("1 of 4 issues moved to Done. 3 were refused.");

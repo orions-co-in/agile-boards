@@ -19,7 +19,10 @@ class ProjectTask(models.Model):
     def _agile_worklog_entries(self):
         self.ensure_one()
         # Read as the person, so timesheets they may not see stay out of the feed.
-        lines = self.env["account.analytic.line"].search([("task_id", "=", self.id)], order="date desc, id desc", limit=200)
+        lines = self.env["account.analytic.line"]
+        if lines.has_access("read"):
+            # People and agents without Timesheets rights (an agent is not a timesheet user) see no work entries.
+            lines = lines.search([("task_id", "=", self.id)], order="date desc, id desc", limit=200)
         return [
             {
                 "key": "w%s" % line.id,

@@ -64,7 +64,7 @@ export class AgilePlanBoard extends Component {
 
     get teams() {
         const teams = this.state.data.teams;
-        return this.ui.isSmall ? teams.slice(this.state.team, this.state.team + 1) : teams;
+        return this.ui.isSmall() ? teams.slice(this.state.team, this.state.team + 1) : teams;
     }
 
     get maxOffset() {
@@ -159,7 +159,7 @@ export class AgilePlanBoard extends Component {
     /** Blocker-to-blocked arrows between cards on screen, measured from the page. */
     drawLines() {
         const root = this.root();
-        if (!root || !this.state.data || this.ui.isSmall) {
+        if (!root || !this.state.data || this.ui.isSmall()) {
             return;
         }
         const origin = root.querySelector(".o_ag_pb_grid")?.getBoundingClientRect();

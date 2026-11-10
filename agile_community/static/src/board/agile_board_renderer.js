@@ -210,7 +210,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
     async moveCard(record, fromGroupId, toGroupId, { announce = false } = {}) {
         this.toggleProcessing(record.id, true);
         try {
-            await this.props.list.moveRecord(record.id, fromGroupId, null, toGroupId);
+            await this.props.list.moveRecords([record.id], null, toGroupId);
         } catch (error) {
             this.notification.add(refusedMessage(record.data.issue_key, reasonOf(error)), { type: "danger" });
             return false;
@@ -302,7 +302,7 @@ export class AgileBoardKanbanRenderer extends ProjectTaskKanbanRenderer {
             buttons: [
                 {
                     name: _t("Undo"),
-                    onClick: () => this.props.list.moveRecord(record.id, group?.id, null, fromGroupId),
+                    onClick: () => this.props.list.moveRecords([record.id], null, fromGroupId),
                 },
             ],
         });

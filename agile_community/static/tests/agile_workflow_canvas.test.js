@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { buildModel, hasMove, recordKey, reorder, sequencesFor } from "@agile_community/workflow/workflow_canvas_helpers";
 import { CATEGORY_CHOICES, arrowLabel, flowLayout } from "@agile_community/workflow/agile_workflow_diagram";
 
@@ -52,7 +52,7 @@ test("a hidden status is flagged and a never-used one can be deleted", () => {
 });
 
 test("a move with conditions says how many in its arrow label and reads them in the model", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const model = buildModel(
         [status(1, "Review", "review", 10), status(2, "Done", "done", 20)],
         [move(5, "Complete", 1, 2, { require_no_open_subtasks: true, require_not_blocked: true })]
@@ -64,7 +64,7 @@ test("a move with conditions says how many in its arrow label and reads them in 
 });
 
 test("the Add status panel offers the six categories in flow order, each with its meaning", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(CATEGORY_CHOICES.map((choice) => choice.value)).toEqual([
         "backlog", "ready", "progress", "review", "done", "canceled",
     ]);
@@ -100,7 +100,7 @@ test("a status pair has one move", () => {
 });
 
 test("each box gets a dot under it and each arrow keeps its id", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const flow = flowLayout({
         statuses: [
             { stage_id: 1, name: "Backlog", category: "backlog", count: 0 },

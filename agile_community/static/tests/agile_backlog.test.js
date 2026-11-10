@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { defineModels, fields, makeMockEnv, models, mountView, onRpc } from "@web/../tests/web_test_helpers";
+import { defineModels, fields, makeTestApp, models, mountView, onRpc } from "@web/../tests/web_test_helpers";
 import {
     backlogText,
     dateRange,
@@ -40,7 +40,7 @@ const sprint = (extra = {}) => ({
 const txt = (value) => String(value);
 
 test("points text states the total, capacity and over capacity in words", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(txt(pointsText(sprint()))).toBe("14 of 14 points");
     expect(txt(pointsText(sprint({ capacity_points: 0 })))).toBe("14 points planned");
     expect(txt(pointsText(sprint({ planned_points: 18, over_capacity: true })))).toBe(
@@ -52,14 +52,14 @@ test("points text states the total, capacity and over capacity in words", async 
 });
 
 test("the sprint total reads in the project's estimate unit", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(txt(pointsText(sprint(), "hours"))).toBe("14 of 14 hours");
     expect(txt(pointsText(sprint({ capacity_points: 0 }), "issues"))).toBe("14 issues planned");
     expect(txt(pointsText(sprint(), "points"))).toBe("14 of 14 points");
 });
 
 test("plan chip follows not confirmed, confirmed, then changed since confirmed", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(txt(planChip(sprint({ planning_confirmed: false })).text)).toBe("Plan not confirmed");
     expect(planChip(sprint({ planning_confirmed: false })).action).toBe("action_confirm_plan");
     expect(txt(planChip(sprint()).text)).toBe("Plan confirmed");
@@ -74,7 +74,7 @@ test("plan chip follows not confirmed, confirmed, then changed since confirmed",
 });
 
 test("ribbon segments are ordered by status, scaled to capacity and capped", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const segments = ribbonSegments(sprint());
     expect(segments.map((s) => s.status)).toEqual(["done", "progress", "backlog"]);
     expect(Math.abs(segments[0].width - (5 / 14) * 100) < 1e-6).toBe(true);
@@ -86,7 +86,7 @@ test("ribbon segments are ordered by status, scaled to capacity and capped", asy
 });
 
 test("labels, unestimated count and backlog totals read plainly", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(txt(stateLabel(sprint({ state: "in_progress" })))).toBe("Active");
     expect(txt(stateLabel(sprint({ state: "done" })))).toBe("Completed");
     expect(dateRange(sprint())).toMatch(/Oct.*–.*Nov/);

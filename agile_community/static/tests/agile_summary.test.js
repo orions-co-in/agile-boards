@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { ago, barWidth, cumulative, flowLines } from "@agile_community/summary/summary_helpers";
 import { DEFAULT_LAYOUT, TILE_NAMES, dropInLayout, moveInLayout } from "@agile_community/summary/agile_summary";
 
@@ -53,14 +53,14 @@ test("relative times read like words", () => {
 const ids = (layout) => layout.map((tile) => tile.id);
 
 test("every default tile has a name and shows", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(ids(DEFAULT_LAYOUT)).toEqual(Object.keys(TILE_NAMES));
     expect(DEFAULT_LAYOUT.every((tile) => !tile.hidden)).toBe(true);
     expect(ids(DEFAULT_LAYOUT)).toHaveLength(9);
 });
 
 test("moving a tile swaps it with its shown neighbour and skips hidden ones", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const layout = DEFAULT_LAYOUT.map((tile) => ({ ...tile, hidden: tile.id === "flow" }));
     const moved = moveInLayout(layout, "load", -1);
     // Created and resolved is hidden, so Workload trades places with Status, the shown tile before it.
@@ -70,7 +70,7 @@ test("moving a tile swaps it with its shown neighbour and skips hidden ones", as
 });
 
 test("dropping a tile puts it in front of the target", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const dropped = dropInLayout(DEFAULT_LAYOUT, "activity", "status");
     expect(ids(dropped).slice(0, 4)).toEqual(["pulse", "counts", "activity", "status"]);
     expect(ids(dropped)).toHaveLength(9);

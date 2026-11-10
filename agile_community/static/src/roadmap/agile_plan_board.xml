@@ -9,7 +9,7 @@
                     <button type="button" class="btn btn-secondary o_ag_pb_prev" t-att-disabled="this.state.offset === 0" t-on-click="() => this.page(-1)">Earlier sprints</button>
                     <button type="button" class="btn btn-secondary o_ag_pb_next" t-att-disabled="this.state.offset >= this.maxOffset" t-on-click="() => this.page(1)">Later sprints</button>
                     <span class="text-muted" t-out="'Sprints ' + (this.state.offset + 1) + ' to ' + (this.state.offset + this.state.data.columns)"/>
-                    <label t-if="this.ui.isSmall and this.state.data.teams.length > 1" class="o_ag_pb_team_pick">Team
+                    <label t-if="this.ui.isSmall() and this.state.data.teams.length > 1" class="o_ag_pb_team_pick">Team
                         <select class="form-select" t-on-change="(ev) => this.state.team = this.Number(ev.target.value)">
                             <option t-foreach="this.state.data.teams" t-as="team" t-key="team.id" t-att-value="team_index" t-att-selected="this.state.team === team_index" t-out="team.name"/>
                         </select></label>

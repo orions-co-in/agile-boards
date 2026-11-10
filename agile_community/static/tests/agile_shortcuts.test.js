@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { SHORTCUTS, isTypingTarget, shortcutFor } from "@agile_community/shortcuts/shortcut_helpers";
 
 describe.current.tags("desktop");
@@ -9,7 +9,7 @@ const press = (key, target = document.body, extra = {}) => ({
 });
 
 test("c, /, m and ? ask for their shortcut", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(shortcutFor(press("c"))).toBe("create");
     expect(shortcutFor(press("/"))).toBe("search");
     expect(shortcutFor(press("m"))).toBe("move");
@@ -18,7 +18,7 @@ test("c, /, m and ? ask for their shortcut", async () => {
 });
 
 test("nothing happens while typing, with a modifier, on a held key or an already handled press", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     for (const tag of ["input", "textarea", "select"]) {
         expect(shortcutFor(press("c", document.createElement(tag)))).toBe(null);
     }
@@ -35,7 +35,7 @@ test("nothing happens while typing, with a modifier, on a held key or an already
 });
 
 test("the help lists every shortcut with what it does and where", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(SHORTCUTS.map((item) => item.keys)).toEqual(["c", "/", "m", "Ctrl + K", "?", "Alt + Up, Alt + Down"]);
     expect(SHORTCUTS.every((item) => String(item.label).length && String(item.where).length)).toBe(true);
 });

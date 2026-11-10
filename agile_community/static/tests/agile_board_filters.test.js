@@ -2,8 +2,8 @@ import { describe, expect, test } from "@odoo/hoot";
 import { click, edit, queryAllTexts, queryOne, select } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { makeMockEnv, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
-import { Component, proxy, xml } from "@odoo/owl";
+import { makeTestApp, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
+import { Component, proxy, xml, useProps, t } from "@odoo/owl";
 import { AgileBoardBar } from "@agile_community/board/agile_board_bar";
 import { buildLanes, laneFilterId, mergeColumns } from "@agile_community/board/agile_board_renderer";
 
@@ -45,7 +45,7 @@ function fakeSearchModel() {
 
 class Host extends Component {
     static components = { AgileBoardBar };
-    static props = ["*"];
+    props = useProps({ searchModel: t.any() });
     static template = xml`<AgileBoardBar projectId="7" filterKey="this.key" swimlane="this.state.swimlane" onSwimlane="(value) => this.state.swimlane = value"/>`;
 
     setup() {
@@ -71,9 +71,8 @@ async function mountBar({ options = OPTIONS, fail = false } = {}) {
         saves.push({ swimlane: kwargs.swimlane, filters: kwargs.filters });
         return true;
     });
-    const env = await makeMockEnv();
-    env.searchModel = searchModel;
-    const host = await mountWithCleanup(Host, { props: { searchModel }, env });
+    await makeTestApp();
+    const host = await mountWithCleanup(Host, { props: { searchModel }, componentEnv: { searchModel } });
     await animationFrame();
     return { searchModel, saves, host };
 }
@@ -363,7 +362,7 @@ async function mountBoards({ current = BOARDS[0], swimlane = "none" } = {}) {
     let board = current;
     class BoardsHost extends Component {
         static components = { AgileBoardBar };
-        static props = ["*"];
+        props = useProps({ calls: t.any() });
         static template = xml`<AgileBoardBar projectId="7" filterKey="this.key" swimlane="this.state.swimlane"
             onSwimlane="(value) => this.onLane(value)" onColumns="(ids) => this.props.calls.columns.push(ids)"/>`;
         setup() {
@@ -394,9 +393,8 @@ async function mountBoards({ current = BOARDS[0], swimlane = "none" } = {}) {
         board = BOARDS[1];
         return { id: 5, name: "Payments squad copy" };
     });
-    const env = await makeMockEnv();
-    env.searchModel = searchModel;
-    await mountWithCleanup(BoardsHost, { props: { calls }, env });
+    await makeTestApp();
+    await mountWithCleanup(BoardsHost, { props: { calls }, componentEnv: { searchModel } });
     await animationFrame();
     return calls;
 }
@@ -515,7 +513,7 @@ test("choosing a board with merged columns tells the board its columns and group
     const seen = [];
     class GroupsHost extends Component {
         static components = { AgileBoardBar };
-        static props = ["*"];
+        props = useProps({ seen: t.any() });
         static template = xml`<AgileBoardBar projectId="7" filterKey="'k'" swimlane="'none'" onSwimlane="() => {}"
             onColumns="(ids, groups) => this.props.seen.push([ids, groups])"/>`;
     }
@@ -525,9 +523,8 @@ test("choosing a board with merged columns tells the board its columns and group
         board: { ...BOARDS[1], column_ids: [3, 4], column_groups: groups },
     }));
     onRpc("project.project", "agile_board_switch", () => true);
-    const env = await makeMockEnv();
-    env.searchModel = proxy(fakeSearchModel());
-    await mountWithCleanup(GroupsHost, { props: { seen }, env });
+    await makeTestApp();
+    await mountWithCleanup(GroupsHost, { props: { seen }, componentEnv: { searchModel: proxy(fakeSearchModel()) } });
     await animationFrame();
     await select("5", { target: "[data-pick=board]" });
     await animationFrame();

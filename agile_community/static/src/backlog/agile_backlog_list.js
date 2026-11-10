@@ -63,11 +63,13 @@ export class AgileBacklogRenderer extends ListRenderer {
         // Capture phase, so Alt+arrows and "m" are handled before the native cell navigation.
         onMounted(() => {
             this.reopenAutoFoldedGroups();
+            this.labelOptionalColumnsToggle();
             this.rootRef().addEventListener("keydown", this.onBacklogKeydown, true);
             this.rootRef().addEventListener("click", this.onBacklogClick, true);
             this.syncEditable();
         });
         onPatched(() => {
+            this.labelOptionalColumnsToggle();
             this.syncEditable();
             this.reopenAutoFoldedGroups();
             this.restoreRowFocus();
@@ -314,12 +316,7 @@ export class AgileBacklogRenderer extends ListRenderer {
 
     async undoMove(snapshot, currentGroupId) {
         try {
-            await this.props.list.moveRecord(
-                snapshot.recordId,
-                currentGroupId,
-                snapshot.previousId,
-                snapshot.groupId
-            );
+            await this.props.list.moveRecords([snapshot.recordId], snapshot.previousId, snapshot.groupId);
             this.announce(_t("Move undone."));
             await this.refreshInfo();
         } catch (error) {
@@ -373,6 +370,18 @@ export class AgileBacklogRenderer extends ListRenderer {
         }, 0);
     }
 
+    /** Odoo 20 renders the optional-columns toggle as an icon-only button; give it a name for screen readers. */
+    labelOptionalColumnsToggle() {
+        this.rootRef()
+            ?.querySelectorAll(".o_optional_columns_dropdown_toggle")
+            .forEach((icon) => {
+                const button = icon.closest("button");
+                if (button && !button.hasAttribute("aria-label")) {
+                    button.setAttribute("aria-label", _t("Choose the columns to show"));
+                }
+            });
+    }
+
     restoreRowFocus() {
         if (this.refocusRecord === null) {
             return;
@@ -424,7 +433,7 @@ export class AgileBacklogRenderer extends ListRenderer {
         }
         const refId = direction < 0 ? records[snapshot.index - 2]?.id ?? null : records[snapshot.index + 1].id;
         try {
-            await this.props.list.moveRecord(recordId, groupId, refId, groupId);
+            await this.props.list.moveRecords([recordId], refId, groupId);
         } catch (error) {
             await this.refuseMove(snapshot, error);
             return;
@@ -491,7 +500,7 @@ export class AgileBacklogRenderer extends ListRenderer {
         const records = targetGroup.list.records;
         const refId = target.top ? null : records.at(-1)?.id ?? null;
         try {
-            await list.moveRecord(snapshot.recordId, snapshot.groupId, refId, targetGroup.id);
+            await list.moveRecords([snapshot.recordId], refId, targetGroup.id);
         } catch (error) {
             await this.refuseMove(snapshot, error);
             return;

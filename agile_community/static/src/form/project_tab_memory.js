@@ -34,9 +34,10 @@ patch(Notebook.prototype, {
             return;
         }
         // Pages are numbered (page_4), which shifts when a project hides a tab; the page name is stable.
-        const nameOf = (id) => this.pages.find(([pageId]) => pageId === id)?.[1].name;
+        // Odoo 20: `pages` is a computed, read it by calling it.
+        const nameOf = (id) => this.pages().find(([pageId]) => pageId === id)?.[1].name;
         const saved = readProjectTab();
-        const match = this.pages.find(([, page]) => page.name === saved && page.isVisible);
+        const match = this.pages().find(([, page]) => page.name === saved && page.isVisible);
         if (saved && match) {
             this.state.currentPage = match[0];
         }

@@ -15,7 +15,7 @@
                         New <t t-out="this.label('theme').toLowerCase()"/></button>
                     <button t-if="this.state.data.can_rename" type="button" class="btn btn-link o_ag_plan_rename" t-on-click="this.openRename">Rename levels</button>
                     <button type="button" class="btn btn-secondary o_ag_plan_download_csv" t-on-click="this.downloadCsv">Download CSV</button>
-                    <button t-if="!this.ui.isSmall" type="button" class="btn btn-secondary o_ag_plan_print" t-on-click="this.printLayout">Print layout</button>
+                    <button t-if="!this.ui.isSmall()" type="button" class="btn btn-secondary o_ag_plan_print" t-on-click="this.printLayout">Print layout</button>
                     <span class="o_ag_plan_limit text-muted" t-out="this.state.data.item_count + ' of ' + this.state.data.limits.items + ' plan items'"/>
                 </div>
                 <div class="o_ag_plan_bar o_ag_plan_scenarios">

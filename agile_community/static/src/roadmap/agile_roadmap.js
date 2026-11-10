@@ -425,7 +425,7 @@ export class AgileRoadmap extends Component {
     }
 
     get isList() {
-        return this.state.asList || this.ui.isSmall || this.state.printing;
+        return this.state.asList || this.ui.isSmall() || this.state.printing;
     }
 
     get isEmpty() {

@@ -3,11 +3,16 @@ import { registry } from "@web/core/registry";
 // Both tours start from the Projects list and open "Tour Project", the project
 // the Python test (and docs/qa) create: a Scrum project with an active sprint,
 // one epic with a child and a few loose issues.
-// A project card opens the board; the project form (with the Backlog button) opens from the list.
+// A project card opens the Summary; the Board is its sidebar entry. The project form (with the Backlog button) opens from the list.
 const OPEN_BOARD = [
     {
-        content: "Open the Tour Project board",
+        content: "Open the Tour Project",
         trigger: '.o_kanban_record:contains("Tour Project")',
+        run: "click",
+    },
+    {
+        content: "Open the Board from the sidebar",
+        trigger: '.o_ag_side_item:has(.o_ag_side_label:contains("Board")):not(.o_ag_side_board)',
         run: "click",
     },
 ];
@@ -111,12 +116,8 @@ registry.category("web_tour.tours").add("agile_board_tour", {
     steps: () => [
         ...OPEN_BOARD,
         {
-            content: "The sprint pulse and the Complete sprint button sit above the columns",
-            trigger: ".o_ag_board_head .o_ag_pulse",
-        },
-        {
-            content: "Managers see Complete sprint",
-            trigger: ".o_ag_board_head .o_ag_complete_sprint",
+            content: "The board shows the active sprint's columns",
+            trigger: ".o_kanban_group .o_kanban_record",
         },
         {
             content: "Switch the Mine chip on",

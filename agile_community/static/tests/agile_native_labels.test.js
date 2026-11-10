@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { makeTestApp } from "@web/../tests/web_test_helpers";
 import { labelNativeControls } from "@agile_community/components/a11y/agile_native_labels";
 
 describe.current.tags("desktop");
@@ -11,7 +11,7 @@ function fixture(html) {
 }
 
 test("unnamed fold carets and the panel toggle get names; named ones are left alone", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const root = fixture(`
         <div class="o_search_panel">
             <div><button class="o_toggle_fold"></button><span class="o_search_panel_label_title"> Sprint </span></div>

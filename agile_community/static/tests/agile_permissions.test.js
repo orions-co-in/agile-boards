@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { click, queryAllTexts, waitFor } from "@odoo/hoot-dom";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
-import { defineModels, getService, makeMockEnv, models, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
+import { defineModels, getService, makeTestApp, models, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { switchQuestion } from "@agile_community/permissions/agile_permissions";
 
 describe.current.tags("desktop");
@@ -32,7 +32,7 @@ const data = (scheme) => ({
 });
 
 test("the switch question names the project, the scheme and that it applies now", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(String(switchQuestion("Demo Shop", SCHEMES[1]))).toBe(
         "Switch Demo Shop to Open? Contributors can also complete issues. This takes effect now for everyone."
     );

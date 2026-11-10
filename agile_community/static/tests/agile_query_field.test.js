@@ -5,7 +5,7 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import {
     defineModels,
     fields,
-    makeMockEnv,
+    makeTestApp,
     models,
     mountView,
     onRpc,
@@ -51,7 +51,7 @@ const OPTIONS = [
 const SUGGEST = { start: 0, end: 3, items: [{ label: "status", insert: "status", hint: "where it is" }] };
 
 test("accepting a suggestion replaces the typed fragment and moves on", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     const done = applySuggestion("sta", { start: 0, end: 3 }, { insert: "status" });
     expect(done).toEqual({ text: "status ", cursor: 7 });
     expect(applySuggestion("type = B", { start: 7, end: 8 }, { insert: "Bug" }).text).toBe("type = Bug ");
@@ -115,7 +115,7 @@ test("the bar shows suggestions, the count and the meaning, or the error", async
 });
 
 test("rows become query text and values are quoted when they need it", async () => {
-    await makeMockEnv();
+    await makeTestApp();
     expect(quoteValue("Bug")).toBe("Bug");
     expect(quoteValue("In Progress")).toBe('"In Progress"');
     expect(quoteValue("and")).toBe('"and"');
