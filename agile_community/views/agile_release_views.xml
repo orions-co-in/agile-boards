@@ -3,7 +3,7 @@
     <record id="project_version_form_agile" model="ir.ui.view">
         <field name="name">project.version.form.agile</field>
         <field name="model">project.version</field>
-        <field name="inherit_id" ref="project_version.project_version_form"/>
+        <field name="inherit_id" ref="agile_version.project_version_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/sheet" position="before">
                 <header invisible="not is_agile_release">
@@ -82,7 +82,7 @@
     <record id="project_version_tree_agile" model="ir.ui.view">
         <field name="name">project.version.list.agile</field>
         <field name="model">project.version</field>
-        <field name="inherit_id" ref="project_version.project_version_tree"/>
+        <field name="inherit_id" ref="agile_version.project_version_tree"/>
         <field name="arch" type="xml">
             <field name="project_id" position="after">
                 <field name="release_date" optional="show"/>
@@ -99,7 +99,7 @@
     <record id="project_version_form_project_navigation" model="ir.ui.view">
         <field name="name">project.form.releases.navigation</field>
         <field name="model">project.project</field>
-        <field name="inherit_id" ref="project_version.project_project_version_form"/>
+        <field name="inherit_id" ref="agile_version.project_project_version_form"/>
         <field name="arch" type="xml">
             <page name="version" position="attributes">
                 <attribute name="invisible">agile_enabled</attribute>
@@ -124,11 +124,11 @@
         </field>
     </record>
 
-    <record id="project_version.menu_action_project_version" model="ir.ui.menu">
+    <record id="agile_version.menu_action_project_version" model="ir.ui.menu">
         <field name="name">Releases and Versions</field>
         <field name="group_ids" eval="[(6, 0, [ref('project.group_project_user')])]"/>
     </record>
-    <record id="project_version.action_project_version" model="ir.actions.act_window">
+    <record id="agile_version.action_project_version" model="ir.actions.act_window">
         <field name="name">Releases and Versions</field>
     </record>
 </odoo>

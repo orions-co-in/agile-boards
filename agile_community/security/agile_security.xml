@@ -23,8 +23,8 @@
         <field name="implied_ids" eval="[(4, ref('group_agile_admin'))]"/>
     </record>
 
-        <!-- Odoo 20: the unrestricted release permission of project_version is replaced by the team-only rows in ir.access.csv. -->
-    <record id="project_version.project_version" model="ir.access">
+        <!-- Odoo 20: the unrestricted release permission of agile_version is replaced by the team-only rows in ir.access.csv. -->
+    <record id="agile_version.agile_version" model="ir.access">
         <field name="active" eval="False"/>
     </record>
 </odoo>

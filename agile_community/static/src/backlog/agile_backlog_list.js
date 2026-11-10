@@ -930,7 +930,7 @@ export class AgileBacklogRenderer extends ListRenderer {
     }
 
     completeSprint(sprint) {
-        return this.action.doAction("project_scrum.action_project_sprint_close", {
+        return this.action.doAction("agile_scrum.action_project_sprint_close", {
             additionalContext: { active_id: sprint.id },
             onClose: async () => {
                 this.infoKey = null;

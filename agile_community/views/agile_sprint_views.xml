@@ -3,7 +3,7 @@
     <record id="project_sprint_form_agile_roles" model="ir.ui.view">
         <field name="name">project.sprint.form.agile.roles</field>
         <field name="model">project.sprint</field>
-        <field name="inherit_id" ref="project_scrum.project_sprint_view_form"/>
+        <field name="inherit_id" ref="agile_scrum.project_sprint_view_form"/>
         <field name="arch" type="xml">
             <header position="inside">
                 <field name="can_manage_project_sprint" invisible="1"/>
@@ -12,7 +12,7 @@
                 <attribute name="groups">project.group_project_user</attribute>
                 <attribute name="invisible">state != 'draft' or not can_manage_project_sprint</attribute>
             </button>
-            <button name="%(project_scrum.action_project_sprint_close)d" position="attributes">
+            <button name="%(agile_scrum.action_project_sprint_close)d" position="attributes">
                 <attribute name="groups">project.group_project_user</attribute>
                 <attribute name="invisible">state != 'in_progress' or not can_manage_project_sprint</attribute>
             </button>
@@ -95,7 +95,7 @@
         </field>
     </record>
 
-    <record id="project_scrum.project_sprint_menu" model="ir.ui.menu">
+    <record id="agile_scrum.project_sprint_menu" model="ir.ui.menu">
         <field name="group_ids" eval="[(6, 0, [ref('project.group_project_user')])]"/>
     </record>
 </odoo>

@@ -112,7 +112,7 @@ class TestAgileBoard(TransactionCase):
 
     def test_sprint_form_hides_planning_notes_outside_planning(self):
         view = self.env["project.sprint"].get_view(
-            self.env.ref("project_scrum.project_sprint_view_form").id, "form"
+            self.env.ref("agile_scrum.project_sprint_view_form").id, "form"
         )
         arch = etree.fromstring(view["arch"])
         for field_name in ("over_capacity", "planning_stale"):

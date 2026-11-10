@@ -315,7 +315,7 @@
     <record id="project_sprint_form_metric_history" model="ir.ui.view">
         <field name="name">project.sprint.form.metric.history</field>
         <field name="model">project.sprint</field>
-        <field name="inherit_id" ref="project_scrum.project_sprint_view_form"/>
+        <field name="inherit_id" ref="agile_scrum.project_sprint_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_metric_history" type="object" class="oe_stat_button" icon="show_chart">

@@ -14,7 +14,7 @@
         "static/description/reports.png",
     ],
     "post_init_hook": "post_init_hook",
-    "depends": ["project", "mail_tracking", "project_scrum", "project_version", "web_timeline"],
+    "depends": ["project", "mail_tracking", "agile_scrum", "agile_version", "agile_timeline"],
     "assets": {
         "web.assets_backend": [
             "agile_community/static/src/scss/agile_accessibility.scss",

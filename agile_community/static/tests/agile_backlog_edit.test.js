@@ -356,7 +356,7 @@ test("the active sprint row has Complete sprint, for managers only", async () =>
     });
     expect(".o_ag_complete_sprint").toHaveCount(1);
     await contains(".o_ag_complete_sprint").click();
-    expect(opened.action).toBe("project_scrum.action_project_sprint_close");
+    expect(opened.action).toBe("agile_scrum.action_project_sprint_close");
     expect(opened.options.additionalContext).toEqual({ active_id: 1 });
 });
 
