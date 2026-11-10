@@ -325,10 +325,12 @@ export class AgileBacklogRenderer extends ListRenderer {
         }
     }
 
-    async sortDrop(dataRowId, dataGroupId, params) {
+    // Odoo 20 calls sortDrop(dataRowId, params): the group of the dragged row comes from the row itself.
+    async sortDrop(dataRowId, params) {
+        const dataGroupId = params.element?.dataset.groupId;
         const snapshot = dataGroupId ? this.snapshotRecord(dataRowId, dataGroupId) : null;
         if (!snapshot) {
-            return super.sortDrop(dataRowId, dataGroupId, params);
+            return super.sortDrop(dataRowId, params);
         }
         const targetGroupId = params.previous?.dataset.groupId || dataGroupId;
         const targetGroup = this.groupById(targetGroupId);
@@ -340,7 +342,7 @@ export class AgileBacklogRenderer extends ListRenderer {
             return;
         }
         try {
-            await super.sortDrop(dataRowId, dataGroupId, params);
+            await super.sortDrop(dataRowId, params);
         } catch (error) {
             await this.refuseMove(snapshot, error);
             return;

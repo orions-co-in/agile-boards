@@ -5,7 +5,6 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { MainComponentsContainer } from "@web/core/main_components_container";
 import {
     contains,
-    sortableDrag,
     defineModels,
     fields,
     models,
@@ -104,13 +103,6 @@ const keys = () => queryAllTexts(".o_data_row td[name=issue_key]").filter((key) 
 const toast = () => queryAllTexts(".o_notification_content");
 const row = (key) => `.o_data_row:contains(${key})`;
 
-/** Drags a row's handle to another row the way the sortable list reads it: from the top edge of the dragged row. */
-async function dragRow(key, target, how) {
-    const drag = await sortableDrag(`${row(key)} .o_handle_cell`);
-    await drag[how](target);
-    await drag.drop();
-}
-
 async function focusCell(key) {
     queryOne(`${row(key)} td[name=issue_key]`).focus();
     await animationFrame();
@@ -123,7 +115,7 @@ test("dragging a row inside its sprint ranks it, says where it landed and Undo p
     });
     await mountBacklog();
     expect(keys()).toEqual(["WALK-1", "WALK-2", "WALK-3", "WALK-4"]);
-    await dragRow("WALK-1", row("WALK-2"), "moveUnder");
+    await contains(`${row("WALK-1")} .o_handle_cell`).dragAndDrop(row("WALK-2"));
     await animationFrame();
     expect(keys()).toEqual(["WALK-2", "WALK-1", "WALK-3", "WALK-4"]);
     expect(resequenced.length).toBe(1);
@@ -141,14 +133,14 @@ test("dragging into a confirmed planned sprint says the plan changed, and into t
         saves.push(args);
     });
     await mountBacklog();
-    await dragRow("WALK-4", row("WALK-2"), "moveAbove");
+    await contains(`${row("WALK-4")} .o_handle_cell`).dragAndDrop(row("WALK-2"));
     await animationFrame();
     expect(toast().at(-1)).toBe(
         "WALK-4 added to Planned. The confirmed plan changed: update it before starting."
     );
     expect(saves.length).toBe(1);
     expect(saves[0][1]).toEqual({ sprint_id: 1 });
-    await dragRow("WALK-4", row("WALK-3"), "moveAbove");
+    await contains(`${row("WALK-4")} .o_handle_cell`).dragAndDrop(row("WALK-3"));
     await animationFrame();
     expect(toast().at(-1)).toBe(
         "WALK-4 added to Active. It counts as a scope change on the Pulse. The confirmed plan of Planned changed: update it before starting."
@@ -161,7 +153,7 @@ test("moving out of a sprint to the Backlog is worded and Undo restores the old 
         saves.push(args[1]);
     });
     await mountBacklog();
-    await dragRow("WALK-3", row("WALK-4"), "moveUnder");
+    await contains(`${row("WALK-3")} .o_handle_cell`).dragAndDrop(row("WALK-4"));
     await animationFrame();
     expect(toast().at(-1)).toBe(
         "WALK-3 moved to Backlog. It counts as a scope change on the Pulse."
@@ -177,7 +169,7 @@ test("a refused move snaps back and shows the server's reason", async () => {
         throw new Error("Only this project's Agile Manager can change sprint membership.");
     });
     await mountBacklog();
-    await dragRow("WALK-4", row("WALK-2"), "moveAbove");
+    await contains(`${row("WALK-4")} .o_handle_cell`).dragAndDrop(row("WALK-2"));
     await animationFrame();
     expect(toast().at(-1)).toBe(
         "Could not move WALK-4: Only this project's Agile Manager can change sprint membership."
@@ -196,10 +188,10 @@ test("completed sprints have no handle and refuse a drop", async () => {
     expect(`${row("WALK-5")}`).not.toHaveClass("o_row_draggable");
     expect(`${row("WALK-1")}`).toHaveClass("o_row_draggable");
     // Dropping on a completed sprint's row is ignored by the list; dropping on its header is refused.
-    await dragRow("WALK-4", row("WALK-5"), "moveUnder");
+    await contains(`${row("WALK-4")} .o_handle_cell`).dragAndDrop(row("WALK-5"));
     await animationFrame();
     expect(saves.length).toBe(0);
-    await dragRow("WALK-4", ".o_group_header:contains(Closed)", "moveTo");
+    await contains(`${row("WALK-4")} .o_handle_cell`).dragAndDrop(".o_group_header:contains(Closed)");
     await animationFrame();
     expect(toast().at(-1)).toBe(
         "Completed sprints cannot take issues here. Use the sprint's Correct action."
