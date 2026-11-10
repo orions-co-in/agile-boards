@@ -6,6 +6,7 @@
     "author": "Orions",
     "license": "AGPL-3",
     "images": [
+        "static/description/cover.png",
         "static/description/board_screenshot.png",
         "static/description/backlog.png",
         "static/description/summary.png",
