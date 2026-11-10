@@ -258,7 +258,7 @@
     <record id="project_task_kanban_agile" model="ir.ui.view">
         <field name="name">project.task.kanban.agile</field>
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="project_scrum.view_task_kanban"/>
+        <field name="inherit_id" ref="agile_scrum.view_task_kanban"/>
         <field name="arch" type="xml">
             <field name="name" position="before">
                 <field name="agile_project_enabled" invisible="1"/>

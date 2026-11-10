@@ -179,7 +179,7 @@
     <record id="agile_project_hide_standalone_scrum_switch" model="ir.ui.view">
         <field name="name">project.project.form.agile.hide.scrum.switch</field>
         <field name="model">project.project</field>
-        <field name="inherit_id" ref="project_scrum.project_project_view_form_inherit_scrum_setting"/>
+        <field name="inherit_id" ref="agile_scrum.project_project_view_form_inherit_scrum_setting"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='use_scrum']" position="attributes">
                 <attribute name="invisible">agile_enabled</attribute>
@@ -193,7 +193,7 @@
     <record id="agile_project_scrum_navigation_roles" model="ir.ui.view">
         <field name="name">project.project.form.scrum.navigation.roles</field>
         <field name="model">project.project</field>
-        <field name="inherit_id" ref="project_scrum.project_project_view_form_inherit"/>
+        <field name="inherit_id" ref="agile_scrum.project_project_view_form_inherit"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_sprints']" position="attributes">
                 <attribute name="groups">project.group_project_user</attribute>

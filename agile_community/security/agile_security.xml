@@ -152,7 +152,7 @@
     </record>
     <record id="agile_sprint_project_member_rule" model="ir.rule">
         <field name="name">Agile sprints: Project-visible team (global, narrows native sprint rule)</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint"/>
         <field name="domain_force">[
             '|',
                 ('project_id.agile_enabled', '=', False),
@@ -166,7 +166,7 @@
     </record>
     <record id="agile_sprint_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprints: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint"/>
         <field name="domain_force">[
             ('project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -175,7 +175,7 @@
     </record>
     <record id="agile_sprint_scope_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint scope history: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_scope_change"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_scope_change"/>
         <field name="domain_force">[
             '|',
                 ('sprint_id.project_id.agile_enabled', '=', False),
@@ -189,7 +189,7 @@
     </record>
     <record id="agile_sprint_scope_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint scope history: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_scope_change"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_scope_change"/>
         <field name="domain_force">[
             ('sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -198,7 +198,7 @@
     </record>
     <record id="agile_sprint_commitment_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint plans: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment"/>
         <field name="domain_force">[
             '|',
                 ('sprint_id.project_id.agile_enabled', '=', False),
@@ -212,7 +212,7 @@
     </record>
     <record id="agile_sprint_commitment_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint plans: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment"/>
         <field name="domain_force">[
             ('sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -221,7 +221,7 @@
     </record>
     <record id="agile_sprint_commitment_line_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint plan issues: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment_line"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment_line"/>
         <field name="domain_force">[
             '|',
                 ('commitment_id.sprint_id.project_id.agile_enabled', '=', False),
@@ -235,7 +235,7 @@
     </record>
     <record id="agile_sprint_commitment_line_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint plan issues: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment_line"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment_line"/>
         <field name="domain_force">[
             ('commitment_id.sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('commitment_id.sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -244,7 +244,7 @@
     </record>
     <record id="agile_sprint_commitment_capacity_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint capacity snapshots: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment_capacity"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment_capacity"/>
         <field name="domain_force">[
             '|',
                 ('commitment_id.sprint_id.project_id.agile_enabled', '=', False),
@@ -258,7 +258,7 @@
     </record>
     <record id="agile_sprint_commitment_capacity_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint capacity snapshots: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_commitment_capacity"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_commitment_capacity"/>
         <field name="domain_force">[
             ('commitment_id.sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('commitment_id.sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -267,7 +267,7 @@
     </record>
     <record id="agile_sprint_correction_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint corrections: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_correction"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_correction"/>
         <field name="domain_force">[
             '|',
                 ('sprint_id.project_id.agile_enabled', '=', False),
@@ -281,7 +281,7 @@
     </record>
     <record id="agile_sprint_correction_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint corrections: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_correction"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_correction"/>
         <field name="domain_force">[
             ('sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])
@@ -290,7 +290,7 @@
     </record>
     <record id="agile_sprint_capacity_project_member_rule" model="ir.rule">
         <field name="name">Agile sprint capacity: Project-visible team</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_capacity"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_capacity"/>
         <field name="domain_force">[
             '|',
                 ('sprint_id.project_id.agile_enabled', '=', False),
@@ -304,7 +304,7 @@
     </record>
     <record id="agile_sprint_capacity_project_manager_visibility_rule" model="ir.rule">
         <field name="name">Agile sprint capacity: native Project Manager visibility</field>
-        <field name="model_id" ref="project_scrum.model_project_sprint_capacity"/>
+        <field name="model_id" ref="agile_scrum.model_project_sprint_capacity"/>
         <field name="domain_force">[
             ('sprint_id.project_id.agile_enabled', '=', True),
             (1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('sprint_id.project_id.agile_member_ids', 'any', [('user_id', '=', user.id)])

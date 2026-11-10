@@ -3,7 +3,7 @@
     <data noupdate="0">
         <record id="agile_project_version_company_rule" model="ir.rule">
             <field name="name">Project versions: allowed companies</field>
-            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="model_id" ref="agile_version.model_project_version"/>
             <field name="domain_force">[('project_id.company_id', 'in', company_ids + [False])]</field>
         </record>
         <record id="agile_release_audit_company_rule" model="ir.rule">
@@ -13,7 +13,7 @@
         </record>
         <record id="agile_project_version_visibility_rule" model="ir.rule">
             <field name="name">Agile releases: team-only for Agile projects</field>
-            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="model_id" ref="agile_version.model_project_version"/>
             <field name="domain_force">[
                 '|',
                     ('project_id.agile_enabled', '=', False),
@@ -27,7 +27,7 @@
         </record>
         <record id="agile_project_version_manager_rule" model="ir.rule">
             <field name="name">Agile releases: Project Managers see all</field>
-            <field name="model_id" ref="project_version.model_project_version"/>
+            <field name="model_id" ref="agile_version.model_project_version"/>
             <field name="domain_force">[(1, '=', 1) if user.has_group('agile_community.group_agile_admin') or user.has_group('base.group_system') else ('project_id.agile_member_ids', 'any', [('user_id', '=', user.id), ('role', '=', 'manager')])]</field>
             <field name="groups" eval="[(4, ref('project.group_project_manager'))]"/>
         </record>

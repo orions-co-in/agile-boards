@@ -22,7 +22,7 @@ Everything respects Odoo's own Project access: nobody sees an Agile project they
 ## Requirements
 
 - Odoo 19.0 Community (or Enterprise) with the **Project** app (`project`). The `hr_timesheet` app is only needed for the optional bridge `agile_community_timesheet`.
-- The other modules in this repository: `project_scrum`, `project_version`, `web_timeline` (installed automatically as dependencies).
+- The other modules in this repository: `agile_scrum`, `agile_version`, `agile_timeline` (installed automatically as dependencies).
 
 ## Install
 

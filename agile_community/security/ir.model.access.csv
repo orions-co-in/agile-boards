@@ -16,12 +16,12 @@ access_agile_issue_metric_event_user,agile.issue.metric.event.user,model_agile_i
 access_agile_project_member_manager,agile.project.member.manager,model_agile_project_member,project.group_project_manager,1,1,1,1
 access_agile_project_member_project_user,agile.project.member.project.user,model_agile_project_member,project.group_project_user,1,1,1,1
 access_agile_project_wip_limit_user,agile.project.wip.limit.project.user,model_agile_project_wip_limit,project.group_project_user,1,1,1,1
-access_agile_sprint_project_user,agile.sprint.project.user,project_scrum.model_project_sprint,project.group_project_user,1,1,1,1
+access_agile_sprint_project_user,agile.sprint.project.user,agile_scrum.model_project_sprint,project.group_project_user,1,1,1,1
 access_agile_sprint_reopen_project_user,agile.sprint.reopen.project.user,model_agile_sprint_reopen,project.group_project_user,1,1,1,1
-access_agile_sprint_close_project_user,agile.sprint.close.project.user,project_scrum.model_project_sprint_close,project.group_project_user,1,1,1,1
-access_agile_sprint_scope_wizard_project_user,agile.sprint.scope.wizard.project.user,project_scrum.model_project_sprint_scope_change_wizard,project.group_project_user,1,1,1,1
-access_agile_sprint_capacity_project_user,agile.sprint.capacity.project.user,project_scrum.model_project_sprint_capacity,project.group_project_user,1,1,1,1
-access_agile_sprint_correction_wizard_project_user,agile.sprint.correction.wizard.project.user,project_scrum.model_project_sprint_correction_wizard,project.group_project_user,1,1,1,1
+access_agile_sprint_close_project_user,agile.sprint.close.project.user,agile_scrum.model_project_sprint_close,project.group_project_user,1,1,1,1
+access_agile_sprint_scope_wizard_project_user,agile.sprint.scope.wizard.project.user,agile_scrum.model_project_sprint_scope_change_wizard,project.group_project_user,1,1,1,1
+access_agile_sprint_capacity_project_user,agile.sprint.capacity.project.user,agile_scrum.model_project_sprint_capacity,project.group_project_user,1,1,1,1
+access_agile_sprint_correction_wizard_project_user,agile.sprint.correction.wizard.project.user,agile_scrum.model_project_sprint_correction_wizard,project.group_project_user,1,1,1,1
 access_agile_issue_migration_wizard_user,agile.issue.migration.wizard.user,model_agile_community_issue_migration_wizard,project.group_project_user,1,1,1,1
 access_agile_issue_migration_stage_user,agile.issue.migration.stage.user,model_agile_community_issue_migration_stage,project.group_project_user,1,1,1,1
 access_agile_project_component_user,agile.project.component.user,model_agile_project_component,project.group_project_user,1,1,1,1
