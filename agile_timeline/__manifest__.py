@@ -3,8 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
-    "name": "Web timeline",
-    "summary": "Interactive visualization chart to show events in time",
+    "name": "Agile Timeline",
+    "summary": "Timeline view for Agile Boards roadmaps in Odoo Project",
     "version": "19.0.1.0.0",
     "development_status": "Production/Stable",
     "author": "ACSONE SA/NV, "
