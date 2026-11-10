@@ -51,3 +51,4 @@ access_agile_workflow_template_wizard_user,agile.workflow.template.wizard.user,m
 access_agile_roadmap_share_user,agile.roadmap.share.user,model_agile_roadmap_share,project.group_project_user,1,0,0,0
 access_agile_roadmap_share_admin,agile.roadmap.share.admin,model_agile_roadmap_share,base.group_system,1,0,0,0
 access_agile_log_time_user,agile.log.time.user,model_agile_log_time,project.group_project_user,1,1,1,1
+access_agile_log_work_user,agile.log.work.user,model_agile_log_work,project.group_project_user,1,1,1,1

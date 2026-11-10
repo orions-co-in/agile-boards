@@ -154,6 +154,9 @@
                             <field name="agile_log_time_available" invisible="1"/>
                             <button name="action_agile_log_time" type="object" string="Log work" class="btn-secondary"
                                     invisible="not agile_log_time_available"/>
+                            <field name="agile_log_work_available" invisible="1"/>
+                            <button name="action_agile_log_work" type="object" string="Log work" class="btn-secondary"
+                                    invisible="not agile_log_work_available"/>
                             <field name="agile_time_progress" widget="percentage" invisible="not allocated_hours"/>
                         </group>
                     </group>
@@ -344,6 +347,9 @@
             </xpath>
             <xpath expr="//t[@t-name='card']//footer/div[last()]/field[@name='state']" position="before">
                 <div class="o_agile_task_actions" role="group" aria-label="Issue actions">
+                    <field name="agile_log_work_available" invisible="1"/>
+                    <button name="action_agile_log_work" type="object" title="Log work on this issue" string="Log work"
+                            class="btn btn-sm btn-secondary" invisible="not agile_log_work_available"/>
                     <field name="agile_step_reasons" widget="agile_step_reasons"/>
                     <button name="action_agile_mark_ready" type="object" title="Move issue to To Do" string="To Do" class="btn btn-sm btn-primary" invisible="not can_agile_mark_ready"/>
                     <button name="action_agile_start" type="object" title="Start work on this issue" string="Start" class="btn btn-sm btn-primary" invisible="not can_agile_start"/>
@@ -458,6 +464,9 @@
                             <field name="agile_log_time_available" invisible="1"/>
                             <button name="action_agile_log_time" type="object" string="Log work" class="btn-secondary"
                                     invisible="not agile_log_time_available"/>
+                            <field name="agile_log_work_available" invisible="1"/>
+                            <button name="action_agile_log_work" type="object" string="Log work" class="btn-secondary"
+                                    invisible="not agile_log_work_available"/>
                             <field name="agile_time_progress" widget="percentage" invisible="not allocated_hours"/>
                         </group>
                     </group>
