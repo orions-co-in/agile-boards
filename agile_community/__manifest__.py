@@ -95,6 +95,7 @@
         "wizard/agile_sprint_start_views.xml",
         "wizard/agile_release_confirm_views.xml",
         "wizard/agile_log_time_views.xml",
+        "views/agile_log_work_views.xml",
         'security/ir.access.csv',
     ],
     "installable": True,

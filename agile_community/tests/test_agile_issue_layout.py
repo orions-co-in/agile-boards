@@ -46,6 +46,8 @@ class TestAgileLogWorkAndAssign(TransactionCase):
         self.assertFalse(task.agile_can_assign_me)
 
     def test_log_work_adds_to_the_total(self):
+        if "effective_hours" in self.env["project.task"]._fields:
+            self.skipTest("With Timesheets installed, work is logged as timesheet lines")
         task = self.task.with_user(self.manager)
         self.assertTrue(task.agile_log_time_available)
         wizard = self.env["agile.log.time"].with_user(self.manager).with_context(default_task_id=task.id).create({
@@ -60,6 +62,8 @@ class TestAgileLogWorkAndAssign(TransactionCase):
         self.assertIn("Pairing", " ".join(task.message_ids.mapped("body")))
 
     def test_log_work_needs_a_positive_time(self):
+        if "effective_hours" in self.env["project.task"]._fields:
+            self.skipTest("With Timesheets installed, work is logged as timesheet lines")
         from odoo.exceptions import UserError
         task = self.task.with_user(self.manager)
         wizard = self.env["agile.log.time"].with_user(self.manager).with_context(default_task_id=task.id).create({

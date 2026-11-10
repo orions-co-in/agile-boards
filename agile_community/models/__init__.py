@@ -45,3 +45,4 @@ from . import agile_document
 from . import agile_history
 from . import ir_http
 from . import res_users
+from . import agile_timesheet

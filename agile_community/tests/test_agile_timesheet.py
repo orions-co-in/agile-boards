@@ -1,11 +1,19 @@
+from unittest import SkipTest
+
 from odoo.exceptions import AccessError, UserError
+from odoo.tests import tagged
 from odoo.tests.common import TransactionCase, new_test_user
 
 
+@tagged("post_install", "-at_install")
 class TestAgileTimesheet(TransactionCase):
+    """Only runs when the Timesheets app is installed next to Agile Boards."""
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        if "effective_hours" not in cls.env["project.task"]._fields:
+            raise SkipTest("hr_timesheet is not installed")
         cls.user = new_test_user(
             cls.env, login="ts_user", groups="project.group_project_manager,hr_timesheet.group_hr_timesheet_user")
         cls.employee = cls.env["hr.employee"].create({"name": "TS employee", "user_id": cls.user.id})

@@ -9,3 +9,4 @@ from . import workflow_template
 from . import sprint_start
 from . import release_confirm
 from . import log_time
+from . import log_work
