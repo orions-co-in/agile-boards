@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 {
-    "name": "Project Scrum",
+    "name": "Agile Scrum",
     "version": "20.0.1.6.0",
     "category": "Project",
     "website": "https://github.com/OCA/project-agile",
@@ -11,7 +11,7 @@
     "license": "AGPL-3",
     "installable": True,
     "application": False,
-    "summary": "This addon allow use the scrum methodology in projects",
+    "summary": "Sprints for Agile Boards: plan, start and complete sprints in Odoo Project",
     "depends": ["project"],
     "data": [
         "wizard/project_sprint_wizard_views.xml",
