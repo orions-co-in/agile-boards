@@ -59,4 +59,4 @@ Open an issue at <https://github.com/orions-co-in/agile-boards/issues> or write 
 
 ## License
 
-AGPL-3. See `LICENSE` in each module. Copyright Orions.
+AGPL-3. See `LICENSE` in `agile_community` and `agile_pro`. Copyright Orions. The bundled add-ons `agile_scrum`, `agile_version` and `agile_timeline` are based on Odoo Community Association (OCA) modules and keep their AGPL-3 license and original author credits; see `THIRD_PARTY_NOTICES.md`.
