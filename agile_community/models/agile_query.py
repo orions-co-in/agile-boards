@@ -500,7 +500,7 @@ class AgileQuery:
         project = self.project.sudo()
         if "agile_custom_field_ids" not in project._fields:
             raise QueryError(
-                _("Custom fields in searches come with Agile Boards Connect."), cond.start, cond.end,
+                _("Custom fields in searches come with Agile Boards Pro."), cond.start, cond.end,
             )
         fields_ = project.agile_custom_field_ids
         found = fields_.filtered(lambda f: f.name.lower() == name.lower())
